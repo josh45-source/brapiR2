@@ -1,0 +1,295 @@
+---
+title: "Multi-Environment Trial (MET) Analysis with brapiR2"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Multi-Environment Trial (MET) Analysis with brapiR2}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+## Overview
+
+Multi-environment trial (MET) analysis is the core workflow of a plant breeding
+program: gather phenotypic observations from many locations and years, then
+decompose genotype × environment (GxE) interaction to identify stable,
+high-performing varieties.
+
+This vignette shows how to:
+
+1. Pull phenotypic data from multiple BrAPI studies in parallel
+2. Attach environment metadata (location, season)
+3. Run AMMI / GGE biplots with the **metan** package
+4. Run mixed-model stability analysis with **lme4**
+
+## Step 1: Connect and Discover Studies
+
+```{r setup}
+library(brapiR2)
+library(dplyr)
+
+con <- brapi_connection("https://my-breedbase.org")
+con <- brapi_login(con, "username", "password")
+
+# Cache responses to speed up re-runs and protect server bandwidth
+con <- brapi_cache_enable(con, ttl = 7200)
+#> v Caching enabled at ~/.cache/brapiR2 (TTL: 7200s)
+```
+
+```{r discover}
+# Discover all studies in the target trial
+trials <- brapi_trials(con, programDbId = "wheat_program_01")
+trials
+#> # A tibble: 4 x 12
+#>   trialDbId   trialName           programDbId active
+#>   <chr>       <chr>               <chr>       <lgl>
+#> 1 trial_2022  National Yield 2022 wheat_prog  TRUE
+#> 2 trial_2021  National Yield 2021 wheat_prog  FALSE
+#> 3 trial_2020  National Yield 2020 wheat_prog  FALSE
+#> 4 trial_drght Drought Nursery     wheat_prog  TRUE
+
+# Focus on the current MET
+studies <- brapi_studies(con, trialDbId = "trial_2022")
+studies
+#> # A tibble: 8 x 15
+#>   studyDbId  studyName          locationDbId locationName  seasonDbId
+#>   <chr>      <chr>              <chr>        <chr>         <chr>
+#> 1 study_e1   Ithaca NY 2022     loc_ithaca   Ithaca        season_2022
+#> 2 study_e2   Geneva NY 2022     loc_geneva   Geneva        season_2022
+#> 3 study_e3   Riverhead NY 2022  loc_river    Riverhead     season_2022
+#> 4 study_e4   State College 2022 loc_psu      State College season_2022
+#> 5 study_e5   Wooster OH 2022    loc_wooster  Wooster       season_2022
+#> 6 study_e6   Lexington KY 2022  loc_lexing   Lexington     season_2022
+#> 7 study_e7   Raleigh NC 2022    loc_raleigh  Raleigh       season_2022
+#> 8 study_e8   Gainesville FL 22  loc_gnsvlle  Gainesville   season_2022
+
+study_ids <- studies$studyDbId
+```
+
+## Step 2: Fetch All Study Data in Parallel
+
+`brapi_fetch_parallel()` uses the **furrr** package to run one worker per study
+concurrently. With 8 environments and 4 workers, the fetch completes in roughly
+the time of 2 sequential requests.
+
+```{r parallel-fetch}
+library(future) # plan() sets the parallel backend
+
+# Adjust .workers to match your CPU count or server rate limits
+met_raw <- brapi_fetch_parallel(
+  con, brapi_study_data, study_ids,
+  .workers = 4L
+)
+#> i Fetching 8 items across 4 workers...
+#> v Fetched 2400 rows from 8 sources.
+
+glimpse(met_raw)
+#> Rows: 2,400
+#> Columns: 10
+#> $ observationUnitDbId  <chr> "ou_e1_001", "ou_e1_002", ...
+#> $ observationUnitName  <chr> "Plot 101", "Plot 102", ...
+#> $ germplasmDbId        <chr> "g001", "g002", ...
+#> $ germplasmName        <chr> "Variety_001", "Variety_002", ...
+#> $ studyDbId            <chr> "study_e1", "study_e1", ...
+#> $ studyName            <chr> "Ithaca NY 2022", ...
+#> $ Grain_Yield_t_ha     <chr> "5.12", "4.89", ...
+#> $ Days_to_Heading      <chr> "65", "68", ...
+#> $ Plant_Height_cm      <chr> "92", "88", ...
+#> $ Thousand_Grain_Wt    <chr> "38.4", "41.2", ...
+```
+
+## Step 3: Attach Environment Metadata
+
+The study data already carries `studyDbId` and `studyName`. Join with location
+and season data from the `studies` tibble for richer environment labels.
+
+```{r env-metadata}
+# Bring in location and season columns from the studies tibble
+env_meta <- studies |>
+  select(studyDbId, studyName, locationName, seasonDbId)
+
+met <- met_raw |>
+  left_join(env_meta, by = "studyDbId") |>
+  mutate(
+    Grain_Yield_t_ha = as.numeric(Grain_Yield_t_ha),
+    Days_to_Heading = as.numeric(Days_to_Heading),
+    Plant_Height_cm = as.numeric(Plant_Height_cm),
+    Thousand_Grain_Wt = as.numeric(Thousand_Grain_Wt),
+    env = locationName # short environment label
+  ) |>
+  filter(!is.na(Grain_Yield_t_ha))
+
+nrow(met)
+#> [1] 2311   # some missing values removed
+
+# Confirm we have data from all 8 environments
+table(met$env)
+#>   Gainesville       Geneva  Ithaca  Lexington  Raleigh  Riverhead
+#>           285          289     291         278      283        286
+#>  State College  Wooster
+#>            304      295
+```
+
+## Step 4: Means Matrix for GxE Analysis
+
+Many GxE methods (AMMI, GGE biplot) require a two-way table of genotype means
+per environment.
+
+```{r means-matrix}
+library(tidyr)
+
+# Compute adjusted means (plot-level mean per genotype × environment)
+means <- met |>
+  group_by(germplasmName, env) |>
+  summarise(yield = mean(Grain_Yield_t_ha, na.rm = TRUE), .groups = "drop")
+
+# Wide format: rows = genotypes, columns = environments
+means_wide <- means |>
+  pivot_wider(names_from = env, values_from = yield)
+
+means_wide
+#> # A tibble: 300 x 9
+#>   germplasmName  Gainesville Geneva Ithaca Lexington Raleigh Riverhead ...
+#>   <chr>                <dbl>  <dbl>  <dbl>     <dbl>   <dbl>     <dbl>
+#> 1 Variety_001           5.23   4.98   5.12      5.41    4.87      5.03
+#> 2 Variety_002           4.89   5.34   4.91      4.72    5.12      5.28
+#> # ...
+```
+
+## Step 5: AMMI and GGE Biplot with metan
+
+```{r metan-ammi}
+library(metan)
+
+# AMMI model: decompose GxE with additive main effects + multiplicative interaction
+ammi_model <- performs_ammi(
+  .data = met,
+  env = env,
+  gen = germplasmName,
+  rep = observationUnitDbId, # plot as replicate; adjust if you have block IDs
+  resp = Grain_Yield_t_ha,
+  verbose = FALSE
+)
+
+# AMMI stability value (ASV) — lower = more stable across environments
+ammi_stable <- ammi_indexes(ammi_model)
+ammi_stable$Grain_Yield_t_ha |>
+  arrange(ASV) |>
+  head(10)
+#> # A tibble: 10 x 6
+#>   GEN          Y     IPCA1   IPCA2    ASV  WAAS
+#>   <chr>    <dbl>     <dbl>   <dbl>  <dbl> <dbl>
+#> 1 Var_089  5.34    0.00312  0.0041  0.012  0.51
+#> 2 Var_214  5.21    0.00891  0.0023  0.035  0.48
+#> # ...
+
+# AMMI1 biplot: IPCA1 scores vs mean yield
+plot(ammi_model, type = "AMMI1")
+```
+
+```{r metan-gge}
+# GGE biplot
+gge_model <- gge(
+  .data = met,
+  env   = env,
+  gen   = germplasmName,
+  rep   = observationUnitDbId,
+  resp  = Grain_Yield_t_ha
+)
+
+plot(gge_model, type = "which_won_where")
+#> (biplot showing mega-environments and winning genotypes per environment)
+```
+
+## Step 6: Mixed Model Stability with lme4
+
+For unbalanced data or when you need BLUPs rather than means, fit a mixed model
+with genotype × environment interaction as a random effect.
+
+```{r lme4}
+library(lme4)
+
+# Basic mixed model: GxE interaction as random
+fm <- lmer(
+  Grain_Yield_t_ha ~ env + (1 | germplasmName) + (1 | germplasmName:env),
+  data = met
+)
+summary(fm)
+#> Random effects:
+#>  Groups               Name        Variance Std.Dev.
+#>  germplasmName:env    (Intercept) 0.0812   0.285
+#>  germplasmName        (Intercept) 0.1947   0.441
+#>  Residual                         0.0534   0.231
+
+# Extract BLUPs for genotypic effects
+blups <- ranef(fm)$germplasmName
+blups <- tibble(
+  germplasmName = rownames(blups),
+  BLUP          = blups[["(Intercept)"]]
+) |>
+  arrange(desc(BLUP))
+
+head(blups, 10)
+#> # A tibble: 10 x 2
+#>   germplasmName   BLUP
+#>   <chr>          <dbl>
+#> 1 Variety_089    0.412
+#> 2 Variety_214    0.389
+#> 3 Variety_031    0.371
+#> # ...
+
+# Variance component partitioning
+VarCorr(fm)
+#>  Groups            Name        Std.Dev.
+#>  germplasmName:env (Intercept)  0.285    # GxE component
+#>  germplasmName     (Intercept)  0.441    # G (genetic signal)
+#>  Residual                       0.231
+
+# H^2 broad-sense heritability (across-environment)
+var_g <- as.numeric(VarCorr(fm)$germplasmName)
+var_ge <- as.numeric(VarCorr(fm)$`germplasmName:env`)
+var_e <- sigma(fm)^2
+n_env <- length(unique(met$env))
+n_rep <- 1 # one plot per genotype per env (adjust if replicated)
+
+H2 <- var_g / (var_g + var_ge / n_env + var_e / (n_env * n_rep))
+cat(sprintf("Broad-sense H^2 (across environments): %.3f\n", H2))
+#> Broad-sense H^2 (across environments): 0.731
+```
+
+## Step 7: Final Selection List
+
+```{r selection}
+# Combine BLUP ranking with stability
+selection <- blups |>
+  left_join(
+    ammi_stable$Grain_Yield_t_ha |>
+      select(GEN, mean_yield = Y, ASV) |>
+      rename(germplasmName = GEN),
+    by = "germplasmName"
+  ) |>
+  mutate(
+    # Normalise both metrics (0 = worst, 1 = best)
+    rank_yield = rank(BLUP) / n(),
+    rank_stab  = 1 - rank(ASV) / n(), # lower ASV = more stable = better
+    score      = 0.6 * rank_yield + 0.4 * rank_stab
+  ) |>
+  arrange(desc(score))
+
+# Top 20 selections: high yield + high stability
+top20 <- head(selection, 20)
+top20
+#> # A tibble: 20 x 6
+#>   germplasmName    BLUP mean_yield   ASV rank_yield rank_stab score
+#>   <chr>           <dbl>      <dbl> <dbl>      <dbl>     <dbl> <dbl>
+#> 1 Variety_089     0.412       5.34 0.012      0.998     0.997 0.998
+#> 2 Variety_214     0.389       5.21 0.035      0.991     0.989 0.991
+#> # ...
+```

@@ -1,0 +1,51 @@
+Package: brapiR2
+Title: A Tidyverse-Native Client for the BrAPI v2 (Breeding API) Specification
+Version: 0.1.0
+Authors@R: 
+    person("Joash Joshua", "Ayo", , "joashjoshua789@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0007-1642-0172"))
+Description: Provides pipe-friendly, stateless access to every endpoint in the 
+    Breeding API (BrAPI) v2.1 specification. Covers all four BrAPI modules — 
+    Core, Germplasm, Phenotyping, and Genotyping — returning tidy tibbles ready 
+    for analysis. Features include automatic pagination, async search handling, 
+    response caching, parallel batch fetching, and convenience functions for 
+    genomic selection workflows (e.g. dosage matrix extraction). Designed for 
+    plant breeders and bioinformaticians who need programmatic access to 
+    BreedBase, BMS, EBS, GIGWA, Germinate, and any BrAPI-compliant server.
+License: MIT + file LICENSE
+URL: https://josh45-source.github.io/brapiR2, https://github.com/josh45-source/brapiR2
+BugReports: https://github.com/josh45-source/brapiR2/issues
+Encoding: UTF-8
+Language: en-US
+Roxygen: list(markdown = TRUE)
+Depends:
+    R (>= 4.1.0)
+RoxygenNote: 7.3.3
+Imports:
+    cli (>= 3.6.0),
+    dplyr (>= 1.1.0),
+    glue (>= 1.6.0),
+    httr2 (>= 1.0.0),
+    jsonlite (>= 1.8.0),
+    purrr (>= 1.0.0),
+    rlang (>= 1.1.0),
+    tibble (>= 3.2.0),
+    tidyr (>= 1.3.0),
+    tidyselect (>= 1.2.0)
+Suggests:
+    AGHmatrix,
+    BGLR,
+    furrr (>= 0.3.0),
+    future (>= 1.33.0),
+    httptest2,
+    knitr,
+    lme4,
+    metan,
+    rappdirs,
+    rmarkdown,
+    rrBLUP,
+    sommer,
+    testthat (>= 3.0.0),
+    withr
+Config/testthat/edition: 3
+VignetteBuilder: knitr

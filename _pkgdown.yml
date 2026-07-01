@@ -1,0 +1,103 @@
+url: https://josh45-source.github.io/brapiR2/
+
+template:
+  bootstrap: 5
+
+reference:
+  - title: Connection & Authentication
+    desc: Create connections and authenticate with BrAPI servers.
+    contents:
+      - brapi_connection
+      - brapi_login
+      - brapi_login_oauth2
+      - brapi_set_token
+      - brapi_ping
+      - brapi_endpoints
+      - print.brapi_con
+
+  - title: "Core Module"
+    desc: Programs, trials, studies, locations, and other organizational entities.
+    contents:
+      - brapi_programs
+      - brapi_program
+      - brapi_trials
+      - brapi_trial
+      - brapi_studies
+      - brapi_study
+      - brapi_locations
+      - brapi_seasons
+      - brapi_lists
+      - brapi_people
+      - brapi_server_info
+
+  - title: "Germplasm Module"
+    desc: Germplasm management, pedigrees, crosses, and seed lots.
+    contents:
+      - brapi_germplasm
+      - brapi_germplasm_detail
+      - brapi_germplasm_pedigree
+      - brapi_germplasm_progeny
+      - brapi_germplasm_attributes
+      - brapi_crosses
+      - brapi_crossing_projects
+      - brapi_seed_lots
+      - brapi_search_germplasm
+
+  - title: "Phenotyping Module"
+    desc: Observations, variables, traits, and analysis-ready data.
+    contents:
+      - brapi_observation_units
+      - brapi_observations
+      - brapi_observation_variables
+      - brapi_traits
+      - brapi_scales
+      - brapi_methods
+      - brapi_images
+      - brapi_events
+      - brapi_search_observations
+      - brapi_search_variables
+      - brapi_study_data
+
+  - title: "Genotyping Module"
+    desc: Variants, genotype calls, allele matrices, and genomic selection helpers.
+    contents:
+      - brapi_samples
+      - brapi_variants
+      - brapi_variant_sets
+      - brapi_calls
+      - brapi_call_sets
+      - brapi_references
+      - brapi_reference_sets
+      - brapi_allele_matrix
+      - brapi_search_variants
+      - brapi_search_calls
+      - brapi_get_dosage_matrix
+      - brapi_get_marker_map
+
+  - title: "Caching & Performance"
+    desc: Response caching and parallel data fetching.
+    contents:
+      - brapi_cache_enable
+      - brapi_cache_clear
+      - brapi_fetch_parallel
+
+home:
+  sidebar:
+    structure: [links, license, community, citation, authors, dev]
+
+navbar:
+  structure:
+    left: [intro, reference, articles, news]
+    right: [search, github]
+  components:
+    github:
+      icon: fa-github
+      aria-label: GitHub
+      href: https://github.com/josh45-source/brapiR2
+
+repo:
+  url:
+    home: https://github.com/josh45-source/brapiR2
+    source: https://github.com/josh45-source/brapiR2/blob/main/
+    issue: https://github.com/josh45-source/brapiR2/issues/
+    user: https://github.com/
