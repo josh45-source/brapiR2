@@ -1,0 +1,285 @@
+# brapiR2
+
+**brapiR2** is a tidyverse-native, stateless R client for the [BrAPI
+v2](https://brapi.org/) (Breeding API) specification. It provides
+pipe-friendly access to **all four BrAPI modules** — Core, Germplasm,
+Phenotyping, and Genotyping — returning tidy tibbles ready for analysis.
+
+Developed by **Joash Joshua Ayo** (<joashjoshua789@gmail.com>).
+
+## Why brapiR2?
+
+| Feature | brapiR2 | QBMS |
+|----|----|----|
+| Design | Stateless, functional, pipeable | Stateful, menu-driven |
+| BrAPI v2 coverage | Full spec (all 4 modules) | Partial (phenotyping focus) |
+| Genotyping support | Native variants, callsets, dosage matrix | Via GIGWA wrapper |
+| Return type | Always tibbles | Mixed lists/dataframes |
+| Auth | Unified token/OAuth2 | Engine-specific functions |
+| Caching | Built-in response caching | Limited |
+
+**brapiR2 complements [QBMS](https://cran.r-project.org/package=QBMS)**
+— use QBMS for interactive exploration, use brapiR2 for programmatic
+pipelines and custom tooling.
+
+## Installation
+
+Install the development version from GitHub:
+
+``` r
+
+# install.packages("remotes")
+remotes::install_github("josh45-source/brapiR2")
+```
+
+## Quick Start
+
+``` r
+
+library(brapiR2)
+library(dplyr)
+
+# 1. Connect (no global state!)
+con <- brapi_connection("https://test-server.brapi.org")
+
+# 2. Explore programs and trials
+brapi_programs(con)
+
+brapi_trials(con) |>
+  filter(active == TRUE) |>
+  head()
+
+# 3. Get phenotypic data in analysis-ready wide format
+data <- brapi_study_data(con, "study_01")
+
+# 4. Get genotypic data as a dosage matrix for GS
+dosage <- brapi_get_dosage_matrix(con, "variantset_01")
+
+# 5. Parallel fetch across multiple studies
+all_data <- brapi_fetch_parallel(
+  con,
+  brapi_study_data,
+  ids = c("study_01", "study_02", "study_03"),
+  .workers = 4
+)
+```
+
+## Pipe-Friendly Design
+
+Every function takes a connection object as its first argument and
+returns a tibble, making it natural to chain with dplyr:
+
+``` r
+
+con <- brapi_connection("https://my-breedbase.org", token = "my_token")
+
+# Find all germplasm used in a specific study
+brapi_observation_units(con, studyDbId = "study_42") |>
+  select(germplasmDbId, germplasmName) |>
+  distinct()
+
+# Get marker positions for a genotyping dataset
+brapi_get_marker_map(con, "my_variantset") |>
+  filter(referenceName == "chr1") |>
+  arrange(start)
+```
+
+## Supported BrAPI Modules
+
+- **Core**: Programs, Trials, Studies, Locations, Seasons, Lists, People
+- **Germplasm**: Germplasm, Pedigrees, Progeny, Attributes, Crosses,
+  Seed Lots
+- **Phenotyping**: Observation Units, Observations, Variables, Traits,
+  Scales, Methods, Images, Events
+- **Genotyping**: Samples, Variants, Variant Sets, Calls, Call Sets,
+  References, Allele Matrix
+
+## Authentication
+
+``` r
+
+# Token-based (most BrAPI servers)
+con <- brapi_connection("https://my-breedbase.org")
+con <- brapi_login(con, "username", "password")
+
+# OAuth 2.0 (EBS and similar)
+con <- brapi_login_oauth2(
+  con,
+  client_id = "my_id",
+  client_secret = "my_secret",
+  authorize_url = "https://auth.example.org/authorize",
+  access_url = "https://auth.example.org/token"
+)
+
+# Or set an existing token directly
+con <- brapi_set_token(con, "my_existing_token")
+```
+
+## Related Packages
+
+- [QBMS](https://cran.r-project.org/package=QBMS) — High-level, stateful
+  BrAPI client for interactive use
+- [rrBLUP](https://cran.r-project.org/package=rrBLUP) — Genomic
+  selection (use brapiR2 to fetch the dosage matrix)
+- [sommer](https://cran.r-project.org/package=sommer) — Mixed models for
+  multi-environment trials
+
+## Contributing
+
+Contributions are welcome! Please see
+[CONTRIBUTING.md](https://josh45-source.github.io/brapiR2/CONTRIBUTING.md)
+for guidelines.
+
+## License
+
+MIT © Joash Joshua Ayo
+
+# Package index
+
+## Connection & Authentication
+
+Create connections and authenticate with BrAPI servers.
+
+- [`brapi_connection()`](https://josh45-source.github.io/brapiR2/reference/brapi_connection.md)
+  : Create a BrAPI Connection Object
+- [`brapi_login()`](https://josh45-source.github.io/brapiR2/reference/brapi_login.md)
+  : Login to a BrAPI Server with Username and Password
+- [`brapi_login_oauth2()`](https://josh45-source.github.io/brapiR2/reference/brapi_login_oauth2.md)
+  : Login to a BrAPI Server with OAuth 2.0
+- [`brapi_set_token()`](https://josh45-source.github.io/brapiR2/reference/brapi_set_token.md)
+  : Manually Set an Authentication Token
+- [`brapi_ping()`](https://josh45-source.github.io/brapiR2/reference/brapi_ping.md)
+  : Ping a BrAPI Server
+- [`brapi_endpoints()`](https://josh45-source.github.io/brapiR2/reference/brapi_endpoints.md)
+  : List Available Endpoints
+- [`print(`*`<brapi_con>`*`)`](https://josh45-source.github.io/brapiR2/reference/print.brapi_con.md)
+  : Print a BrAPI Connection Object
+
+## Core Module
+
+Programs, trials, studies, locations, and other organizational entities.
+
+- [`brapi_programs()`](https://josh45-source.github.io/brapiR2/reference/brapi_programs.md)
+  : List Breeding Programs
+- [`brapi_program()`](https://josh45-source.github.io/brapiR2/reference/brapi_program.md)
+  : Get a Single Program by ID
+- [`brapi_trials()`](https://josh45-source.github.io/brapiR2/reference/brapi_trials.md)
+  : List Trials
+- [`brapi_trial()`](https://josh45-source.github.io/brapiR2/reference/brapi_trial.md)
+  : Get a Single Trial by ID
+- [`brapi_studies()`](https://josh45-source.github.io/brapiR2/reference/brapi_studies.md)
+  : List Studies
+- [`brapi_study()`](https://josh45-source.github.io/brapiR2/reference/brapi_study.md)
+  : Get a Single Study by ID
+- [`brapi_locations()`](https://josh45-source.github.io/brapiR2/reference/brapi_locations.md)
+  : List Locations
+- [`brapi_seasons()`](https://josh45-source.github.io/brapiR2/reference/brapi_seasons.md)
+  : List Seasons
+- [`brapi_lists()`](https://josh45-source.github.io/brapiR2/reference/brapi_lists.md)
+  : List Generic Lists
+- [`brapi_people()`](https://josh45-source.github.io/brapiR2/reference/brapi_people.md)
+  : List People
+- [`brapi_server_info()`](https://josh45-source.github.io/brapiR2/reference/brapi_server_info.md)
+  : Get Server Info
+
+## Germplasm Module
+
+Germplasm management, pedigrees, crosses, and seed lots.
+
+- [`brapi_germplasm()`](https://josh45-source.github.io/brapiR2/reference/brapi_germplasm.md)
+  : List Germplasm
+- [`brapi_germplasm_detail()`](https://josh45-source.github.io/brapiR2/reference/brapi_germplasm_detail.md)
+  : Get a Single Germplasm by ID
+- [`brapi_germplasm_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_germplasm_pedigree.md)
+  : Get Germplasm Pedigree
+- [`brapi_germplasm_progeny()`](https://josh45-source.github.io/brapiR2/reference/brapi_germplasm_progeny.md)
+  : Get Germplasm Progeny
+- [`brapi_germplasm_attributes()`](https://josh45-source.github.io/brapiR2/reference/brapi_germplasm_attributes.md)
+  : List Germplasm Attributes
+- [`brapi_crosses()`](https://josh45-source.github.io/brapiR2/reference/brapi_crosses.md)
+  : List Crosses
+- [`brapi_crossing_projects()`](https://josh45-source.github.io/brapiR2/reference/brapi_crossing_projects.md)
+  : List Crossing Projects
+- [`brapi_seed_lots()`](https://josh45-source.github.io/brapiR2/reference/brapi_seed_lots.md)
+  : List Seed Lots
+- [`brapi_search_germplasm()`](https://josh45-source.github.io/brapiR2/reference/brapi_search_germplasm.md)
+  : Search Germplasm
+
+## Phenotyping Module
+
+Observations, variables, traits, and analysis-ready data.
+
+- [`brapi_observation_units()`](https://josh45-source.github.io/brapiR2/reference/brapi_observation_units.md)
+  : List Observation Units
+- [`brapi_observations()`](https://josh45-source.github.io/brapiR2/reference/brapi_observations.md)
+  : List Observations
+- [`brapi_observation_variables()`](https://josh45-source.github.io/brapiR2/reference/brapi_observation_variables.md)
+  : List Observation Variables
+- [`brapi_traits()`](https://josh45-source.github.io/brapiR2/reference/brapi_traits.md)
+  : List Traits
+- [`brapi_scales()`](https://josh45-source.github.io/brapiR2/reference/brapi_scales.md)
+  : List Scales
+- [`brapi_methods()`](https://josh45-source.github.io/brapiR2/reference/brapi_methods.md)
+  : List Methods
+- [`brapi_images()`](https://josh45-source.github.io/brapiR2/reference/brapi_images.md)
+  : List Images
+- [`brapi_events()`](https://josh45-source.github.io/brapiR2/reference/brapi_events.md)
+  : List Events
+- [`brapi_search_observations()`](https://josh45-source.github.io/brapiR2/reference/brapi_search_observations.md)
+  : Search Observations
+- [`brapi_search_variables()`](https://josh45-source.github.io/brapiR2/reference/brapi_search_variables.md)
+  : Search Observation Variables
+- [`brapi_study_data()`](https://josh45-source.github.io/brapiR2/reference/brapi_study_data.md)
+  : Get Study Data in Wide Format
+
+## Genotyping Module
+
+Variants, genotype calls, allele matrices, and genomic selection
+helpers.
+
+- [`brapi_samples()`](https://josh45-source.github.io/brapiR2/reference/brapi_samples.md)
+  : List Samples
+- [`brapi_variants()`](https://josh45-source.github.io/brapiR2/reference/brapi_variants.md)
+  : List Variants (Markers/SNPs)
+- [`brapi_variant_sets()`](https://josh45-source.github.io/brapiR2/reference/brapi_variant_sets.md)
+  : List Variant Sets (Datasets)
+- [`brapi_calls()`](https://josh45-source.github.io/brapiR2/reference/brapi_calls.md)
+  : List Genotype Calls
+- [`brapi_call_sets()`](https://josh45-source.github.io/brapiR2/reference/brapi_call_sets.md)
+  : List Call Sets (Samples with Genotype Data)
+- [`brapi_references()`](https://josh45-source.github.io/brapiR2/reference/brapi_references.md)
+  : List References (Chromosomes/Contigs)
+- [`brapi_reference_sets()`](https://josh45-source.github.io/brapiR2/reference/brapi_reference_sets.md)
+  : List Reference Sets (Genome Assemblies)
+- [`brapi_allele_matrix()`](https://josh45-source.github.io/brapiR2/reference/brapi_allele_matrix.md)
+  : Get Allele Matrix
+- [`brapi_search_variants()`](https://josh45-source.github.io/brapiR2/reference/brapi_search_variants.md)
+  : Search Variants
+- [`brapi_search_calls()`](https://josh45-source.github.io/brapiR2/reference/brapi_search_calls.md)
+  : Search Genotype Calls
+- [`brapi_get_dosage_matrix()`](https://josh45-source.github.io/brapiR2/reference/brapi_get_dosage_matrix.md)
+  : Get Dosage Matrix for Genomic Selection
+- [`brapi_get_marker_map()`](https://josh45-source.github.io/brapiR2/reference/brapi_get_marker_map.md)
+  : Get Marker Map
+
+## Caching & Performance
+
+Response caching and parallel data fetching.
+
+- [`brapi_cache_enable()`](https://josh45-source.github.io/brapiR2/reference/brapi_cache_enable.md)
+  : Enable Response Caching
+- [`brapi_cache_clear()`](https://josh45-source.github.io/brapiR2/reference/brapi_cache_clear.md)
+  : Clear the Response Cache
+- [`brapi_fetch_parallel()`](https://josh45-source.github.io/brapiR2/reference/brapi_fetch_parallel.md)
+  : Parallel Batch Fetching
+
+# Articles
+
+### All vignettes
+
+- [Genomic Selection Pipeline with
+  brapiR2](https://josh45-source.github.io/brapiR2/articles/genomic-selection-pipeline.md):
+- [Getting Started with
+  brapiR2](https://josh45-source.github.io/brapiR2/articles/getting-started.md):
+- [Multi-Environment Trial (MET) Analysis with
+  brapiR2](https://josh45-source.github.io/brapiR2/articles/multi-environment-analysis.md):

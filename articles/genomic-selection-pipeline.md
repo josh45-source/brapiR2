@@ -1,0 +1,225 @@
+# Genomic Selection Pipeline with brapiR2
+
+## Overview
+
+This vignette demonstrates a complete genomic selection (GS) workflow
+using brapiR2 to pull phenotypic and genotypic data directly from a
+BrAPI-compliant server into R, then running GS models with rrBLUP.
+
+The
+[`brapi_get_dosage_matrix()`](https://josh45-source.github.io/brapiR2/reference/brapi_get_dosage_matrix.md)
+function returns a standard numeric matrix (samples × markers) that is
+directly compatible with the major GS packages:
+
+| Package | Usage |
+|----|----|
+| [rrBLUP](https://cran.r-project.org/package=rrBLUP) | `mixed.solve(y, Z = dosage)` |
+| [BGLR](https://cran.r-project.org/package=BGLR) | `ETA = list(MRK = list(X = dosage, model = "BRR"))` |
+| [sommer](https://cran.r-project.org/package=sommer) | `mmer(yield ~ 1, random = ~ vsr(germplasmName, Gu = A))` |
+| [AGHmatrix](https://cran.r-project.org/package=AGHmatrix) | `Gmatrix(dosage, method = "VanRaden")` |
+
+## Step 1: Connect and Fetch Phenotypic Data
+
+``` r
+
+library(brapiR2)
+library(dplyr)
+
+con <- brapi_connection("https://my-breedbase.org")
+con <- brapi_login(con, "username", "password")
+
+# Optional: enable caching so re-runs don't hit the server again
+con <- brapi_cache_enable(con, ttl = 7200)
+
+# Get phenotype data in wide format (one row per plot, one column per trait)
+pheno_raw <- brapi_study_data(con, "my_study_id")
+pheno_raw
+#> # A tibble: 250 x 8
+#>   observationUnitDbId germplasmDbId germplasmName  studyDbId
+#>   <chr>               <chr>         <chr>          <chr>
+#> 1 ou001               g001          Variety_001    study_01
+#> 2 ou002               g002          Variety_002    study_01
+#> # ... with 246 more rows, and 4 more variables:
+#> #   Grain_Yield_t_ha <chr>, Days_to_Heading <chr>,
+#> #   Plant_Height_cm <chr>, Thousand_Grain_Weight <chr>
+
+# Convert trait columns to numeric and drop missing
+pheno <- pheno_raw |>
+  mutate(across(Grain_Yield_t_ha:Thousand_Grain_Weight, as.numeric)) |>
+  filter(!is.na(Grain_Yield_t_ha))
+
+nrow(pheno)
+#> [1] 241
+```
+
+## Step 2: Fetch Genotypic Data
+
+``` r
+
+# List available variant sets to find the right genotyping dataset
+vsets <- brapi_variant_sets(con)
+vsets
+#> # A tibble: 3 x 8
+#>   variantSetDbId variantSetName callSetCount variantCount
+#>   <chr>          <chr>                 <int>        <int>
+#> 1 vs001          SNP50K_2022              250        45230
+#> 2 vs002          GBS_v2_2022              250        82100
+#> 3 vs003          DArTseq_panel            250        14500
+
+# Get dosage matrix: rows = samples (callSetDbIds), cols = markers (variantDbIds)
+# Values: 0 (hom ref), 1 (het), 2 (hom alt), NA (missing)
+dosage <- brapi_get_dosage_matrix(con, "vs001")
+#> i Fetching allele matrix for variant set 'vs001'...
+#> i Encoding 11307500 genotype calls as allele dosages...
+#> v Dosage matrix ready: 250 samples x 45230 markers.
+
+dim(dosage)
+#> [1]   250 45230
+
+# Preview dosage values
+dosage[1:4, 1:6]
+#>             SNP_chr1_1234 SNP_chr1_5678 SNP_chr2_234 SNP_chr2_890 ...
+#> Variety_001             0             1            2            0
+#> Variety_002             2             0            0            1
+#> Variety_003             1             1            1            1
+#> Variety_004             0             0            2            0
+
+# Get marker map for downstream QTL / Manhattan plots
+markers <- brapi_get_marker_map(con, "vs001")
+markers
+#> # A tibble: 45230 x 4
+#>    variantDbId    variantName   referenceName  start
+#>    <chr>          <chr>         <chr>          <int>
+#>  1 var001         SNP_chr1_1234 1A              1234
+#>  2 var002         SNP_chr1_5678 1A              5678
+#>  # ... with 45228 more rows
+```
+
+## Step 3: Align Phenotypes and Genotypes
+
+``` r
+
+# Match on germplasmName (rownames of dosage = callSetDbId = germplasmName
+# on most servers; adjust if your server uses a different identifier)
+common <- intersect(rownames(dosage), pheno$germplasmName)
+length(common)
+#> [1] 237
+
+pheno_aligned <- pheno |>
+  filter(germplasmName %in% common) |>
+  arrange(match(germplasmName, common))
+
+geno_aligned <- dosage[common, ]
+
+# Quick missing-data summary
+mean(is.na(geno_aligned))
+#> [1] 0.0312     # ~3.1% missing calls — impute before modelling
+```
+
+## Step 4: Imputation (Optional but Recommended)
+
+``` r
+
+# Simple mean imputation (column means)
+col_means <- colMeans(geno_aligned, na.rm = TRUE)
+for (j in seq_len(ncol(geno_aligned))) {
+  geno_aligned[is.na(geno_aligned[, j]), j] <- col_means[j]
+}
+
+# Or use rrBLUP's A.mat which handles missing data internally
+```
+
+## Step 5: Run Genomic Selection with rrBLUP
+
+``` r
+
+library(rrBLUP)
+
+# Mixed model: phenotype ~ overall mean + random marker effects
+result <- mixed.solve(
+  y = pheno_aligned$Grain_Yield_t_ha,
+  Z = geno_aligned
+)
+
+# Estimated marker effects
+length(result$u)
+#> [1] 45230
+
+# GEBVs (Genomic Estimated Breeding Values)
+gebvs <- geno_aligned %*% result$u + result$beta
+head(gebvs)
+#>               [,1]
+#> Variety_001  4.82
+#> Variety_002  5.14
+#> Variety_003  4.67
+#> Variety_004  5.31
+#> Variety_005  4.91
+#> Variety_006  5.09
+
+hist(gebvs,
+  main = "Distribution of GEBVs — Grain Yield",
+  xlab = "GEBV (t/ha)", col = "steelblue"
+)
+```
+
+## Step 6: Alternative GS Packages
+
+``` r
+
+# ---- BGLR (Bayesian regression) ----
+library(BGLR)
+
+fm_bglr <- BGLR(
+  y = pheno_aligned$Grain_Yield_t_ha,
+  ETA = list(MRK = list(X = geno_aligned, model = "BRR")),
+  nIter = 6000, burnIn = 1000,
+  verbose = FALSE
+)
+gebvs_bglr <- geno_aligned %*% fm_bglr$ETA$MRK$b
+
+# ---- sommer (mixed model with G matrix) ----
+library(sommer)
+library(AGHmatrix)
+
+# Build genomic relationship matrix
+G <- Gmatrix(geno_aligned, method = "VanRaden")
+#> Gmatrix computation: VanRaden method
+#> Markers: 45230  Individuals: 237
+
+fm_sommer <- mmer(
+  Grain_Yield_t_ha ~ 1,
+  random  = ~ vsr(germplasmName, Gu = G),
+  rcov    = ~units,
+  data    = pheno_aligned
+)
+gebvs_sommer <- randef(fm_sommer)$`u:germplasmName`
+```
+
+## Step 7: Cross-Validation
+
+``` r
+
+set.seed(42)
+n <- nrow(pheno_aligned)
+folds <- sample(rep(1:5, length.out = n))
+cors <- numeric(5)
+
+for (k in 1:5) {
+  train <- folds != k
+  test <- folds == k
+
+  fit <- mixed.solve(
+    y = pheno_aligned$Grain_Yield_t_ha[train],
+    Z = geno_aligned[train, ]
+  )
+
+  pred <- geno_aligned[test, ] %*% fit$u + fit$beta
+  cors[k] <- cor(as.numeric(pred), pheno_aligned$Grain_Yield_t_ha[test])
+}
+
+cat(sprintf(
+  "5-fold CV prediction accuracy: %.3f ± %.3f\n",
+  mean(cors), sd(cors)
+))
+#> 5-fold CV prediction accuracy: 0.612 ± 0.054
+```
