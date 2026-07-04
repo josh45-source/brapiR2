@@ -14,7 +14,7 @@ output: github_document
 [![CRAN status](https://www.r-pkg.org/badges/version/brapiR2)](https://CRAN.R-project.org/package=brapiR2)
 <!-- badges: end -->
 
-**brapiR2** is a tidyverse-native, stateless R client for the [BrAPI v2](https://brapi.org/) (Breeding API) specification. It provides pipe-friendly access to **all four BrAPI modules** — Core, Germplasm, Phenotyping, and Genotyping — returning tidy tibbles ready for analysis.
+**brapiR2** is a tidyverse-native, stateless R client for the [BrAPI v2](https://brapi.org/) (Breeding API) specification. It provides pipe-friendly access to **all four BrAPI modules** - Core, Germplasm, Phenotyping, and Genotyping - returning tidy tibbles ready for analysis.
 
 Developed by **Joash Joshua Ayo** (<joashjoshua789@gmail.com>).
 
@@ -29,7 +29,7 @@ Developed by **Joash Joshua Ayo** (<joashjoshua789@gmail.com>).
 | Auth | Unified token/OAuth2 | Engine-specific functions |
 | Caching | Built-in response caching | Limited |
 
-**brapiR2 complements [QBMS](https://cran.r-project.org/package=QBMS)** — use QBMS for interactive exploration, use brapiR2 for programmatic pipelines and custom tooling.
+**brapiR2 complements [QBMS](https://cran.r-project.org/package=QBMS)** - use QBMS for interactive exploration, use brapiR2 for programmatic pipelines and custom tooling.
 
 ## Installation
 
