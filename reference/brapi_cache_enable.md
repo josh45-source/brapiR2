@@ -38,7 +38,7 @@ A new `brapi_con` object with caching configured.
 ``` r
 con <- brapi_connection("https://test-server.brapi.org")
 con <- brapi_cache_enable(con, dir = tempdir(), ttl = 7200)
-#> ✔ Caching enabled at /tmp/RtmpWo3Pf7 (TTL: 7200s)
+#> ✔ Caching enabled at /tmp/RtmpW1Veaw (TTL: 7200s)
 con
 #> 
 #> ── BrAPI Connection 
@@ -47,5 +47,5 @@ con
 #> • Auth: ✗ no token
 #> • Page size: 1000
 #> • Timeout: 120s
-#> • Cache: enabled (/tmp/RtmpWo3Pf7)
+#> • Cache: enabled (/tmp/RtmpW1Veaw)
 ```
