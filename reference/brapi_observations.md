@@ -27,3 +27,13 @@ brapi_observations(con, studyDbId = NULL, ...)
 ## Value
 
 A tibble with one row per observation (trait measurement).
+
+## Examples
+
+``` r
+# \donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_observations(con, studyDbId = "study1")
+#> # A tibble: 0 × 0
+# }
+```

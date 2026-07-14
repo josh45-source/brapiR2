@@ -30,9 +30,15 @@ observed trait containing the measurement values.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-data <- brapi_study_data(con, "study_01")
+data <- brapi_study_data(con, "study1")
 head(data)
-} # }
+#> # A tibble: 2 × 6
+#>   observationUnitDbId observationUnitName germplasmDbId germplasmName  studyDbId
+#>   <chr>               <chr>               <chr>         <chr>          <chr>    
+#> 1 observation_unit1   Plot 1              germplasm1    Tomatillo Fan… study1   
+#> 2 observation_unit2   Plot 2              germplasm2    Tomatillo Fan… study1   
+#> # ℹ 1 more variable: `Corn Stalk Height` <list>
+# }
 ```

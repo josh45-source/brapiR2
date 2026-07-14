@@ -40,14 +40,24 @@ A new `brapi_con` object with the token populated.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-con <- brapi_connection("https://ebs.example.org")
+# \donttest{
+con <- brapi_connection("https://test-server.brapi.org")
 con <- brapi_login_oauth2(
   con,
-  client_id = "my_client_id",
-  client_secret = "my_secret",
-  authorize_url = "https://auth.example.org/oauth2/authorize",
-  access_url = "https://auth.example.org/oauth2/token"
+  client_id = "brapi_client",
+  client_secret = "brapi_secret",
+  authorize_url = "https://test-server.brapi.org/brapi/v2/authorize",
+  access_url = "https://test-server.brapi.org/brapi/v2/token"
 )
-} # }
+#> ✔ Authenticated via OAuth2 to <https://test-server.brapi.org>
+con
+#> 
+#> ── BrAPI Connection 
+#> • Server: <https://test-server.brapi.org>
+#> • Version: v2
+#> • Auth: ✓ authenticated
+#> • Page size: 1000
+#> • Timeout: 120s
+#> • Cache: disabled
+# }
 ```

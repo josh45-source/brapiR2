@@ -36,8 +36,16 @@ A new `brapi_con` object with caching configured.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
 con <- brapi_connection("https://test-server.brapi.org")
-con <- brapi_cache_enable(con, ttl = 7200)
-} # }
+con <- brapi_cache_enable(con, dir = tempdir(), ttl = 7200)
+#> ✔ Caching enabled at /tmp/RtmpWo3Pf7 (TTL: 7200s)
+con
+#> 
+#> ── BrAPI Connection 
+#> • Server: <https://test-server.brapi.org>
+#> • Version: v2
+#> • Auth: ✗ no token
+#> • Page size: 1000
+#> • Timeout: 120s
+#> • Cache: enabled (/tmp/RtmpWo3Pf7)
 ```

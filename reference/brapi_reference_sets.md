@@ -23,3 +23,20 @@ brapi_reference_sets(con, ...)
 ## Value
 
 A tibble with one row per reference set.
+
+## Examples
+
+``` r
+# \donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_reference_sets(con)
+#> # A tibble: 2 × 13
+#>   additionalInfo   externalReferences assemblyPUI     commonCropName description
+#>   <list>           <lgl>              <chr>           <chr>          <chr>      
+#> 1 <named list [1]> NA                 doi://10.12345… Tomatillo      This is an…
+#> 2 <named list [1]> NA                 doi://10.22345… Tomatillo      This is an…
+#> # ℹ 8 more variables: isDerived <lgl>, md5checksum <chr>,
+#> #   referenceSetDbId <chr>, referenceSetName <chr>, sourceAccessions <list>,
+#> #   sourceGermplasm <list>, sourceURI <chr>, species <list>
+# }
+```

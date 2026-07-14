@@ -27,3 +27,13 @@ brapi_search_variables(con, traitClasses = NULL, ...)
 ## Value
 
 A tibble of matching observation variables.
+
+## Examples
+
+``` r
+# \donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_search_variables(con, traitClasses = "agronomic")
+#> # A tibble: 0 × 0
+# }
+```

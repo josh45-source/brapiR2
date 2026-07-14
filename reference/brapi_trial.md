@@ -23,3 +23,16 @@ brapi_trial(con, trialDbId)
 ## Value
 
 A single-row tibble with trial details.
+
+## Examples
+
+``` r
+# \donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_trial(con, "trial1")
+#> # A tibble: 1 × 4
+#>   datasetPUI              license               publicReleaseDate submissionDate
+#>   <chr>                   <chr>                 <chr>             <chr>         
+#> 1 doi:10.15454/fake/12345 https://creativecomm… 2014-09-01        2014-01-01    
+# }
+```

@@ -17,3 +17,13 @@ is_brapi_con(x)
 ## Value
 
 Logical.
+
+## Examples
+
+``` r
+con <- brapi_connection("https://test-server.brapi.org")
+is_brapi_con(con)
+#> [1] TRUE
+is_brapi_con("not a connection")
+#> [1] FALSE
+```

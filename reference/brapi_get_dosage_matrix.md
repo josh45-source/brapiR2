@@ -47,12 +47,16 @@ become `NA`.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-dosage <- brapi_get_dosage_matrix(con, "variantset_01")
+dosage <- brapi_get_dosage_matrix(con, "variantset1")
+#> ℹ Fetching allele matrix for variant set "variantset1"...
+#> ℹ Encoding 260 genotype calls as allele dosages...
+#> ✔ Dosage matrix ready: 13 samples x 20 markers.
 dim(dosage)
+#> [1] 13 20
 # Use with rrBLUP:
 # library(rrBLUP)
 # result <- mixed.solve(y = pheno$yield, Z = dosage)
-} # }
+# }
 ```

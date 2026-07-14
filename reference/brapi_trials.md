@@ -31,8 +31,18 @@ A tibble with one row per trial.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 brapi_trials(con)
-} # }
+#> # A tibble: 3 × 16
+#>   active additionalInfo   commonCropName contacts   datasetAuthorships
+#>   <lgl>  <list>           <chr>          <list>     <list>            
+#> 1 TRUE   <named list [1]> Tomatillo      <list [1]> <list [1]>        
+#> 2 TRUE   <named list [1]> Tomatillo      <list [1]> <list [1]>        
+#> 3 TRUE   <named list [1]> Tomatillo      <list [1]> <list [1]>        
+#> # ℹ 11 more variables: documentationURL <chr>, endDate <chr>,
+#> #   externalReferences <list>, programDbId <chr>, programName <chr>,
+#> #   publications <list>, startDate <chr>, trialDescription <chr>,
+#> #   trialName <chr>, trialPUI <chr>, trialDbId <chr>
+# }
 ```

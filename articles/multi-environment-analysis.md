@@ -161,7 +161,8 @@ means_wide
 
 library(metan)
 
-# AMMI model: decompose GxE with additive main effects + multiplicative interaction
+# AMMI model: decompose GxE with additive main effects + multiplicative
+# interaction
 ammi_model <- performs_ammi(
   .data = met,
   env = env,
@@ -264,13 +265,12 @@ cat(sprintf("Broad-sense H^2 (across environments): %.3f\n", H2))
 ``` r
 
 # Combine BLUP ranking with stability
+stability <- ammi_stable$Grain_Yield_t_ha |>
+  select(GEN, mean_yield = Y, ASV) |>
+  rename(germplasmName = GEN)
+
 selection <- blups |>
-  left_join(
-    ammi_stable$Grain_Yield_t_ha |>
-      select(GEN, mean_yield = Y, ASV) |>
-      rename(germplasmName = GEN),
-    by = "germplasmName"
-  ) |>
+  left_join(stability, by = "germplasmName") |>
   mutate(
     # Normalise both metrics (0 = worst, 1 = best)
     rank_yield = rank(BLUP) / n(),

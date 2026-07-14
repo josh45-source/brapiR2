@@ -22,3 +22,18 @@ print(x, ...)
 ## Value
 
 Invisibly returns `x`.
+
+## Examples
+
+``` r
+con <- brapi_connection("https://test-server.brapi.org")
+print(con)
+#> 
+#> ── BrAPI Connection 
+#> • Server: <https://test-server.brapi.org>
+#> • Version: v2
+#> • Auth: ✗ no token
+#> • Page size: 1000
+#> • Timeout: 120s
+#> • Cache: disabled
+```

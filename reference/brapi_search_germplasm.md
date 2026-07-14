@@ -42,3 +42,25 @@ brapi_search_germplasm(
 ## Value
 
 A tibble of matching germplasm records.
+
+## Examples
+
+``` r
+# \donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_search_germplasm(con, commonCropNames = "Tomatillo")
+#> # A tibble: 3 × 32
+#>   additionalInfo   externalReferences accessionNumber acquisitionDate
+#>   <list>           <list>             <chr>           <chr>          
+#> 1 <named list [1]> <list [1]>         A0000001        2000-04-09     
+#> 2 <named list [1]> <list [1]>         A0000002        2000-04-09     
+#> 3 <named list [1]> <list [1]>         A0000003        2000-04-09     
+#> # ℹ 28 more variables: biologicalStatusOfAccessionCode <chr>,
+#> #   biologicalStatusOfAccessionDescription <chr>, breedingMethodDbId <chr>,
+#> #   breedingMethodName <chr>, collection <chr>, commonCropName <chr>,
+#> #   countryOfOriginCode <chr>, defaultDisplayName <chr>,
+#> #   documentationURL <chr>, donors <list>, genus <chr>, germplasmName <chr>,
+#> #   germplasmOrigin <list>, germplasmPUI <chr>, germplasmPreprocessing <chr>,
+#> #   instituteCode <chr>, instituteName <chr>, pedigree <chr>, …
+# }
+```

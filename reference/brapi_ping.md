@@ -23,8 +23,9 @@ Logical. `TRUE` if the server responds, `FALSE` otherwise.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 brapi_ping(con)
-} # }
+#> ✔ Server <https://test-server.brapi.org> is reachable.
+# }
 ```

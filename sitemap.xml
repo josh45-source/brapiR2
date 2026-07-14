@@ -26,7 +26,6 @@
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_germplasm_detail.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_germplasm_pedigree.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_germplasm_progeny.html</loc></url>
-<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_get.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_get_dosage_matrix.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_get_marker_map.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_images.html</loc></url>
@@ -40,12 +39,10 @@
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_observations.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_people.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_ping.html</loc></url>
-<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_post_search.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_program.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_programs.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_reference_sets.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_references.html</loc></url>
-<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_req.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_samples.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_scales.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_search_calls.html</loc></url>
@@ -57,6 +54,7 @@
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_seed_lots.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_server_info.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_set_token.html</loc></url>
+<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_shared_params.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_studies.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_study.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_study_data.html</loc></url>
@@ -67,8 +65,6 @@
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_variants.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/index.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/is_brapi_con.html</loc></url>
-<url><loc>https://josh45-source.github.io/brapiR2/reference/parse_brapi_result.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/print.brapi_con.html</loc></url>
-<url><loc>https://josh45-source.github.io/brapiR2/reference/validate_con.html</loc></url>
 </urlset>
 

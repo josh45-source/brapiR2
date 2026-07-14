@@ -32,8 +32,18 @@ A new `brapi_con` object with the token populated.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-con <- brapi_connection("https://my-breedbase.org")
-con <- brapi_login(con, "my_user", "my_password")
-} # }
+# \donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+con <- brapi_login(con, "brapi_reader", "brapi_reader")
+#> ✔ Logged in to <https://test-server.brapi.org>
+con
+#> 
+#> ── BrAPI Connection 
+#> • Server: <https://test-server.brapi.org>
+#> • Version: v2
+#> • Auth: ✓ authenticated
+#> • Page size: 1000
+#> • Timeout: 120s
+#> • Cache: disabled
+# }
 ```

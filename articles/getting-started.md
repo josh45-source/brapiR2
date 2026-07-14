@@ -10,9 +10,11 @@ scripting, pipelines, and building downstream tools.
 
 ## Installation
 
+If you don’t already have **remotes** installed, run
+`install.packages("remotes")` first.
+
 ``` r
 
-# install.packages("remotes")
 remotes::install_github("josh45-source/brapiR2")
 ```
 
@@ -136,7 +138,7 @@ Most production BrAPI servers require authentication:
 
 ``` r
 
-# Username/password (BreedBase, BMS, Germinate)
+# Username/password login - used by BreedBase, BMS, and Germinate
 con <- brapi_connection("https://my-breedbase.org")
 con <- brapi_login(con, "username", "password")
 

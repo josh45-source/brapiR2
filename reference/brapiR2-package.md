@@ -14,9 +14,9 @@ BrAPI-compliant server.
 
 Useful links:
 
-- <https://josh45-source.github.io/brapiR2>
-
 - <https://github.com/josh45-source/brapiR2>
+
+- <https://josh45-source.github.io/brapiR2/>
 
 - Report bugs at <https://github.com/josh45-source/brapiR2/issues>
 

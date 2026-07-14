@@ -36,3 +36,13 @@ brapi_search_observations(
 ## Value
 
 A tibble of matching observations.
+
+## Examples
+
+``` r
+# \donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_search_observations(con, studyDbIds = "study1")
+#> # A tibble: 0 × 0
+# }
+```

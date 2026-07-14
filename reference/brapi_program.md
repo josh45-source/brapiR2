@@ -23,3 +23,19 @@ brapi_program(con, programDbId)
 ## Value
 
 A single-row tibble with program details.
+
+## Examples
+
+``` r
+# \donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_program(con, "program1")
+#> # A tibble: 1 × 12
+#>   additionalInfo externalReferences abbreviation commonCropName documentationURL
+#>   <list>         <list>             <chr>        <chr>          <chr>           
+#> 1 <named list>   <list [1]>         P1           Tomatillo      https://brapi.o…
+#> # ℹ 7 more variables: leadPersonDbId <chr>, leadPersonName <chr>,
+#> #   objective <chr>, programName <chr>, programType <chr>,
+#> #   fundingInformation <chr>, programDbId <chr>
+# }
+```

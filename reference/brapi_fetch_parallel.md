@@ -41,9 +41,11 @@ A tibble with results from all IDs combined.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+# \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-study_ids <- c("study_01", "study_02", "study_03")
+study_ids <- c("study1", "study2", "study3")
 all_data <- brapi_fetch_parallel(con, brapi_study_data, study_ids)
-} # }
+#> ℹ Fetching 3 items across 4 workers...
+#> ✔ Fetched 6 rows from 3 sources.
+# }
 ```

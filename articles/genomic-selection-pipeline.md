@@ -66,8 +66,9 @@ vsets
 #> 2 vs002          GBS_v2_2022              250        82100
 #> 3 vs003          DArTseq_panel            250        14500
 
-# Get dosage matrix: rows = samples (callSetDbIds), cols = markers (variantDbIds)
-# Values: 0 (hom ref), 1 (het), 2 (hom alt), NA (missing)
+# Get dosage matrix: rows = samples (callSetDbIds),
+# cols = markers (variantDbIds). Values: 0 (hom ref), 1 (het), 2 (hom alt),
+# NA (missing)
 dosage <- brapi_get_dosage_matrix(con, "vs001")
 #> i Fetching allele matrix for variant set 'vs001'...
 #> i Encoding 11307500 genotype calls as allele dosages...

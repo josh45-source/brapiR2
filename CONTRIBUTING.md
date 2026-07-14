@@ -26,11 +26,7 @@ Thank you for your interest in contributing to brapiR2!
     `R/germplasm.R`, etc.)
 2.  Follow the existing pattern: `con` as first argument, `...` for
     query params
-3.  Use
-    [`brapi_get()`](https://josh45-source.github.io/brapiR2/reference/brapi_get.md)
-    or
-    [`brapi_post_search()`](https://josh45-source.github.io/brapiR2/reference/brapi_post_search.md)
-    internally
+3.  Use `brapi_get()` or `brapi_post_search()` internally
 4.  Add the function to `NAMESPACE` exports
 5.  Write tests in `tests/testthat/`
 6.  Update `NEWS.md`
