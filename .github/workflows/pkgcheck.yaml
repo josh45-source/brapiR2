@@ -1,0 +1,13 @@
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+name: pkgcheck
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ropensci-review-tools/pkgcheck-action@main
