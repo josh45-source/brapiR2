@@ -13,8 +13,8 @@ Provides pipe-friendly, stateless access to every endpoint in the Breeding API (
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://josh45-source.github.io/brapiR2}
   \item \url{https://github.com/josh45-source/brapiR2}
+  \item \url{https://josh45-source.github.io/brapiR2/}
   \item Report bugs at \url{https://github.com/josh45-source/brapiR2/issues}
 }
 

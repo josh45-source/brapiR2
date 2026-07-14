@@ -17,3 +17,10 @@ A tibble with one row per attribute definition.
 \description{
 List Germplasm Attributes
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_germplasm_attributes(con)
+}
+
+}

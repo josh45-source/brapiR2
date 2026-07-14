@@ -19,3 +19,10 @@ A tibble with one row per observation (trait measurement).
 \description{
 List Observations
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_observations(con, studyDbId = "study1")
+}
+
+}

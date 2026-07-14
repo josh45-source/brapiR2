@@ -17,3 +17,10 @@ A single-row tibble with trial details.
 \description{
 Get a Single Trial by ID
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_trial(con, "trial1")
+}
+
+}

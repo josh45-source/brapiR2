@@ -17,3 +17,10 @@ A tibble with one row per reference sequence.
 \description{
 List References (Chromosomes/Contigs)
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_references(con)
+}
+
+}

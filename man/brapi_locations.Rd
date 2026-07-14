@@ -17,3 +17,10 @@ A tibble with one row per location.
 \description{
 List Locations
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_locations(con)
+}
+
+}

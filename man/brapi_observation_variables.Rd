@@ -17,3 +17,10 @@ A tibble with one row per variable definition.
 \description{
 Returns the ontology of observation variables (trait + method + scale).
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_observation_variables(con)
+}
+
+}

@@ -19,3 +19,10 @@ A tibble with one row per event.
 \description{
 List Events
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_events(con, studyDbId = "study1")
+}
+
+}

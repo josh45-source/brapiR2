@@ -115,8 +115,8 @@ test_that("brapi_germplasm_detail returns one row for a valid ID", {
   detail <- brapi_germplasm_detail(con, germ_id)
 
   expect_s3_class(detail, "data.frame")
-  expect_equal(nrow(detail), 1L)
-  expect_equal(detail$germplasmDbId[[1L]], germ_id)
+  expect_identical(nrow(detail), 1L)
+  expect_identical(detail$germplasmDbId[[1L]], germ_id)
 })
 
 test_that("brapi_germplasm_pedigree returns a single-row tibble", {
@@ -129,7 +129,7 @@ test_that("brapi_germplasm_pedigree returns a single-row tibble", {
   ped <- brapi_germplasm_pedigree(con, germ_id)
 
   expect_s3_class(ped, "data.frame")
-  expect_equal(nrow(ped), 1L)
+  expect_identical(nrow(ped), 1L)
   expect_true("germplasmDbId" %in% names(ped))
 })
 
@@ -254,7 +254,7 @@ test_that("brapi_get_dosage_matrix returns a numeric matrix", {
   dm <- brapi_get_dosage_matrix(con, vs_id)
 
   expect_true(is.matrix(dm))
-  expect_true(is.numeric(dm))
+  expect_type(dm, "double")
   expect_gt(nrow(dm), 0L)
   expect_gt(ncol(dm), 0L)
   # Dosage values should be 0, 1, 2, or NA

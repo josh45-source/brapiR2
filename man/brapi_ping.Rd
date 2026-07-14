@@ -16,7 +16,7 @@ Logical. \code{TRUE} if the server responds, \code{FALSE} otherwise.
 Tests whether the BrAPI server is reachable and responding.
 }
 \examples{
-\dontrun{
+\donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 brapi_ping(con)
 }

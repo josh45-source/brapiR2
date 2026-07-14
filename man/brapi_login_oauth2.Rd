@@ -25,15 +25,16 @@ Performs an OAuth 2.0 authorization code flow or client credentials flow.
 Returns an updated connection object with the Bearer token set.
 }
 \examples{
-\dontrun{
-con <- brapi_connection("https://ebs.example.org")
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
 con <- brapi_login_oauth2(
   con,
-  client_id = "my_client_id",
-  client_secret = "my_secret",
-  authorize_url = "https://auth.example.org/oauth2/authorize",
-  access_url = "https://auth.example.org/oauth2/token"
+  client_id = "brapi_client",
+  client_secret = "brapi_secret",
+  authorize_url = "https://test-server.brapi.org/brapi/v2/authorize",
+  access_url = "https://test-server.brapi.org/brapi/v2/token"
 )
+con
 }
 
 }

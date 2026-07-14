@@ -17,3 +17,10 @@ A single-row tibble with program details.
 \description{
 Get a Single Program by ID
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_program(con, "program1")
+}
+
+}

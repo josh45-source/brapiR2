@@ -15,3 +15,9 @@ Invisibly returns \code{con}.
 \description{
 Removes all cached responses from the cache directory.
 }
+\examples{
+con <- brapi_connection("https://test-server.brapi.org")
+con <- brapi_cache_enable(con, dir = tempdir())
+brapi_cache_clear(con)
+
+}

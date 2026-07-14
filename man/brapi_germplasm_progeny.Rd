@@ -17,3 +17,10 @@ A tibble with progeny information.
 \description{
 Get Germplasm Progeny
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_germplasm_progeny(con, "germplasm1")
+}
+
+}

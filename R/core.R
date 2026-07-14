@@ -1,19 +1,20 @@
 # ---- BrAPI Core Module ----
-# Endpoints: /programs, /trials, /studies, /locations, /seasons, /lists, /people, /serverinfo
+# Endpoints: /programs, /trials, /studies, /locations, /seasons, /lists,
+#            /people, /serverinfo
 
 
 #' List Breeding Programs
 #'
 #' Retrieves a list of breeding programs from the BrAPI server.
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param ... Additional query parameters passed to the API
 #'   (e.g. `commonCropName = "rice"`, `programName = "IRRI"`).
 #'
 #' @return A tibble with one row per program.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
 #' brapi_programs(con)
 #' brapi_programs(con, commonCropName = "rice")
@@ -27,10 +28,16 @@ brapi_programs <- function(con, ...) {
 
 #' Get a Single Program by ID
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param programDbId Character. The unique program identifier.
 #'
 #' @return A single-row tibble with program details.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_program(con, "program1")
+#' }
 #'
 #' @export
 brapi_program <- function(con, programDbId) {
@@ -42,14 +49,14 @@ brapi_program <- function(con, programDbId) {
 #'
 #' Retrieves trials, optionally filtered by program.
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param programDbId Character or NULL. Filter by program.
 #' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per trial.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
 #' brapi_trials(con)
 #' }
@@ -64,10 +71,16 @@ brapi_trials <- function(con, programDbId = NULL, ...) {
 
 #' Get a Single Trial by ID
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param trialDbId Character. The unique trial identifier.
 #'
 #' @return A single-row tibble with trial details.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_trial(con, "trial1")
+#' }
 #'
 #' @export
 brapi_trial <- function(con, trialDbId) {
@@ -79,17 +92,17 @@ brapi_trial <- function(con, trialDbId) {
 #'
 #' Retrieves studies (occurrences/environments), optionally filtered by trial.
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param trialDbId Character or NULL. Filter by trial.
 #' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per study.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
 #' brapi_studies(con)
-#' brapi_studies(con, trialDbId = "trial_01")
+#' brapi_studies(con, trialDbId = "trial1")
 #' }
 #'
 #' @export
@@ -102,10 +115,16 @@ brapi_studies <- function(con, trialDbId = NULL, ...) {
 
 #' Get a Single Study by ID
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param studyDbId Character. The unique study identifier.
 #'
 #' @return A single-row tibble with study metadata.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_study(con, "study1")
+#' }
 #'
 #' @export
 brapi_study <- function(con, studyDbId) {
@@ -115,10 +134,16 @@ brapi_study <- function(con, studyDbId) {
 
 #' List Locations
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param ... Additional query parameters (e.g. `locationType`).
 #'
 #' @return A tibble with one row per location.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_locations(con)
+#' }
 #'
 #' @export
 brapi_locations <- function(con, ...) {
@@ -128,10 +153,16 @@ brapi_locations <- function(con, ...) {
 
 #' List Seasons
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param ... Additional query parameters (e.g. `year`).
 #'
 #' @return A tibble with one row per season.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_seasons(con)
+#' }
 #'
 #' @export
 brapi_seasons <- function(con, ...) {
@@ -141,10 +172,16 @@ brapi_seasons <- function(con, ...) {
 
 #' List Generic Lists
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param ... Additional query parameters (e.g. `listType`).
 #'
 #' @return A tibble with one row per list.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_lists(con)
+#' }
 #'
 #' @export
 brapi_lists <- function(con, ...) {
@@ -154,10 +191,16 @@ brapi_lists <- function(con, ...) {
 
 #' List People
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per person.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_people(con)
+#' }
 #'
 #' @export
 brapi_people <- function(con, ...) {
@@ -171,12 +214,12 @@ brapi_people <- function(con, ...) {
 #' supported endpoint with columns for service name, HTTP methods, BrAPI
 #' versions, and content/data types.
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #'
 #' @return A tibble of supported endpoints and their methods.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
 #' brapi_server_info(con)
 #' }

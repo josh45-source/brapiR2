@@ -17,3 +17,10 @@ A tibble with one row per list.
 \description{
 List Generic Lists
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_lists(con)
+}
+
+}

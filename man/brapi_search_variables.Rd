@@ -19,3 +19,10 @@ A tibble of matching observation variables.
 \description{
 Search Observation Variables
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_search_variables(con, traitClasses = "agronomic")
+}
+
+}

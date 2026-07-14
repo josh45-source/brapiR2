@@ -17,3 +17,8 @@ Invisibly returns \code{x}.
 \description{
 Print a BrAPI Connection Object
 }
+\examples{
+con <- brapi_connection("https://test-server.brapi.org")
+print(con)
+
+}

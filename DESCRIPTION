@@ -13,7 +13,8 @@ Description: Provides pipe-friendly, stateless access to every endpoint in the
     plant breeders and bioinformaticians who need programmatic access to 
     BreedBase, BMS, EBS, GIGWA, Germinate, and any BrAPI-compliant server.
 License: MIT + file LICENSE
-URL: https://josh45-source.github.io/brapiR2, https://github.com/josh45-source/brapiR2
+URL: https://github.com/josh45-source/brapiR2,
+    https://josh45-source.github.io/brapiR2/
 BugReports: https://github.com/josh45-source/brapiR2/issues
 Encoding: UTF-8
 Language: en-US

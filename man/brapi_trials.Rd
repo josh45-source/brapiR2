@@ -20,7 +20,7 @@ A tibble with one row per trial.
 Retrieves trials, optionally filtered by program.
 }
 \examples{
-\dontrun{
+\donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 brapi_trials(con)
 }

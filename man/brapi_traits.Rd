@@ -17,3 +17,10 @@ A tibble with one row per trait.
 \description{
 List Traits
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_traits(con)
+}
+
+}

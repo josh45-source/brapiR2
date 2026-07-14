@@ -19,3 +19,10 @@ A tibble with one row per variant set.
 \description{
 List Variant Sets (Datasets)
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_variant_sets(con)
+}
+
+}

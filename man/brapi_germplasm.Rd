@@ -18,3 +18,10 @@ A tibble with one row per germplasm accession.
 \description{
 List Germplasm
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_germplasm(con)
+}
+
+}

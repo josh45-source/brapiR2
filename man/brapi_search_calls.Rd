@@ -21,3 +21,10 @@ A tibble of matching genotype calls.
 \description{
 Search Genotype Calls
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_search_calls(con, variantSetDbIds = "variantset1")
+}
+
+}

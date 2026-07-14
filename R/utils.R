@@ -10,7 +10,7 @@
 #' @return Logical. `TRUE` if the server responds, `FALSE` otherwise.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
 #' brapi_ping(con)
 #' }
@@ -45,10 +45,11 @@ brapi_ping <- function(con) {
 #'
 #' @param con A [brapi_connection()] object.
 #'
-#' @return A tibble with columns for endpoint service, method(s), and version(s).
+#' @return A tibble with columns for endpoint service, method(s), and
+#'   version(s).
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
 #' brapi_endpoints(con)
 #' }

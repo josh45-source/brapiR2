@@ -17,3 +17,10 @@ A tibble with one row per seed lot.
 \description{
 List Seed Lots
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_seed_lots(con)
+}
+
+}

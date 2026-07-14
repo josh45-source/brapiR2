@@ -27,9 +27,9 @@ the \code{furrr} package. Useful for retrieving data across many studies,
 trials, or germplasm records simultaneously.
 }
 \examples{
-\dontrun{
+\donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-study_ids <- c("study_01", "study_02", "study_03")
+study_ids <- c("study1", "study2", "study3")
 all_data <- brapi_fetch_parallel(con, brapi_study_data, study_ids)
 }
 

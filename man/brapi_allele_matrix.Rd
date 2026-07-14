@@ -23,3 +23,10 @@ tidy tibble with one row per (variant, callSet) combination. The
 \verb{/allelematrix} response has a unique structure (2-D pagination, no
 \code{result$data} envelope) so it cannot use the generic \code{brapi_get()}.
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_allele_matrix(con, variantSetDbId = "variantset1")
+}
+
+}

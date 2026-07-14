@@ -17,3 +17,10 @@ A tibble with one row per crossing project.
 \description{
 List Crossing Projects
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_crossing_projects(con)
+}
+
+}

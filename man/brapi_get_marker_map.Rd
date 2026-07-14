@@ -20,9 +20,9 @@ Convenience function that retrieves variant positions as a tidy tibble
 with columns for marker name, chromosome, and position.
 }
 \examples{
-\dontrun{
+\donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-markers <- brapi_get_marker_map(con, "variantset_01")
+markers <- brapi_get_marker_map(con, "variantset1")
 head(markers)
 }
 

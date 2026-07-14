@@ -17,3 +17,10 @@ A tibble with pedigree information (parents, crosses).
 \description{
 Get Germplasm Pedigree
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_germplasm_pedigree(con, "germplasm1")
+}
+
+}

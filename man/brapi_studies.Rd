@@ -20,10 +20,10 @@ A tibble with one row per study.
 Retrieves studies (occurrences/environments), optionally filtered by trial.
 }
 \examples{
-\dontrun{
+\donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 brapi_studies(con)
-brapi_studies(con, trialDbId = "trial_01")
+brapi_studies(con, trialDbId = "trial1")
 }
 
 }

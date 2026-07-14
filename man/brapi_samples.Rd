@@ -18,3 +18,10 @@ A tibble with one row per sample.
 \description{
 List Samples
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_samples(con)
+}
+
+}

@@ -3,16 +3,17 @@
 #' Authenticates using the BrAPI `/token` endpoint and returns an updated
 #' connection object with the Bearer token set.
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param username Character. Your username.
 #' @param password Character. Your password.
 #'
 #' @return A new `brapi_con` object with the token populated.
 #'
 #' @examples
-#' \dontrun{
-#' con <- brapi_connection("https://my-breedbase.org")
-#' con <- brapi_login(con, "my_user", "my_password")
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' con <- brapi_login(con, "brapi_reader", "brapi_reader")
+#' con
 #' }
 #'
 #' @export
@@ -53,7 +54,7 @@ brapi_login <- function(con, username, password) {
 #' Performs an OAuth 2.0 authorization code flow or client credentials flow.
 #' Returns an updated connection object with the Bearer token set.
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param client_id Character. OAuth client ID.
 #' @param client_secret Character. OAuth client secret.
 #' @param authorize_url Character. The authorization endpoint URL.
@@ -62,15 +63,16 @@ brapi_login <- function(con, username, password) {
 #' @return A new `brapi_con` object with the token populated.
 #'
 #' @examples
-#' \dontrun{
-#' con <- brapi_connection("https://ebs.example.org")
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
 #' con <- brapi_login_oauth2(
 #'   con,
-#'   client_id = "my_client_id",
-#'   client_secret = "my_secret",
-#'   authorize_url = "https://auth.example.org/oauth2/authorize",
-#'   access_url = "https://auth.example.org/oauth2/token"
+#'   client_id = "brapi_client",
+#'   client_secret = "brapi_secret",
+#'   authorize_url = "https://test-server.brapi.org/brapi/v2/authorize",
+#'   access_url = "https://test-server.brapi.org/brapi/v2/token"
 #' )
+#' con
 #' }
 #'
 #' @export
@@ -109,7 +111,7 @@ brapi_login_oauth2 <- function(con, client_id, client_secret,
 #' If you already have a token (e.g. from a web browser session), you can
 #' set it directly without going through a login flow.
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param token Character. The Bearer token string.
 #'
 #' @return A new `brapi_con` object with the token populated.

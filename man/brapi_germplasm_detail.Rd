@@ -17,3 +17,10 @@ A single-row tibble with germplasm details.
 \description{
 Get a Single Germplasm by ID
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_germplasm_detail(con, "germplasm1")
+}
+
+}

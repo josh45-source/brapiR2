@@ -14,3 +14,17 @@
 #'   req_auth_bearer_token req_method
 #' @importFrom tidyr pivot_wider unnest
 NULL
+
+
+#' Internal: Shared Parameter Documentation
+#'
+#' Not a real function; exists only so other topics can
+#' `@inheritParams brapi_shared_params` instead of repeating the
+#' description of the `con` argument in every file.
+#'
+#' @param con A [brapi_connection()] object.
+#'
+#' @return `NULL`, invisibly.
+#' @keywords internal
+#' @rdname brapi_shared_params
+brapi_shared_params <- function(con) NULL

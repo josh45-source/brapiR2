@@ -8,6 +8,7 @@
 #'
 #' @return An httr2 request object.
 #' @keywords internal
+#' @noRd
 brapi_req <- function(con, endpoint) {
   # Remove leading slash if present
   endpoint <- sub("^/", "", endpoint)
@@ -41,48 +42,117 @@ brapi_req <- function(con, endpoint) {
 #' @return A tibble of results, or an empty tibble if no data.
 #' @importFrom rlang hash
 #' @keywords internal
+#' @noRd
 brapi_get <- function(con, endpoint, query = list()) {
   validate_con(con)
 
   query$pageSize <- query$pageSize %||% con$page_size
   query$page <- 0L
 
-  # ---- Cache lookup ----
-  # The key covers the full result (all pages), so exclude the page param.
-  cache_file <- NULL
-  if (!is.null(con$cache)) {
-    key_query <- query[setdiff(names(query), "page")]
-    key_str <- paste0(
-      con$base_url, "/brapi/", con$version, "/",
-      sub("^/", "", endpoint)
-    )
-    if (length(key_query) > 0L) {
-      q <- key_query[order(names(key_query))]
-      key_str <- paste0(
-        key_str, "?",
-        paste0(names(q), "=", vapply(q, as.character, character(1L)),
-          collapse = "&"
-        )
-      )
-    }
-    cache_file <- file.path(
-      con$cache$dir,
-      paste0(rlang::hash(key_str), ".json")
-    )
-
-    if (file.exists(cache_file)) {
-      age <- as.numeric(
-        difftime(Sys.time(), file.mtime(cache_file), units = "secs")
-      )
-      if (age <= con$cache$ttl) {
-        cli_alert_info("Using cached response for {.path {endpoint}}.")
-        cached <- fromJSON(cache_file, simplifyVector = FALSE)
-        return(parse_brapi_result(cached))
-      }
+  cache_file <- brapi_cache_path(con, endpoint, query)
+  if (!is.null(cache_file)) {
+    cached <- brapi_cache_read(cache_file, con$cache$ttl, endpoint)
+    if (!is.null(cached)) {
+      return(cached)
     }
   }
 
-  # ---- HTTP request (with pagination) ----
+  pages <- brapi_get_pages(con, endpoint, query)
+  if (pages$single) {
+    return(parse_brapi_result(pages$data))
+  }
+
+  all_data <- pages$data
+
+  # Use auto_unbox = TRUE so R scalars serialise as JSON scalars (not 1-element
+  # arrays).  R lists from simplifyVector = FALSE are never auto-unboxed, so
+  # true array fields remain arrays after the round-trip.
+  if (!is.null(cache_file) && length(all_data) > 0L) {
+    writeLines(toJSON(all_data, auto_unbox = TRUE), cache_file)
+  }
+
+  if (length(all_data) == 0L) {
+    return(tibble())
+  }
+
+  parse_brapi_result(all_data)
+}
+
+
+#' Internal: Build the Cache File Path for a Request
+#'
+#' Returns `NULL` if caching is not enabled on `con`. Otherwise builds a
+#' deterministic cache key from the URL and sorted query parameters
+#' (excluding `page`, since the key covers the full multi-page result).
+#'
+#' @param con A `brapi_con` object.
+#' @param endpoint Character. The API endpoint.
+#' @param query Named list. Query parameters.
+#'
+#' @return A file path, or `NULL` if caching is not enabled.
+#' @keywords internal
+#' @noRd
+brapi_cache_path <- function(con, endpoint, query) {
+  if (is.null(con$cache)) {
+    return(NULL)
+  }
+
+  key_query <- query[setdiff(names(query), "page")]
+  key_str <- paste0(
+    con$base_url, "/brapi/", con$version, "/",
+    sub("^/", "", endpoint)
+  )
+  if (length(key_query) > 0L) {
+    q <- key_query[order(names(key_query))]
+    key_str <- paste0(
+      key_str, "?",
+      paste0(names(q), "=", vapply(q, as.character, character(1L)),
+        collapse = "&"
+      )
+    )
+  }
+  file.path(con$cache$dir, paste0(rlang::hash(key_str), ".json"))
+}
+
+
+#' Internal: Read a Cached Response if Still Fresh
+#'
+#' @param cache_file Character. Path to the cache file.
+#' @param ttl Numeric. Time-to-live in seconds.
+#' @param endpoint Character. The API endpoint (used in the status message).
+#'
+#' @return A parsed tibble, or `NULL` if there is no fresh cache entry.
+#' @keywords internal
+#' @noRd
+brapi_cache_read <- function(cache_file, ttl, endpoint) {
+  if (!file.exists(cache_file)) {
+    return(NULL)
+  }
+  age <- as.numeric(
+    difftime(Sys.time(), file.mtime(cache_file), units = "secs")
+  )
+  if (age > ttl) {
+    return(NULL)
+  }
+  cli_alert_info("Using cached response for {.path {endpoint}}.")
+  cached <- fromJSON(cache_file, simplifyVector = FALSE)
+  parse_brapi_result(cached)
+}
+
+
+#' Internal: Fetch All Pages of a GET Endpoint
+#'
+#' @param con A `brapi_con` object.
+#' @param endpoint Character. The API endpoint.
+#' @param query Named list. Query parameters (the `page` element is
+#'   overwritten on each iteration).
+#'
+#' @return A list with elements `data` (the accumulated records, or a
+#'   single result object when `single` is `TRUE`) and `single` (logical;
+#'   `TRUE` for single-object endpoints with no `data` envelope).
+#' @keywords internal
+#' @noRd
+brapi_get_pages <- function(con, endpoint, query) {
   all_data <- list()
   total_pages <- 1L
   current_page <- 0L
@@ -106,7 +176,7 @@ brapi_get <- function(con, endpoint, query = list()) {
     # Single-object endpoint (no `data` envelope) — return immediately,
     # no caching because there is nothing to paginate.
     if (!is.null(body$result) && is.null(body$result$data)) {
-      return(parse_brapi_result(list(body$result)))
+      return(list(data = list(body$result), single = TRUE))
     }
 
     if (length(data) > 0L) {
@@ -117,19 +187,7 @@ brapi_get <- function(con, endpoint, query = list()) {
     if (current_page >= total_pages) break
   }
 
-  # ---- Cache write ----
-  # Use auto_unbox = TRUE so R scalars serialise as JSON scalars (not 1-element
-  # arrays).  R lists from simplifyVector = FALSE are never auto-unboxed, so
-  # true array fields remain arrays after the round-trip.
-  if (!is.null(cache_file) && length(all_data) > 0L) {
-    writeLines(toJSON(all_data, auto_unbox = TRUE), cache_file)
-  }
-
-  if (length(all_data) == 0L) {
-    return(tibble())
-  }
-
-  parse_brapi_result(all_data)
+  list(data = all_data, single = FALSE)
 }
 
 
@@ -145,10 +203,12 @@ brapi_get <- function(con, endpoint, query = list()) {
 #' @param endpoint Character. The search endpoint (e.g. "/search/germplasm").
 #' @param body Named list. The search request body.
 #' @param poll_interval Numeric. Seconds between polling attempts. Default 2.
-#' @param max_polls Integer. Maximum polling attempts before giving up. Default 30.
+#' @param max_polls Integer. Maximum polling attempts before giving up.
+#'   Default 30.
 #'
 #' @return A tibble of search results.
 #' @keywords internal
+#' @noRd
 brapi_post_search <- function(con, endpoint, body = list(),
                               poll_interval = 2, max_polls = 30L) {
   validate_con(con)
@@ -171,7 +231,6 @@ brapi_post_search <- function(con, endpoint, body = list(),
   resp_body <- resp_body_json(resp, simplifyVector = FALSE)
 
   if (status == 202L || !is.null(resp_body$result$searchResultsDbId)) {
-    # Async search — poll for results
     search_id <- resp_body$result$searchResultsDbId %||%
       resp_body$searchResultsDbId
 
@@ -179,28 +238,9 @@ brapi_post_search <- function(con, endpoint, body = list(),
       cli_abort("Server returned 202 but no {.field searchResultsDbId}.")
     }
 
-    cli_alert_info("Async search started (ID: {search_id}). Polling...")
-
-    poll_endpoint <- paste0(endpoint, "/", search_id)
-    for (i in seq_len(max_polls)) {
-      Sys.sleep(poll_interval)
-
-      poll_resp <- brapi_req(con, poll_endpoint) |>
-        req_url_query(pageSize = con$page_size) |>
-        req_perform()
-
-      poll_status <- resp_status(poll_resp)
-      if (poll_status == 200L) {
-        poll_body <- resp_body_json(poll_resp, simplifyVector = FALSE)
-        data <- poll_body$result$data %||% list()
-        if (length(data) == 0) {
-          return(tibble())
-        }
-        return(parse_brapi_result(data))
-      }
-    }
-
-    cli_abort("Search timed out after {max_polls} attempts.")
+    return(brapi_poll_search(
+      con, endpoint, search_id, poll_interval, max_polls
+    ))
   }
 
   # Immediate 200 response
@@ -209,6 +249,44 @@ brapi_post_search <- function(con, endpoint, body = list(),
     return(tibble())
   }
   parse_brapi_result(data)
+}
+
+
+#' Internal: Poll an Async BrAPI Search Until Results Are Ready
+#'
+#' @param con A `brapi_con` object.
+#' @param endpoint Character. The original search endpoint.
+#' @param search_id Character. The `searchResultsDbId` from the initial POST.
+#' @param poll_interval Numeric. Seconds between polling attempts.
+#' @param max_polls Integer. Maximum polling attempts before giving up.
+#'
+#' @return A tibble of search results.
+#' @keywords internal
+#' @noRd
+brapi_poll_search <- function(con, endpoint, search_id,
+                              poll_interval, max_polls) {
+  cli_alert_info("Async search started (ID: {search_id}). Polling...")
+
+  poll_endpoint <- paste0(endpoint, "/", search_id)
+  for (i in seq_len(max_polls)) {
+    Sys.sleep(poll_interval)
+
+    poll_resp <- brapi_req(con, poll_endpoint) |>
+      req_url_query(pageSize = con$page_size) |>
+      req_perform()
+
+    poll_status <- resp_status(poll_resp)
+    if (poll_status == 200L) {
+      poll_body <- resp_body_json(poll_resp, simplifyVector = FALSE)
+      data <- poll_body$result$data %||% list()
+      if (length(data) == 0) {
+        return(tibble())
+      }
+      return(parse_brapi_result(data))
+    }
+  }
+
+  cli_abort("Search timed out after {max_polls} attempts.")
 }
 
 
@@ -221,6 +299,7 @@ brapi_post_search <- function(con, endpoint, body = list(),
 #'
 #' @return A tibble.
 #' @keywords internal
+#' @noRd
 parse_brapi_result <- function(data) {
   if (length(data) == 0) {
     return(tibble())

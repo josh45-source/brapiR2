@@ -26,3 +26,10 @@ A tibble of matching observations.
 \description{
 Search Observations
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_search_observations(con, studyDbIds = "study1")
+}
+
+}

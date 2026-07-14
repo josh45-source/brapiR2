@@ -19,3 +19,10 @@ A tibble with one row per genotype call.
 \description{
 List Genotype Calls
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_calls(con, variantSetDbId = "variantset1")
+}
+
+}

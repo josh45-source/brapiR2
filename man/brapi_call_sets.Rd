@@ -17,3 +17,10 @@ A tibble with one row per call set.
 \description{
 List Call Sets (Samples with Genotype Data)
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_call_sets(con)
+}
+
+}

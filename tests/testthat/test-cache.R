@@ -4,7 +4,7 @@ test_that("brapi_cache_enable adds cache config to connection", {
 
   con <- brapi_cache_enable(con, dir = file.path(tmpdir, "brapi_test_cache"))
   expect_false(is.null(con$cache))
-  expect_equal(con$cache$ttl, 3600)
+  expect_identical(con$cache$ttl, 3600)
   expect_true(dir.exists(con$cache$dir))
 
   # Cleanup

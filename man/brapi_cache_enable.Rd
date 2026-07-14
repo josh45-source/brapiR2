@@ -24,9 +24,8 @@ are stored as JSON files in the specified directory, keyed by URL and
 query parameters.
 }
 \examples{
-\dontrun{
 con <- brapi_connection("https://test-server.brapi.org")
-con <- brapi_cache_enable(con, ttl = 7200)
-}
+con <- brapi_cache_enable(con, dir = tempdir(), ttl = 7200)
+con
 
 }

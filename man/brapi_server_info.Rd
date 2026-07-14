@@ -18,7 +18,7 @@ supported endpoint with columns for service name, HTTP methods, BrAPI
 versions, and content/data types.
 }
 \examples{
-\dontrun{
+\donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 brapi_server_info(con)
 }

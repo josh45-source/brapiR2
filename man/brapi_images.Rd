@@ -17,3 +17,10 @@ A tibble with one row per image record.
 \description{
 List Images
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_images(con)
+}
+
+}

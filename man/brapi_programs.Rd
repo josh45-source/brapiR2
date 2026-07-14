@@ -19,7 +19,7 @@ A tibble with one row per program.
 Retrieves a list of breeding programs from the BrAPI server.
 }
 \examples{
-\dontrun{
+\donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 brapi_programs(con)
 brapi_programs(con, commonCropName = "rice")

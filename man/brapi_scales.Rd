@@ -17,3 +17,10 @@ A tibble with one row per scale definition.
 \description{
 List Scales
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_scales(con)
+}
+
+}

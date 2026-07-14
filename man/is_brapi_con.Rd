@@ -15,4 +15,10 @@ Logical.
 \description{
 Test if an Object is a BrAPI Connection
 }
+\examples{
+con <- brapi_connection("https://test-server.brapi.org")
+is_brapi_con(con)
+is_brapi_con("not a connection")
+
+}
 \keyword{internal}

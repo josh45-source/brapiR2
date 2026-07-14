@@ -17,3 +17,10 @@ A tibble with one row per measurement method.
 \description{
 List Methods
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_methods(con)
+}
+
+}

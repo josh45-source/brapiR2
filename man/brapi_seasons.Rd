@@ -17,3 +17,10 @@ A tibble with one row per season.
 \description{
 List Seasons
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_seasons(con)
+}
+
+}

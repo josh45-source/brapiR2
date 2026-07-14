@@ -10,14 +10,15 @@ brapi_endpoints(con)
 \item{con}{A \code{\link[=brapi_connection]{brapi_connection()}} object.}
 }
 \value{
-A tibble with columns for endpoint service, method(s), and version(s).
+A tibble with columns for endpoint service, method(s), and
+version(s).
 }
 \description{
 Queries the \verb{/serverinfo} endpoint to list which BrAPI calls the
 server supports, along with their HTTP methods and versions.
 }
 \examples{
-\dontrun{
+\donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 brapi_endpoints(con)
 }

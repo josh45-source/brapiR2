@@ -17,3 +17,10 @@ A single-row tibble with study metadata.
 \description{
 Get a Single Study by ID
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_study(con, "study1")
+}
+
+}

@@ -21,9 +21,10 @@ Authenticates using the BrAPI \verb{/token} endpoint and returns an updated
 connection object with the Bearer token set.
 }
 \examples{
-\dontrun{
-con <- brapi_connection("https://my-breedbase.org")
-con <- brapi_login(con, "my_user", "my_password")
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+con <- brapi_login(con, "brapi_reader", "brapi_reader")
+con
 }
 
 }

@@ -19,3 +19,10 @@ A tibble with one row per observation unit (plot/plant/sample).
 \description{
 List Observation Units
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_observation_units(con, studyDbId = "study1")
+}
+
+}

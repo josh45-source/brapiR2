@@ -19,3 +19,10 @@ A tibble with one row per variant.
 \description{
 List Variants (Markers/SNPs)
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_variants(con, variantSetDbId = "variantset1")
+}
+
+}

@@ -17,3 +17,10 @@ A tibble with one row per reference set.
 \description{
 List Reference Sets (Genome Assemblies)
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_reference_sets(con)
+}
+
+}

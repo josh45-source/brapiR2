@@ -44,7 +44,7 @@ test_that("second call returns cached result and skips HTTP", {
   t_cached <- proc.time()[["elapsed"]] - t_start
 
   # Results must be identical
-  expect_equal(result1, result2)
+  expect_identical(result1, result2)
 
   # Cached call should be faster than a typical HTTP round-trip (>0.3 s).
   # Even on a slow machine a file read finishes in well under 0.3 s.
@@ -130,7 +130,7 @@ test_that("cache key is deterministic for identical requests", {
 
   # Manually write a fake cache file at the expected key
   # The key path is: hash(base_url/brapi/v2/programs?pageSize=1000) + .json
-  key_str <- paste0("https://test-server.brapi.org/brapi/v2/programs?pageSize=1000")
+  key_str <- "https://test-server.brapi.org/brapi/v2/programs?pageSize=1000"
   key_file <- file.path(tmpdir, paste0(rlang::hash(key_str), ".json"))
 
   # Write a fake one-record result using auto_unbox = TRUE to match how
@@ -140,5 +140,5 @@ test_that("cache key is deterministic for identical requests", {
 
   # brapi_programs should pick up the fake cache
   result <- brapi_programs(con)
-  expect_equal(result$programDbId[[1L]], "fake_01")
+  expect_identical(result$programDbId[[1L]], "fake_01")
 })

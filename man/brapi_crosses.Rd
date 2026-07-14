@@ -17,3 +17,10 @@ A tibble with one row per cross.
 \description{
 List Crosses
 }
+\examples{
+\donttest{
+con <- brapi_connection("https://test-server.brapi.org")
+brapi_crosses(con)
+}
+
+}

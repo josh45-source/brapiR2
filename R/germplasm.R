@@ -4,11 +4,17 @@
 
 #' List Germplasm
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param ... Additional query parameters
 #'   (e.g. `commonCropName`, `germplasmName`, `studyDbId`).
 #'
 #' @return A tibble with one row per germplasm accession.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_germplasm(con)
+#' }
 #'
 #' @export
 brapi_germplasm <- function(con, ...) {
@@ -18,10 +24,16 @@ brapi_germplasm <- function(con, ...) {
 
 #' Get a Single Germplasm by ID
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param germplasmDbId Character. The unique germplasm identifier.
 #'
 #' @return A single-row tibble with germplasm details.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_germplasm_detail(con, "germplasm1")
+#' }
 #'
 #' @export
 brapi_germplasm_detail <- function(con, germplasmDbId) {
@@ -31,10 +43,16 @@ brapi_germplasm_detail <- function(con, germplasmDbId) {
 
 #' Get Germplasm Pedigree
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param germplasmDbId Character. The unique germplasm identifier.
 #'
 #' @return A tibble with pedigree information (parents, crosses).
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_germplasm_pedigree(con, "germplasm1")
+#' }
 #'
 #' @export
 brapi_germplasm_pedigree <- function(con, germplasmDbId) {
@@ -44,10 +62,16 @@ brapi_germplasm_pedigree <- function(con, germplasmDbId) {
 
 #' Get Germplasm Progeny
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param germplasmDbId Character. The unique germplasm identifier.
 #'
 #' @return A tibble with progeny information.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_germplasm_progeny(con, "germplasm1")
+#' }
 #'
 #' @export
 brapi_germplasm_progeny <- function(con, germplasmDbId) {
@@ -57,10 +81,16 @@ brapi_germplasm_progeny <- function(con, germplasmDbId) {
 
 #' List Germplasm Attributes
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per attribute definition.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_germplasm_attributes(con)
+#' }
 #'
 #' @export
 brapi_germplasm_attributes <- function(con, ...) {
@@ -70,10 +100,16 @@ brapi_germplasm_attributes <- function(con, ...) {
 
 #' List Crosses
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per cross.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_crosses(con)
+#' }
 #'
 #' @export
 brapi_crosses <- function(con, ...) {
@@ -83,10 +119,16 @@ brapi_crosses <- function(con, ...) {
 
 #' List Crossing Projects
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per crossing project.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_crossing_projects(con)
+#' }
 #'
 #' @export
 brapi_crossing_projects <- function(con, ...) {
@@ -96,10 +138,16 @@ brapi_crossing_projects <- function(con, ...) {
 
 #' List Seed Lots
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per seed lot.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_seed_lots(con)
+#' }
 #'
 #' @export
 brapi_seed_lots <- function(con, ...) {
@@ -111,13 +159,19 @@ brapi_seed_lots <- function(con, ...) {
 #'
 #' Performs a BrAPI search for germplasm records matching the given criteria.
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param germplasmNames Character vector. Filter by germplasm names.
 #' @param germplasmDbIds Character vector. Filter by database IDs.
 #' @param commonCropNames Character vector. Filter by crop name.
 #' @param ... Additional body parameters for the search request.
 #'
 #' @return A tibble of matching germplasm records.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_search_germplasm(con, commonCropNames = "Tomatillo")
+#' }
 #'
 #' @export
 brapi_search_germplasm <- function(con,

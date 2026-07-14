@@ -59,6 +59,11 @@ brapi_connection <- function(url,
 #' @param ... Additional arguments (ignored).
 #'
 #' @return Invisibly returns `x`.
+#'
+#' @examples
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' print(con)
+#'
 #' @export
 print.brapi_con <- function(x, ...) {
   auth_status <- if (!is.null(x$token)) {
@@ -89,7 +94,14 @@ print.brapi_con <- function(x, ...) {
 #'
 #' @param x An object to test.
 #' @return Logical.
+#'
+#' @examples
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' is_brapi_con(con)
+#' is_brapi_con("not a connection")
+#'
 #' @keywords internal
+#' @export
 is_brapi_con <- function(x) {
   inherits(x, "brapi_con")
 }
@@ -102,7 +114,7 @@ is_brapi_con <- function(x) {
 #'
 #' @param con Object to validate.
 #' @return Invisibly returns `con` if valid; throws an error otherwise.
-#' @keywords internal
+#' @noRd
 validate_con <- function(con) {
   if (!is_brapi_con(con)) {
     cli_abort(c(

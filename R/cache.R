@@ -7,7 +7,7 @@
 #' are stored as JSON files in the specified directory, keyed by URL and
 #' query parameters.
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param dir Character. Directory to store cached responses.
 #'   Defaults to a user cache directory via `rappdirs::user_cache_dir()`.
 #' @param ttl Numeric. Time-to-live for cached entries in seconds.
@@ -16,10 +16,9 @@
 #' @return A new `brapi_con` object with caching configured.
 #'
 #' @examples
-#' \dontrun{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' con <- brapi_cache_enable(con, ttl = 7200)
-#' }
+#' con <- brapi_cache_enable(con, dir = tempdir(), ttl = 7200)
+#' con
 #'
 #' @export
 brapi_cache_enable <- function(con, dir = NULL, ttl = 3600) {
@@ -27,7 +26,10 @@ brapi_cache_enable <- function(con, dir = NULL, ttl = 3600) {
 
   if (is.null(dir)) {
     if (!requireNamespace("rappdirs", quietly = TRUE)) {
-      cli_abort("Install {.pkg rappdirs} to use default cache dir, or specify {.arg dir}.")
+      cli_abort(c(
+        "Install {.pkg rappdirs} to use the default cache dir,",
+        "i" = "or specify {.arg dir} directly."
+      ))
     }
     dir <- rappdirs::user_cache_dir("brapiR2")
   }
@@ -49,6 +51,11 @@ brapi_cache_enable <- function(con, dir = NULL, ttl = 3600) {
 #' @param con A [brapi_connection()] object with caching enabled.
 #'
 #' @return Invisibly returns `con`.
+#'
+#' @examples
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' con <- brapi_cache_enable(con, dir = tempdir())
+#' brapi_cache_clear(con)
 #'
 #' @export
 brapi_cache_clear <- function(con) {
@@ -76,7 +83,7 @@ brapi_cache_clear <- function(con) {
 #' the `furrr` package. Useful for retrieving data across many studies,
 #' trials, or germplasm records simultaneously.
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #' @param .fn A brapiR2 function to call for each item
 #'   (e.g. `brapi_study_data`).
 #' @param ids Character vector. A set of IDs to iterate over.
@@ -86,9 +93,9 @@ brapi_cache_clear <- function(con) {
 #' @return A tibble with results from all IDs combined.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' study_ids <- c("study_01", "study_02", "study_03")
+#' study_ids <- c("study1", "study2", "study3")
 #' all_data <- brapi_fetch_parallel(con, brapi_study_data, study_ids)
 #' }
 #'
@@ -97,7 +104,7 @@ brapi_fetch_parallel <- function(con, .fn, ids, .workers = 4L, ...) {
   validate_con(con)
 
   if (!requireNamespace("furrr", quietly = TRUE) ||
-    !requireNamespace("future", quietly = TRUE)) {
+        !requireNamespace("future", quietly = TRUE)) {
     cli_abort("Install {.pkg furrr} and {.pkg future} for parallel fetching.")
   }
 
@@ -106,7 +113,8 @@ brapi_fetch_parallel <- function(con, .fn, ids, .workers = 4L, ...) {
 
   future::plan(future::multisession, workers = .workers)
 
-  cli_alert_info("Fetching {length(ids)} items across {.workers} workers...")
+  n_workers <- .workers
+  cli_alert_info("Fetching {length(ids)} items across {n_workers} workers...")
 
   results <- furrr::future_map_dfr(ids, function(id) {
     tryCatch(

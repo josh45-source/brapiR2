@@ -21,9 +21,9 @@ for a given study and pivots them into a wide-format tibble with one
 row per observation unit and one column per trait — ready for analysis.
 }
 \examples{
-\dontrun{
+\donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-data <- brapi_study_data(con, "study_01")
+data <- brapi_study_data(con, "study1")
 head(data)
 }
 

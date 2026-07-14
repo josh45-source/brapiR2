@@ -34,9 +34,9 @@ Allele dosage is computed by splitting each genotype string on \code{sep} (or
 \code{NA}.
 }
 \examples{
-\dontrun{
+\donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-dosage <- brapi_get_dosage_matrix(con, "variantset_01")
+dosage <- brapi_get_dosage_matrix(con, "variantset1")
 dim(dosage)
 # Use with rrBLUP:
 # library(rrBLUP)
