@@ -6,6 +6,10 @@ on:
 
 name: pkgcheck
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   check:
     runs-on: ubuntu-latest
