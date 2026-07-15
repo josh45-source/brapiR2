@@ -42,7 +42,7 @@
 <p>This note documents why <code>brapiR2</code> has its current structure. It is written for rOpenSci review and future maintenance.</p>
 <div class="section level2">
 <h2 id="design-history">Design History<a class="anchor" aria-label="anchor" href="#design-history"></a></h2>
-<p><code>brapiR2</code> was built to fill a gap in the R ecosystem for the Breeding API (BrAPI) v2 specification. The existing R client, <code>QBMS</code>, is stateful and menu-driven: it holds a “current” program, trial, or study internally and walks the user through an interactive selection flow. That design fits exploratory, console-driven use, but it does not fit scripted pipelines, parallel batch jobs, or reproducible analysis code, where the caller wants to pass an explicit connection and get a tibble back — nothing hidden, nothing stateful.</p>
+<p><code>brapiR2</code> was built to fill a gap in the R ecosystem for the Breeding API (BrAPI) v2 specification. The existing R client, <code>QBMS</code>, is stateful and menu-driven: it holds a “current” program, trial, or study internally and walks the user through an interactive selection flow. That design fits exploratory, console-driven use, but it does not fit scripted pipelines, parallel batch jobs, or reproducible analysis code, where the caller wants to pass an explicit connection and get a tibble back nothing hidden, nothing stateful.</p>
 <p><code>brapiR2</code> was developed with Claude Code assistance. The author directed the architecture, the public API design, and the domain logic (which BrAPI modules to cover, how pagination and async search should behave, how genotype calls should be encoded as dosages); the assistant implemented those decisions and iterated against the live public BrAPI test server (<code>https://test-server.brapi.org</code>) to validate real request/response shapes rather than only against synthetic fixtures. The git history for this repository is comparatively compressed relative to the amount of surface area covered, which reflects that AI-assisted development pattern: whole modules were scaffolded and corrected against live server output in single passes rather than built up commit-by-commit over weeks.</p>
 <p>Before rOpenSci submission, the package went through a review-driven cleanup pass: every exported function gained a runnable example (verified against the live test server), <code>\dontrun{}</code> was replaced package-wide with <code>\donttest{}</code> since the examples are not broken, only network-dependent, goodpractice/lintr issues were fixed (function length, line length, duplicated parameter docs via <code>@inheritParams</code>, assignment style), and test coverage was raised from roughly 65% to 98% by adding mocked unit tests alongside the existing live-server integration tests.</p>
 </div>
@@ -50,15 +50,15 @@
 <h2 id="architecture-overview">Architecture Overview<a class="anchor" aria-label="anchor" href="#architecture-overview"></a></h2>
 <p><code>brapiR2</code> is organized in layers, from the caller’s perspective inward:</p>
 <ol style="list-style-type: decimal"><li>
-<strong>Connection and auth</strong> — build and hold connection state explicitly (<code><a href="reference/brapi_connection.html">brapi_connection()</a></code>, <code><a href="reference/brapi_login.html">brapi_login()</a></code>, <code><a href="reference/brapi_login_oauth2.html">brapi_login_oauth2()</a></code>, <code><a href="reference/brapi_set_token.html">brapi_set_token()</a></code>). Nothing is stored globally.</li>
+<strong>Connection and auth</strong> - build and hold connection state explicitly (<code><a href="reference/brapi_connection.html">brapi_connection()</a></code>, <code><a href="reference/brapi_login.html">brapi_login()</a></code>, <code><a href="reference/brapi_login_oauth2.html">brapi_login_oauth2()</a></code>, <code><a href="reference/brapi_set_token.html">brapi_set_token()</a></code>). Nothing is stored globally.</li>
 <li>
-<strong>Request engine</strong> — a small set of internal functions that every exported endpoint function is built on top of. This layer owns HTTP request construction, transparent pagination, the BrAPI async-search poll protocol, and response-to-tibble parsing.</li>
+<strong>Request engine</strong> - a small set of internal functions that every exported endpoint function is built on top of. This layer owns HTTP request construction, transparent pagination, the BrAPI async-search poll protocol, and response-to-tibble parsing.</li>
 <li>
-<strong>Four BrAPI modules</strong> — Core, Germplasm, Phenotyping, and Genotyping. Each module is a thin, one-function-per-endpoint wrapper around the request engine, matching the four modules defined by the BrAPI v2 specification itself.</li>
+<strong>Four BrAPI modules</strong> - Core, Germplasm, Phenotyping, and Genotyping. Each module is a thin, one-function-per-endpoint wrapper around the request engine, matching the four modules defined by the BrAPI v2 specification itself.</li>
 <li>
-<strong>Convenience functions</strong> — a small number of higher-level functions (<code><a href="reference/brapi_study_data.html">brapi_study_data()</a></code>, <code><a href="reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix()</a></code>, <code><a href="reference/brapi_get_marker_map.html">brapi_get_marker_map()</a></code>) that compose module functions into analysis-ready shapes (a wide phenotyping tibble, a numeric dosage matrix) without introducing any new HTTP behavior of their own.</li>
+<strong>Convenience functions</strong> - a small number of higher-level functions (<code><a href="reference/brapi_study_data.html">brapi_study_data()</a></code>, <code><a href="reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix()</a></code>, <code><a href="reference/brapi_get_marker_map.html">brapi_get_marker_map()</a></code>) that compose module functions into analysis-ready shapes (a wide phenotyping tibble, a numeric dosage matrix) without introducing any new HTTP behavior of their own.</li>
 <li>
-<strong>Caching and parallel fetching</strong> — an optional, opt-in disk cache (<code><a href="reference/brapi_cache_enable.html">brapi_cache_enable()</a></code>, <code><a href="reference/brapi_cache_clear.html">brapi_cache_clear()</a></code>) and a parallel batch fetch helper (<code><a href="reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code>) layered on top of the request engine, both off by default.</li>
+<strong>Caching and parallel fetching</strong> - an optional, opt-in disk cache (<code><a href="reference/brapi_cache_enable.html">brapi_cache_enable()</a></code>, <code><a href="reference/brapi_cache_clear.html">brapi_cache_clear()</a></code>) and a parallel batch fetch helper (<code><a href="reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code>) layered on top of the request engine, both off by default.</li>
 </ol></div>
 <div class="section level2">
 <h2 id="component-map">Component Map<a class="anchor" aria-label="anchor" href="#component-map"></a></h2>
@@ -72,11 +72,11 @@
 </tr><tr><td>Authentication</td>
 <td><code>R/auth.R</code></td>
 <td>
-<code><a href="reference/brapi_login.html">brapi_login()</a></code>, <code><a href="reference/brapi_login_oauth2.html">brapi_login_oauth2()</a></code>, <code><a href="reference/brapi_set_token.html">brapi_set_token()</a></code> — populate the connection’s Bearer token via password grant, OAuth2 client-credentials grant, or direct assignment</td>
+<code><a href="reference/brapi_login.html">brapi_login()</a></code>, <code><a href="reference/brapi_login_oauth2.html">brapi_login_oauth2()</a></code>, <code><a href="reference/brapi_set_token.html">brapi_set_token()</a></code> - populate the connection’s Bearer token via password grant, OAuth2 client-credentials grant, or direct assignment</td>
 </tr><tr><td>Request engine</td>
 <td><code>R/request.R</code></td>
 <td>
-<code>brapi_req()</code>, <code>brapi_get()</code>, <code>brapi_get_pages()</code>, <code>brapi_cache_path()</code>, <code>brapi_cache_read()</code>, <code>brapi_post_search()</code>, <code>brapi_poll_search()</code>, <code>parse_brapi_result()</code> — shared HTTP plumbing: headers/auth/retry, GET pagination, cache key/lookup, the POST-search 200/202-poll protocol, and list-to-tibble parsing</td>
+<code>brapi_req()</code>, <code>brapi_get()</code>, <code>brapi_get_pages()</code>, <code>brapi_cache_path()</code>, <code>brapi_cache_read()</code>, <code>brapi_post_search()</code>, <code>brapi_poll_search()</code>, <code>parse_brapi_result()</code> - shared HTTP plumbing: headers/auth/retry, GET pagination, cache key/lookup, the POST-search 200/202-poll protocol, and list-to-tibble parsing</td>
 </tr><tr><td>Core module</td>
 <td><code>R/core.R</code></td>
 <td>Programs, trials, studies, locations, seasons, lists, people, server info</td>
@@ -92,16 +92,16 @@
 </tr><tr><td>Caching</td>
 <td><code>R/cache.R</code></td>
 <td>
-<code><a href="reference/brapi_cache_enable.html">brapi_cache_enable()</a></code>, <code><a href="reference/brapi_cache_clear.html">brapi_cache_clear()</a></code> — opt-in disk cache configuration and invalidation, keyed via <code><a href="https://rlang.r-lib.org/reference/hash.html" class="external-link">rlang::hash()</a></code>
+<code><a href="reference/brapi_cache_enable.html">brapi_cache_enable()</a></code>, <code><a href="reference/brapi_cache_clear.html">brapi_cache_clear()</a></code> - opt-in disk cache configuration and invalidation, keyed via <code><a href="https://rlang.r-lib.org/reference/hash.html" class="external-link">rlang::hash()</a></code>
 </td>
 </tr><tr><td>Parallel fetching</td>
 <td><code>R/cache.R</code></td>
 <td>
-<code><a href="reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code> — <code>furrr</code>/<code>future</code>-based batch fetching across many IDs</td>
+<code><a href="reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code> - <code>furrr</code>/<code>future</code>-based batch fetching across many IDs</td>
 </tr><tr><td>Utilities</td>
 <td><code>R/utils.R</code></td>
 <td>
-<code><a href="reference/brapi_ping.html">brapi_ping()</a></code>, <code><a href="reference/brapi_endpoints.html">brapi_endpoints()</a></code> — connectivity check and supported-endpoint introspection</td>
+<code><a href="reference/brapi_ping.html">brapi_ping()</a></code>, <code><a href="reference/brapi_endpoints.html">brapi_endpoints()</a></code> - connectivity check and supported-endpoint introspection</td>
 </tr><tr><td>Package doc</td>
 <td><code>R/brapiR2-package.R</code></td>
 <td>Package-level roxygen imports and the shared <code>@inheritParams</code> documentation template</td>
@@ -118,7 +118,7 @@
 </div>
 <div class="section level3">
 <h3 id="one-function-per-brapi-endpoint">One function per BrAPI endpoint<a class="anchor" aria-label="anchor" href="#one-function-per-brapi-endpoint"></a></h3>
-<p>Rather than one generic <code>brapi_call(entity, ...)</code> dispatcher, each BrAPI endpoint gets its own named function (<code><a href="reference/brapi_programs.html">brapi_programs()</a></code>, <code><a href="reference/brapi_trials.html">brapi_trials()</a></code>, <code><a href="reference/brapi_germplasm.html">brapi_germplasm()</a></code>, …). This costs more exported functions, but each one is individually documented, individually testable, and discoverable via autocomplete — which matters more for a spec with dozens of endpoints than a small parameter saving would.</p>
+<p>Rather than one generic <code>brapi_call(entity, ...)</code> dispatcher, each BrAPI endpoint gets its own named function (<code><a href="reference/brapi_programs.html">brapi_programs()</a></code>, <code><a href="reference/brapi_trials.html">brapi_trials()</a></code>, <code><a href="reference/brapi_germplasm.html">brapi_germplasm()</a></code>, …). This costs more exported functions, but each one is individually documented, individually testable, and discoverable via autocomplete which matters more for a spec with dozens of endpoints than a small parameter saving would.</p>
 </div>
 <div class="section level3">
 <h3 id="transparent-pagination">Transparent pagination<a class="anchor" aria-label="anchor" href="#transparent-pagination"></a></h3>
@@ -136,7 +136,7 @@
 </div>
 <div class="section level3">
 <h3 id="genotyping-module-as-the-key-differentiator">Genotyping module as the key differentiator<a class="anchor" aria-label="anchor" href="#genotyping-module-as-the-key-differentiator"></a></h3>
-<p>Core, Germplasm, and Phenotyping coverage exist in other BrAPI clients. Full genotyping support — the allele matrix’s non-standard 2D pagination, and the <code><a href="reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix()</a></code> / <code><a href="reference/brapi_get_marker_map.html">brapi_get_marker_map()</a></code> conversion into genomic-selection-ready numeric matrices — does not, and is the main reason <code>brapiR2</code> exists as a separate package rather than a QBMS contribution.</p>
+<p>Core, Germplasm, and Phenotyping coverage exist in other BrAPI clients. Full genotyping support - the allele matrix’s non-standard 2D pagination, and the <code><a href="reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix()</a></code> / <code><a href="reference/brapi_get_marker_map.html">brapi_get_marker_map()</a></code> conversion into genomic-selection-ready numeric matrices does not, and is the main reason <code>brapiR2</code> exists as a separate package rather than a QBMS contribution.</p>
 </div>
 <div class="section level3">
 <h3 id="disk-based-caching-keyed-with-rlanghash">Disk-based caching keyed with <code>rlang::hash()</code>
@@ -145,7 +145,7 @@
 </div>
 <div class="section level3">
 <h3 id="mocked-tests-alongside-integration-tests">Mocked tests alongside integration tests<a class="anchor" aria-label="anchor" href="#mocked-tests-alongside-integration-tests"></a></h3>
-<p>The test suite pairs two layers: <code>tests/testthat/test-*-mocked.R</code> files patch <code>httr2</code>’s <code>req_perform()</code>/<code>resp_body_json()</code>/<code>resp_status()</code> (and <code>future</code>/<code>furrr</code> for parallel fetching) via <code>local_mocked_bindings()</code> so every code path — including pagination edge cases, async-search polling, and cache hit/miss/expiry — runs deterministically without the live server; <code>test-integration.R</code> and <code>test-cache-integration.R</code> separately exercise the real test server and are skipped on CRAN and when offline. Together they bring line coverage to about 98%.</p>
+<p>The test suite pairs two layers: <code>tests/testthat/test-*-mocked.R</code> files patch <code>httr2</code>’s <code>req_perform()</code>/<code>resp_body_json()</code>/<code>resp_status()</code> (and <code>future</code>/<code>furrr</code> for parallel fetching) via <code>local_mocked_bindings()</code> so every code path — including pagination edge cases, async-search polling, and cache hit/miss/expiry - runs deterministically without the live server; <code>test-integration.R</code> and <code>test-cache-integration.R</code> separately exercise the real test server and are skipped on CRAN and when offline. Together they bring line coverage to about 98%.</p>
 </div>
 </div>
 <div class="section level2">
@@ -164,13 +164,13 @@
 <h2 id="relationship-to-other-tools">Relationship to Other Tools<a class="anchor" aria-label="anchor" href="#relationship-to-other-tools"></a></h2>
 <p><code>brapiR2</code> is designed to sit at the start of a breeding-data analysis pipeline, not to replace the tools downstream of it:</p>
 <ul><li>
-<strong>phenoQC</strong> — phenotypic data cleaning and quality control, consuming the tibbles from <code><a href="reference/brapi_observations.html">brapi_observations()</a></code> / <code><a href="reference/brapi_study_data.html">brapi_study_data()</a></code>.</li>
+<strong>phenoQC</strong> - phenotypic data cleaning and quality control, consuming the tibbles from <code><a href="reference/brapi_observations.html">brapi_observations()</a></code> / <code><a href="reference/brapi_study_data.html">brapi_study_data()</a></code>.</li>
 <li>
-<strong>vcf2dosage</strong> — genotype format conversion, complementary to <code><a href="reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix()</a></code> for data that originates as VCF rather than from a BrAPI server.</li>
+<strong>vcf2dosage</strong> - genotype format conversion, complementary to <code><a href="reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix()</a></code> for data that originates as VCF rather than from a BrAPI server.</li>
 <li>
-<strong>ggvariant</strong> — variant and genotype visualization, consuming <code><a href="reference/brapi_variants.html">brapi_variants()</a></code> / <code><a href="reference/brapi_allele_matrix.html">brapi_allele_matrix()</a></code> output.</li>
+<strong>ggvariant</strong> - variant and genotype visualization, consuming <code><a href="reference/brapi_variants.html">brapi_variants()</a></code> / <code><a href="reference/brapi_allele_matrix.html">brapi_allele_matrix()</a></code> output.</li>
 <li>
-<strong>gsbench</strong> — genomic selection model benchmarking, consuming the dosage matrix and phenotyping tibble directly as model inputs.</li>
+<strong>gsbench</strong> - genomic selection model benchmarking, consuming the dosage matrix and phenotyping tibble directly as model inputs.</li>
 </ul><p>In each case, <code>brapiR2</code>’s job ends at “a tidy tibble or matrix retrieved from a BrAPI server”; cleaning, visualization, and modeling are left to packages built for those tasks specifically.</p>
 </div>
 <div class="section level2">
