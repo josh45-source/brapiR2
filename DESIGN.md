@@ -11,7 +11,7 @@ menu-driven: it holds a "current" program, trial, or study internally and
 walks the user through an interactive selection flow. That design fits
 exploratory, console-driven use, but it does not fit scripted pipelines,
 parallel batch jobs, or reproducible analysis code, where the caller wants to
-pass an explicit connection and get a tibble back — nothing hidden, nothing
+pass an explicit connection and get a tibble back nothing hidden, nothing
 stateful.
 
 `brapiR2` was developed with Claude Code assistance. The author directed the
@@ -39,23 +39,23 @@ alongside the existing live-server integration tests.
 
 `brapiR2` is organized in layers, from the caller's perspective inward:
 
-1. **Connection and auth** — build and hold connection state explicitly
+1. **Connection and auth** - build and hold connection state explicitly
    (`brapi_connection()`, `brapi_login()`, `brapi_login_oauth2()`,
    `brapi_set_token()`). Nothing is stored globally.
-2. **Request engine** — a small set of internal functions that every
+2. **Request engine** - a small set of internal functions that every
    exported endpoint function is built on top of. This layer owns HTTP
    request construction, transparent pagination, the BrAPI async-search
    poll protocol, and response-to-tibble parsing.
-3. **Four BrAPI modules** — Core, Germplasm, Phenotyping, and Genotyping.
+3. **Four BrAPI modules** - Core, Germplasm, Phenotyping, and Genotyping.
    Each module is a thin, one-function-per-endpoint wrapper around the
    request engine, matching the four modules defined by the BrAPI v2
    specification itself.
-4. **Convenience functions** — a small number of higher-level functions
+4. **Convenience functions** - a small number of higher-level functions
    (`brapi_study_data()`, `brapi_get_dosage_matrix()`,
    `brapi_get_marker_map()`) that compose module functions into
    analysis-ready shapes (a wide phenotyping tibble, a numeric dosage
    matrix) without introducing any new HTTP behavior of their own.
-5. **Caching and parallel fetching** — an optional, opt-in disk cache
+5. **Caching and parallel fetching** - an optional, opt-in disk cache
    (`brapi_cache_enable()`, `brapi_cache_clear()`) and a parallel batch
    fetch helper (`brapi_fetch_parallel()`) layered on top of the request
    engine, both off by default.
@@ -65,15 +65,15 @@ alongside the existing live-server integration tests.
 | Component | Files | Responsibility |
 | --- | --- | --- |
 | Connection & validation | `R/connection.R` | `brapi_connection()`, `print.brapi_con()`, `is_brapi_con()`, `validate_con()` — build, print, and validate the stateless connection object every other function takes as its first argument |
-| Authentication | `R/auth.R` | `brapi_login()`, `brapi_login_oauth2()`, `brapi_set_token()` — populate the connection's Bearer token via password grant, OAuth2 client-credentials grant, or direct assignment |
-| Request engine | `R/request.R` | `brapi_req()`, `brapi_get()`, `brapi_get_pages()`, `brapi_cache_path()`, `brapi_cache_read()`, `brapi_post_search()`, `brapi_poll_search()`, `parse_brapi_result()` — shared HTTP plumbing: headers/auth/retry, GET pagination, cache key/lookup, the POST-search 200/202-poll protocol, and list-to-tibble parsing |
+| Authentication | `R/auth.R` | `brapi_login()`, `brapi_login_oauth2()`, `brapi_set_token()` - populate the connection's Bearer token via password grant, OAuth2 client-credentials grant, or direct assignment |
+| Request engine | `R/request.R` | `brapi_req()`, `brapi_get()`, `brapi_get_pages()`, `brapi_cache_path()`, `brapi_cache_read()`, `brapi_post_search()`, `brapi_poll_search()`, `parse_brapi_result()` - shared HTTP plumbing: headers/auth/retry, GET pagination, cache key/lookup, the POST-search 200/202-poll protocol, and list-to-tibble parsing |
 | Core module | `R/core.R` | Programs, trials, studies, locations, seasons, lists, people, server info |
 | Germplasm module | `R/germplasm.R` | Germplasm records, pedigree, progeny, attributes, crosses, crossing projects, seed lots, germplasm search |
 | Phenotyping module | `R/phenotyping.R` | Observation units, observations, observation variables, traits, scales, methods, images, events, phenotyping search, and `brapi_study_data()` (wide-format pivot) |
 | Genotyping module | `R/genotyping.R` | Samples, variants, variant sets, calls, call sets, references, reference sets, the allele matrix, genotyping search, and the `brapi_get_dosage_matrix()` / `brapi_get_marker_map()` convenience functions |
-| Caching | `R/cache.R` | `brapi_cache_enable()`, `brapi_cache_clear()` — opt-in disk cache configuration and invalidation, keyed via `rlang::hash()` |
-| Parallel fetching | `R/cache.R` | `brapi_fetch_parallel()` — `furrr`/`future`-based batch fetching across many IDs |
-| Utilities | `R/utils.R` | `brapi_ping()`, `brapi_endpoints()` — connectivity check and supported-endpoint introspection |
+| Caching | `R/cache.R` | `brapi_cache_enable()`, `brapi_cache_clear()` - opt-in disk cache configuration and invalidation, keyed via `rlang::hash()` |
+| Parallel fetching | `R/cache.R` | `brapi_fetch_parallel()` - `furrr`/`future`-based batch fetching across many IDs |
+| Utilities | `R/utils.R` | `brapi_ping()`, `brapi_endpoints()` - connectivity check and supported-endpoint introspection |
 | Package doc | `R/brapiR2-package.R` | Package-level roxygen imports and the shared `@inheritParams` documentation template |
 
 ## Main Design Decisions
@@ -103,7 +103,7 @@ Rather than one generic `brapi_call(entity, ...)` dispatcher, each BrAPI
 endpoint gets its own named function (`brapi_programs()`, `brapi_trials()`,
 `brapi_germplasm()`, ...). This costs more exported functions, but each one
 is individually documented, individually testable, and discoverable via
-autocomplete — which matters more for a spec with dozens of endpoints than
+autocomplete which matters more for a spec with dozens of endpoints than
 a small parameter saving would.
 
 ### Transparent pagination
@@ -132,9 +132,9 @@ of `brapiR2`'s request-engine internals (mockable in tests via
 ### Genotyping module as the key differentiator
 
 Core, Germplasm, and Phenotyping coverage exist in other BrAPI clients.
-Full genotyping support — the allele matrix's non-standard 2D pagination,
+Full genotyping support - the allele matrix's non-standard 2D pagination,
 and the `brapi_get_dosage_matrix()` / `brapi_get_marker_map()` conversion
-into genomic-selection-ready numeric matrices — does not, and is the main
+into genomic-selection-ready numeric matrices does not, and is the main
 reason `brapiR2` exists as a separate package rather than a QBMS
 contribution.
 
@@ -153,7 +153,7 @@ The test suite pairs two layers: `tests/testthat/test-*-mocked.R` files
 patch `httr2`'s `req_perform()`/`resp_body_json()`/`resp_status()` (and
 `future`/`furrr` for parallel fetching) via `local_mocked_bindings()` so
 every code path — including pagination edge cases, async-search polling,
-and cache hit/miss/expiry — runs deterministically without the live
+and cache hit/miss/expiry - runs deterministically without the live
 server; `test-integration.R` and `test-cache-integration.R` separately
 exercise the real test server and are skipped on CRAN and when offline.
 Together they bring line coverage to about 98%.
@@ -182,14 +182,14 @@ The current design deliberately leaves several things out of scope:
 `brapiR2` is designed to sit at the start of a breeding-data analysis
 pipeline, not to replace the tools downstream of it:
 
-- **phenoQC** — phenotypic data cleaning and quality control, consuming
+- **phenoQC** - phenotypic data cleaning and quality control, consuming
   the tibbles from `brapi_observations()` / `brapi_study_data()`.
-- **vcf2dosage** — genotype format conversion, complementary to
+- **vcf2dosage** - genotype format conversion, complementary to
   `brapi_get_dosage_matrix()` for data that originates as VCF rather than
   from a BrAPI server.
-- **ggvariant** — variant and genotype visualization, consuming
+- **ggvariant** - variant and genotype visualization, consuming
   `brapi_variants()` / `brapi_allele_matrix()` output.
-- **gsbench** — genomic selection model benchmarking, consuming the
+- **gsbench** - genomic selection model benchmarking, consuming the
   dosage matrix and phenotyping tibble directly as model inputs.
 
 In each case, `brapiR2`'s job ends at "a tidy tibble or matrix retrieved
