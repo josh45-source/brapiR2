@@ -64,10 +64,10 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="brapi_connection.html">brapi_connection</a></span><span class="op">(</span><span class="st">"https://test-server.brapi.org"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="brapi_cache_enable.html">brapi_cache_enable</a></span><span class="op">(</span><span class="va">con</span>, dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Caching enabled at <span style="color: #0000BB;">/tmp/Rtmpb9eCNO</span> (TTL: 3600s)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Caching enabled at <span style="color: #0000BB;">/tmp/RtmpbhJkEr</span> (TTL: 3600s)</span>
 <span class="r-in"><span><span class="fu">brapi_cache_clear</span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot remove file '/tmp/Rtmpb9eCNO/bslib-36dd7d54583ca31becd9906e27a99038', reason 'Directory not empty'</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot remove file '/tmp/Rtmpb9eCNO/downlit', reason 'Directory not empty'</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot remove file '/tmp/RtmpbhJkEr/bslib-36dd7d54583ca31becd9906e27a99038', reason 'Directory not empty'</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>cannot remove file '/tmp/RtmpbhJkEr/downlit', reason 'Directory not empty'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Cleared 4 cached response(s).</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
