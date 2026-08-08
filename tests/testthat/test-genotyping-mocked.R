@@ -126,6 +126,10 @@ test_that("brapi_get_marker_map returns tidy marker positions", {
     names(markers),
     c("variantDbId", "variantName", "referenceName", "start")
   )
+  expect_identical(markers$variantDbId, c("v1", "v2"))
+  expect_identical(markers$variantName, c("m1", "m2"))
+  expect_identical(markers$referenceName, c("1", "1"))
+  expect_identical(markers$start, c(100L, 200L))
 })
 
 test_that("brapi_get_marker_map handles a variantNames list-column", {

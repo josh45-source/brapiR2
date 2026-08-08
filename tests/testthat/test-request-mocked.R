@@ -3,11 +3,12 @@
 ## resp_body_json() bindings inside brapiR2's namespace.
 
 test_that("brapi_get paginates across multiple pages", {
-  call_n <- 0
+  call_n <- new.env()
+  call_n$n <- 0
   local_mocked_bindings(
     req_perform = function(req) {
-      resp <- structure(list(page = call_n), class = "httr2_response")
-      call_n <<- call_n + 1
+      resp <- structure(list(page = call_n$n), class = "httr2_response")
+      call_n$n <- call_n$n + 1
       resp
     },
     resp_body_json = function(resp, ...) {
@@ -65,10 +66,11 @@ test_that("brapi_get uses cache on second call within TTL", {
   tmpdir <- file.path(tempdir(), paste0("brapi_get_cache_", Sys.getpid()))
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
-  call_count <- 0
+  call_count <- new.env()
+  call_count$n <- 0
   local_mocked_bindings(
     req_perform = function(req) {
-      call_count <<- call_count + 1
+      call_count$n <- call_count$n + 1
       structure(list(), class = "httr2_response")
     },
     resp_body_json = function(resp, ...) {
@@ -86,7 +88,7 @@ test_that("brapi_get uses cache on second call within TTL", {
   r1 <- brapi_get(con, "/programs")
   r2 <- brapi_get(con, "/programs")
 
-  expect_identical(call_count, 1)
+  expect_identical(call_count$n, 1)
   expect_identical(r1, r2)
 })
 
@@ -94,10 +96,11 @@ test_that("brapi_get refetches when the cache entry has expired", {
   tmpdir <- file.path(tempdir(), paste0("brapi_get_cache_exp_", Sys.getpid()))
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
-  call_count <- 0
+  call_count <- new.env()
+  call_count$n <- 0
   local_mocked_bindings(
     req_perform = function(req) {
-      call_count <<- call_count + 1
+      call_count$n <- call_count$n + 1
       structure(list(), class = "httr2_response")
     },
     resp_body_json = function(resp, ...) {
@@ -116,7 +119,7 @@ test_that("brapi_get refetches when the cache entry has expired", {
   Sys.sleep(0.05)
   brapi_get(con, "/programs")
 
-  expect_identical(call_count, 2)
+  expect_identical(call_count$n, 2)
 })
 
 test_that("brapi_post_search returns data on an immediate 200 response", {
@@ -154,11 +157,12 @@ test_that("brapi_post_search returns an empty tibble on 200 with no data", {
 })
 
 test_that("brapi_post_search polls an async search until results ready", {
-  call_n <- 0
+  call_n <- new.env()
+  call_n$n <- 0
   local_mocked_bindings(
     req_perform = function(req) {
-      call_n <<- call_n + 1
-      structure(list(call = call_n), class = "httr2_response")
+      call_n$n <- call_n$n + 1
+      structure(list(call = call_n$n), class = "httr2_response")
     },
     resp_status = function(resp) if (resp$call == 1L) 202L else 200L,
     resp_body_json = function(resp, ...) {
@@ -181,11 +185,12 @@ test_that("brapi_post_search polls an async search until results ready", {
 })
 
 test_that("brapi_post_search returns empty tibble when polling finds no data", {
-  call_n <- 0
+  call_n <- new.env()
+  call_n$n <- 0
   local_mocked_bindings(
     req_perform = function(req) {
-      call_n <<- call_n + 1
-      structure(list(call = call_n), class = "httr2_response")
+      call_n$n <- call_n$n + 1
+      structure(list(call = call_n$n), class = "httr2_response")
     },
     resp_status = function(resp) if (resp$call == 1L) 202L else 200L,
     resp_body_json = function(resp, ...) {
@@ -246,5 +251,9 @@ test_that("parse_brapi_result falls back to jsonlite flatten on bad records", {
   # size-1 assumption and trigger the tryCatch fallback branch.
   bad_data <- list(list(id = "1", nested = data.frame(x = 1:2)))
   result <- parse_brapi_result(bad_data)
+
   expect_s3_class(result, "tbl_df")
+  expect_identical(nrow(result), 1L)
+  expect_identical(result$id, "1")
+  expect_identical(result$nested[[1]]$x, 1:2)
 })

@@ -1,82 +1,235 @@
 ## Most exported list/get functions are one-line wrappers around
 ## brapi_get() or brapi_post_search(). Mocking those two internal
 ## functions once exercises every wrapper's own body without any network.
+##
+## The mocks below capture the arguments they were called with (endpoint,
+## query, body) so each assertion can check that a wrapper hit the right
+## BrAPI path and threaded its ID/filter arguments through under the
+## correct key - not just that it returned whatever the mock handed back.
 
-test_that("GET-based list/detail wrappers call brapi_get() and return it", {
+test_that("core wrappers hit the right endpoint and pass filters through", {
+  captured <- new.env()
   canned <- tibble::tibble(id = "x")
   local_mocked_bindings(
-    brapi_get = function(con, endpoint, query = list()) canned,
+    brapi_get = function(con, endpoint, query = list()) {
+      captured$endpoint <- endpoint
+      captured$query <- query
+      canned
+    },
     .package = "brapiR2"
   )
 
   con <- brapi_connection("https://example.org")
 
   expect_identical(brapi_programs(con), canned)
+  expect_identical(captured$endpoint, "/programs")
+  brapi_programs(con, commonCropName = "rice")
+  expect_identical(captured$query$commonCropName, "rice")
+
   expect_identical(brapi_program(con, "p1"), canned)
+  expect_identical(captured$endpoint, "/programs/p1")
+
   expect_identical(brapi_trials(con), canned)
-  expect_identical(brapi_trials(con, programDbId = "p1"), canned)
+  expect_identical(captured$endpoint, "/trials")
+  brapi_trials(con, programDbId = "p1")
+  expect_identical(captured$query$programDbId, "p1")
+
   expect_identical(brapi_trial(con, "t1"), canned)
+  expect_identical(captured$endpoint, "/trials/t1")
+
   expect_identical(brapi_studies(con), canned)
-  expect_identical(brapi_studies(con, trialDbId = "t1"), canned)
+  expect_identical(captured$endpoint, "/studies")
+  brapi_studies(con, trialDbId = "t1")
+  expect_identical(captured$query$trialDbId, "t1")
+
   expect_identical(brapi_study(con, "s1"), canned)
+  expect_identical(captured$endpoint, "/studies/s1")
+
   expect_identical(brapi_locations(con), canned)
+  expect_identical(captured$endpoint, "/locations")
+  brapi_locations(con, locationType = "Field")
+  expect_identical(captured$query$locationType, "Field")
+
   expect_identical(brapi_seasons(con), canned)
+  expect_identical(captured$endpoint, "/seasons")
+  brapi_seasons(con, year = 2020)
+  expect_identical(captured$query$year, 2020)
+
   expect_identical(brapi_lists(con), canned)
+  expect_identical(captured$endpoint, "/lists")
+
   expect_identical(brapi_people(con), canned)
-
-  expect_identical(brapi_samples(con), canned)
-  expect_identical(brapi_variants(con), canned)
-  expect_identical(brapi_variants(con, variantSetDbId = "vs1"), canned)
-  expect_identical(brapi_variant_sets(con), canned)
-  expect_identical(brapi_variant_sets(con, studyDbId = "s1"), canned)
-  expect_identical(brapi_calls(con), canned)
-  expect_identical(brapi_calls(con, variantSetDbId = "vs1"), canned)
-  expect_identical(brapi_call_sets(con), canned)
-  expect_identical(brapi_references(con), canned)
-  expect_identical(brapi_reference_sets(con), canned)
-
-  expect_identical(brapi_germplasm(con), canned)
-  expect_identical(brapi_germplasm_detail(con, "g1"), canned)
-  expect_identical(brapi_germplasm_pedigree(con, "g1"), canned)
-  expect_identical(brapi_germplasm_progeny(con, "g1"), canned)
-  expect_identical(brapi_germplasm_attributes(con), canned)
-  expect_identical(brapi_crosses(con), canned)
-  expect_identical(brapi_crossing_projects(con), canned)
-  expect_identical(brapi_seed_lots(con), canned)
-
-  expect_identical(brapi_observation_units(con), canned)
-  expect_identical(brapi_observation_units(con, studyDbId = "s1"), canned)
-  expect_identical(brapi_observations(con), canned)
-  expect_identical(brapi_observations(con, studyDbId = "s1"), canned)
-  expect_identical(brapi_observation_variables(con), canned)
-  expect_identical(brapi_traits(con), canned)
-  expect_identical(brapi_scales(con), canned)
-  expect_identical(brapi_methods(con), canned)
-  expect_identical(brapi_images(con), canned)
-  expect_identical(brapi_events(con), canned)
-  expect_identical(brapi_events(con, studyDbId = "s1"), canned)
+  expect_identical(captured$endpoint, "/people")
 })
 
-test_that("search wrappers call brapi_post_search() and return it", {
+test_that("germplasm wrappers hit the right endpoint and pass filters", {
+  captured <- new.env()
   canned <- tibble::tibble(id = "x")
   local_mocked_bindings(
-    brapi_post_search = function(con, endpoint, body = list(), ...) canned,
+    brapi_get = function(con, endpoint, query = list()) {
+      captured$endpoint <- endpoint
+      captured$query <- query
+      canned
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+
+  expect_identical(brapi_germplasm(con), canned)
+  expect_identical(captured$endpoint, "/germplasm")
+  brapi_germplasm(con, germplasmName = "Line1")
+  expect_identical(captured$query$germplasmName, "Line1")
+
+  expect_identical(brapi_germplasm_detail(con, "g1"), canned)
+  expect_identical(captured$endpoint, "/germplasm/g1")
+
+  expect_identical(brapi_germplasm_pedigree(con, "g1"), canned)
+  expect_identical(captured$endpoint, "/germplasm/g1/pedigree")
+
+  expect_identical(brapi_germplasm_progeny(con, "g1"), canned)
+  expect_identical(captured$endpoint, "/germplasm/g1/progeny")
+
+  expect_identical(brapi_germplasm_attributes(con), canned)
+  expect_identical(captured$endpoint, "/attributes")
+
+  expect_identical(brapi_crosses(con), canned)
+  expect_identical(captured$endpoint, "/crosses")
+
+  expect_identical(brapi_crossing_projects(con), canned)
+  expect_identical(captured$endpoint, "/crossingprojects")
+
+  expect_identical(brapi_seed_lots(con), canned)
+  expect_identical(captured$endpoint, "/seedlots")
+})
+
+test_that("phenotyping wrappers hit the right endpoint and pass filters", {
+  captured <- new.env()
+  canned <- tibble::tibble(id = "x")
+  local_mocked_bindings(
+    brapi_get = function(con, endpoint, query = list()) {
+      captured$endpoint <- endpoint
+      captured$query <- query
+      canned
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+
+  expect_identical(brapi_observation_units(con), canned)
+  expect_identical(captured$endpoint, "/observationunits")
+  brapi_observation_units(con, studyDbId = "s1")
+  expect_identical(captured$query$studyDbId, "s1")
+
+  expect_identical(brapi_observations(con), canned)
+  expect_identical(captured$endpoint, "/observations")
+  brapi_observations(con, studyDbId = "s1")
+  expect_identical(captured$query$studyDbId, "s1")
+
+  expect_identical(brapi_observation_variables(con), canned)
+  expect_identical(captured$endpoint, "/variables")
+
+  expect_identical(brapi_traits(con), canned)
+  expect_identical(captured$endpoint, "/traits")
+
+  expect_identical(brapi_scales(con), canned)
+  expect_identical(captured$endpoint, "/scales")
+
+  expect_identical(brapi_methods(con), canned)
+  expect_identical(captured$endpoint, "/methods")
+
+  expect_identical(brapi_images(con), canned)
+  expect_identical(captured$endpoint, "/images")
+
+  expect_identical(brapi_events(con), canned)
+  expect_identical(captured$endpoint, "/events")
+  brapi_events(con, studyDbId = "s1")
+  expect_identical(captured$query$studyDbId, "s1")
+})
+
+test_that("genotyping wrappers hit the right endpoint and pass filters", {
+  captured <- new.env()
+  canned <- tibble::tibble(id = "x")
+  local_mocked_bindings(
+    brapi_get = function(con, endpoint, query = list()) {
+      captured$endpoint <- endpoint
+      captured$query <- query
+      canned
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+
+  expect_identical(brapi_samples(con), canned)
+  expect_identical(captured$endpoint, "/samples")
+
+  expect_identical(brapi_variants(con), canned)
+  expect_identical(captured$endpoint, "/variants")
+  brapi_variants(con, variantSetDbId = "vs1")
+  expect_identical(captured$query$variantSetDbId, "vs1")
+
+  expect_identical(brapi_variant_sets(con), canned)
+  expect_identical(captured$endpoint, "/variantsets")
+  brapi_variant_sets(con, studyDbId = "s1")
+  expect_identical(captured$query$studyDbId, "s1")
+
+  expect_identical(brapi_calls(con), canned)
+  expect_identical(captured$endpoint, "/calls")
+  brapi_calls(con, variantSetDbId = "vs1")
+  expect_identical(captured$query$variantSetDbId, "vs1")
+
+  expect_identical(brapi_call_sets(con), canned)
+  expect_identical(captured$endpoint, "/callsets")
+
+  expect_identical(brapi_references(con), canned)
+  expect_identical(captured$endpoint, "/references")
+
+  expect_identical(brapi_reference_sets(con), canned)
+  expect_identical(captured$endpoint, "/referencesets")
+})
+
+test_that("search wrappers hit the right endpoint and pass body fields", {
+  captured <- new.env()
+  canned <- tibble::tibble(id = "x")
+  local_mocked_bindings(
+    brapi_post_search = function(con, endpoint, body = list(), ...) {
+      captured$endpoint <- endpoint
+      captured$body <- body
+      canned
+    },
     .package = "brapiR2"
   )
 
   con <- brapi_connection("https://example.org")
 
   expect_identical(brapi_search_germplasm(con, germplasmNames = "a"), canned)
+  expect_identical(captured$endpoint, "/search/germplasm")
+  expect_identical(captured$body$germplasmNames, "a")
+
   expect_identical(brapi_search_variants(con, variantSetDbIds = "vs1"), canned)
+  expect_identical(captured$endpoint, "/search/variants")
+  expect_identical(captured$body$variantSetDbIds, "vs1")
+
   expect_identical(
     brapi_search_calls(con, variantSetDbIds = "vs1", callSetDbIds = "cs1"),
     canned
   )
+  expect_identical(captured$endpoint, "/search/calls")
+  expect_identical(captured$body$variantSetDbIds, "vs1")
+  expect_identical(captured$body$callSetDbIds, "cs1")
+
   expect_identical(brapi_search_observations(con, studyDbIds = "s1"), canned)
+  expect_identical(captured$endpoint, "/search/observations")
+  expect_identical(captured$body$studyDbIds, "s1")
+
   expect_identical(
     brapi_search_variables(con, traitClasses = "agronomic"),
     canned
   )
+  expect_identical(captured$endpoint, "/search/variables")
+  expect_identical(captured$body$traitClasses, "agronomic")
 })
 
 test_that("brapi_server_info parses the calls array from /serverinfo", {

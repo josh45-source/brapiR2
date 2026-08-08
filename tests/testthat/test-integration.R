@@ -3,7 +3,7 @@
 ## They validate the full request → parse → tibble pipeline end-to-end.
 
 skip_if_offline_brapi <- function() {
-  skip_if_offline(host = "test-server.brapi.org")
+  testthat::skip_if_offline(host = "test-server.brapi.org")
 }
 
 SERVER <- "https://test-server.brapi.org"
