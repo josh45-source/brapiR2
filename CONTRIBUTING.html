@@ -15,11 +15,11 @@
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+      <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="articles/brapiR2.html">Get started</a></li>
+<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="articles/genomic-selection-pipeline.html">Genomic Selection Pipeline with brapiR2</a></li>
-    <li><a class="dropdown-item" href="articles/getting-started.html">Getting Started with brapiR2</a></li>
     <li><a class="dropdown-item" href="articles/multi-environment-analysis.html">Multi-Environment Trial (MET) Analysis with brapiR2</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -68,12 +68,19 @@
 <ol style="list-style-type: decimal"><li>Add the function in the appropriate module file (<code>R/core.R</code>, <code>R/germplasm.R</code>, etc.)</li>
 <li>Follow the existing pattern: <code>con</code> as first argument, <code>...</code> for query params</li>
 <li>Use <code>brapi_get()</code> or <code>brapi_post_search()</code> internally</li>
-<li>Add the function to <code>NAMESPACE</code> exports</li>
+<li>Add <code>#' @export</code> to the function’s roxygen block and run <code>devtools::document()</code> to regenerate <code>NAMESPACE</code> (it carries a roxygen2 “do not edit by hand” header, so never edit it directly)</li>
 <li>Write tests in <code>tests/testthat/</code>
 </li>
 <li>Update <code>NEWS.md</code>
 </li>
 </ol></div>
+<div class="section level2">
+<h2 id="running-the-test-suite">Running the Test Suite<a class="anchor" aria-label="anchor" href="#running-the-test-suite"></a></h2>
+<ul><li>Integration tests run against the public BrAPI test server at <a href="https://test-server.brapi.org" class="external-link uri">https://test-server.brapi.org</a> and require no authentication token.</li>
+<li>These tests are guarded by <code>skip_on_cran()</code> and <code>skip_if_offline()</code>, so they are skipped automatically when there’s no network access.</li>
+<li>Mocked tests use <code><a href="https://testthat.r-lib.org/reference/local_mocked_bindings.html" class="external-link">testthat::local_mocked_bindings()</a></code> and run fully offline.</li>
+<li>Some tests exercise optional integrations and require their packages to be installed for the full suite to run: <code>furrr</code> and <code>future</code> (parallel batch fetching), <code>rappdirs</code> (response caching), and <code>AGHmatrix</code>, <code>BGLR</code>, <code>lme4</code>, <code>metan</code>, <code>rrBLUP</code>, and <code>sommer</code> (genomic selection workflows). Tests that depend on a missing package are skipped rather than failed.</li>
+</ul></div>
 <div class="section level2">
 <h2 id="reporting-issues">Reporting Issues<a class="anchor" aria-label="anchor" href="#reporting-issues"></a></h2>
 <ul><li>Use the GitHub issue tracker</li>

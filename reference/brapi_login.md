@@ -29,6 +29,13 @@ brapi_login(con, username, password)
 
 A new `brapi_con` object with the token populated.
 
+## See also
+
+The "Handling Credentials Safely" section of
+[`vignette("brapiR2")`](https://josh45-source.github.io/brapiR2/articles/brapiR2.md)
+for how to keep `username`/`password` out of your script, using
+`.Renviron` or the keyring package.
+
 ## Examples
 
 ``` r

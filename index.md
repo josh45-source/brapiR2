@@ -23,6 +23,12 @@ Developed by **Joash Joshua Ayo** (<joashjoshua789@gmail.com>).
 interactive exploration, use brapiR2 for programmatic pipelines and
 custom tooling.
 
+[brapir-v2](https://github.com/mverouden/brapir-v2) is another R client
+that, like brapiR2, targets the BrAPI v2 specification directly rather
+than v1. Its own README describes it as still under development, and the
+repository has had no commits in roughly four years (last pushed April
+2022) - it does not appear to be actively maintained.
+
 ## Installation
 
 Install the development version from GitHub:
@@ -56,13 +62,16 @@ data <- brapi_study_data(con, "study_01")
 # 4. Get genotypic data as a dosage matrix for GS
 dosage <- brapi_get_dosage_matrix(con, "variantset_01")
 
-# 5. Parallel fetch across multiple studies
+# 5. Parallel fetch across multiple studies - set the backend yourself;
+#    brapi_fetch_parallel() uses whatever plan is active rather than
+#    setting one for you
+future::plan(future::multisession, workers = 4)
 all_data <- brapi_fetch_parallel(
   con,
   brapi_study_data,
-  ids = c("study_01", "study_02", "study_03"),
-  .workers = 4
+  ids = c("study_01", "study_02", "study_03")
 )
+future::plan(future::sequential) # shut the workers back down when done
 ```
 
 ## Pipe-Friendly Design

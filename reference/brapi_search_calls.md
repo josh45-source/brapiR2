@@ -38,7 +38,7 @@ A tibble of matching genotype calls.
 # \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 brapi_search_calls(con, variantSetDbIds = "variantset1")
-#> ℹ Async search started (ID: 6b87e0e8-5ce0-4313-b89d-a42988f6f379). Polling...
+#> ℹ Async search started (ID: 2d2f82c5-bd59-4431-8f36-ef5040bbc685). Polling...
 #> # A tibble: 260 × 12
 #>    additionalInfo callSetDbId callSetName genotype         genotypeValue
 #>    <lgl>          <chr>       <chr>       <list>           <chr>        

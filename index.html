@@ -16,8 +16,8 @@
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="A Tidyverse-Native Client for the BrAPI v2 (Breeding API) Specification">
-<meta name="description" content="Provides pipe-friendly, stateless access to every endpoint in the Breeding API (BrAPI) v2.1 specification. Covers all four BrAPI modules Core, Germplasm, Phenotyping, and Genotyping returning tidy tibbles ready for analysis. Features include automatic pagination, async search handling, response caching, parallel batch fetching, and convenience functions for genomic selection workflows (e.g. dosage matrix extraction). Designed for plant breeders and bioinformaticians who need programmatic access to BreedBase, BMS, EBS, GIGWA, Germinate, and any BrAPI-compliant server.">
-<meta property="og:description" content="Provides pipe-friendly, stateless access to every endpoint in the Breeding API (BrAPI) v2.1 specification. Covers all four BrAPI modules Core, Germplasm, Phenotyping, and Genotyping returning tidy tibbles ready for analysis. Features include automatic pagination, async search handling, response caching, parallel batch fetching, and convenience functions for genomic selection workflows (e.g. dosage matrix extraction). Designed for plant breeders and bioinformaticians who need programmatic access to BreedBase, BMS, EBS, GIGWA, Germinate, and any BrAPI-compliant server.">
+<meta name="description" content="Provides pipe-friendly, stateless access to every endpoint in the Breeding API (BrAPI) v2.1 specification, an open community standard for plant breeding data interchange maintained by the BrAPI project &lt;https://brapi.org&gt;. Covers all four BrAPI modules, Core, Germplasm, Phenotyping, and Genotyping, returning tidy tibbles ready for analysis. Features include automatic pagination, async search handling, response caching, parallel batch fetching, and convenience functions for genomic selection workflows (e.g. dosage matrix extraction). Designed for plant breeders and bioinformaticians who need programmatic access to BreedBase, BMS, EBS, GIGWA, Germinate, and any BrAPI-compliant server.">
+<meta property="og:description" content="Provides pipe-friendly, stateless access to every endpoint in the Breeding API (BrAPI) v2.1 specification, an open community standard for plant breeding data interchange maintained by the BrAPI project &lt;https://brapi.org&gt;. Covers all four BrAPI modules, Core, Germplasm, Phenotyping, and Genotyping, returning tidy tibbles ready for analysis. Features include automatic pagination, async search handling, response caching, parallel batch fetching, and convenience functions for genomic selection workflows (e.g. dosage matrix extraction). Designed for plant breeders and bioinformaticians who need programmatic access to BreedBase, BMS, EBS, GIGWA, Germinate, and any BrAPI-compliant server.">
 <meta property="og:image" content="https://josh45-source.github.io/brapiR2/logo.png">
 </head>
 <body>
@@ -37,12 +37,12 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="articles/brapiR2.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="articles/genomic-selection-pipeline.html">Genomic Selection Pipeline with brapiR2</a></li>
-    <li><a class="dropdown-item" href="articles/getting-started.html">Getting Started with brapiR2</a></li>
     <li><a class="dropdown-item" href="articles/multi-environment-analysis.html">Multi-Environment Trial (MET) Analysis with brapiR2</a></li>
   </ul>
 </li>
@@ -74,9 +74,9 @@
 </h2>
 <table class="table">
 <colgroup>
-<col width="37%">
-<col width="37%">
-<col width="25%">
+<col width="33%">
+<col width="33%">
+<col width="33%">
 </colgroup>
 <thead><tr>
 <th>Feature</th>
@@ -117,6 +117,7 @@
 </tbody>
 </table>
 <p><strong>brapiR2 complements <a href="https://cran.r-project.org/package=QBMS" class="external-link">QBMS</a></strong> - use QBMS for interactive exploration, use brapiR2 for programmatic pipelines and custom tooling.</p>
+<p><a href="https://github.com/mverouden/brapir-v2" class="external-link">brapir-v2</a> is another R client that, like brapiR2, targets the BrAPI v2 specification directly rather than v1. Its own README describes it as still under development, and the repository has had no commits in roughly four years (last pushed April 2022) - it does not appear to be actively maintained.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -149,13 +150,16 @@
 <span><span class="co"># 4. Get genotypic data as a dosage matrix for GS</span></span>
 <span><span class="va">dosage</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"variantset_01"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 5. Parallel fetch across multiple studies</span></span>
+<span><span class="co"># 5. Parallel fetch across multiple studies - set the backend yourself;</span></span>
+<span><span class="co">#    brapi_fetch_parallel() uses whatever plan is active rather than</span></span>
+<span><span class="co">#    setting one for you</span></span>
+<span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="va"><a href="https://future.futureverse.org/reference/multisession.html" class="external-link">multisession</a></span>, workers <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="va">all_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/brapi_fetch_parallel.html">brapi_fetch_parallel</a></span><span class="op">(</span></span>
 <span>  <span class="va">con</span>,</span>
 <span>  <span class="va">brapi_study_data</span>,</span>
-<span>  ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"study_01"</span>, <span class="st">"study_02"</span>, <span class="st">"study_03"</span><span class="op">)</span>,</span>
-<span>  .workers <span class="op">=</span> <span class="fl">4</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span>  ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"study_01"</span>, <span class="st">"study_02"</span>, <span class="st">"study_03"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="va"><a href="https://future.futureverse.org/reference/sequential.html" class="external-link">sequential</a></span><span class="op">)</span> <span class="co"># shut the workers back down when done</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="pipe-friendly-design">Pipe-Friendly Design<a class="anchor" aria-label="anchor" href="#pipe-friendly-design"></a>
@@ -274,7 +278,6 @@
 <ul class="list-unstyled">
 <li><a href="https://github.com/josh45-source/brapiR2/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/josh45-source/brapiR2/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
-<li><a href="https://CRAN.R-project.org/package=brapiR2" class="external-link"><img src="https://www.r-pkg.org/badges/version/brapiR2" alt="CRAN status"></a></li>
 </ul>
 </div>
 

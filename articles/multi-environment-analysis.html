@@ -34,12 +34,12 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="../articles/brapiR2.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/genomic-selection-pipeline.html">Genomic Selection Pipeline with brapiR2</a></li>
-    <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with brapiR2</a></li>
     <li><a class="dropdown-item" href="../articles/multi-environment-analysis.html">Multi-Environment Trial (MET) Analysis with brapiR2</a></li>
   </ul>
 </li>
@@ -65,7 +65,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Multi-Environment Trial (MET) Analysis with brapiR2</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/josh45-source/brapiR2/blob/main/vignettes/multi-environment-analysis.Rmd" class="external-link"><code>vignettes/multi-environment-analysis.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/josh45-source/brapiR2/blob/main/vignettes/articles/multi-environment-analysis.Rmd" class="external-link"><code>vignettes/articles/multi-environment-analysis.Rmd</code></a></small>
       <div class="d-none name"><code>multi-environment-analysis.Rmd</code></div>
     </div>
 
@@ -74,134 +74,246 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>Multi-environment trial (MET) analysis is the core workflow of a
-plant breeding program: gather phenotypic observations from many
-locations and years, then decompose genotype × environment (GxE)
-interaction to identify stable, high-performing varieties.</p>
-<p>This vignette shows how to:</p>
-<ol style="list-style-type: decimal">
-<li>Pull phenotypic data from multiple BrAPI studies in parallel</li>
-<li>Attach environment metadata (location, season)</li>
-<li>Run AMMI / GGE biplots with the <strong>metan</strong> package</li>
-<li>Run mixed-model stability analysis with <strong>lme4</strong>
-</li>
-</ol>
+<p>Multi-environment trial (MET) analysis is a core workflow of a plant
+breeding program: gather phenotypic observations from many locations and
+years, then decompose genotype x environment (GxE) interaction to
+identify stable, high-performing varieties.</p>
+<p>This article has three parts: <strong>Part 1</strong> fetches real
+study, location, and phenotype data from the public BrAPI test server
+and shows exactly what brapiR2 returns. <strong>Part 2</strong> shows
+the authenticated, parallel-fetch pattern you’d use against your own
+server, without running it. <strong>Part 3</strong> runs the actual GxE
+analysis — AMMI/GGE biplots (<strong>metan</strong>) and mixed-model
+stability (<strong>lme4</strong>) — on a simulated trial, because Part
+1’s real data is nowhere near large enough for either method.</p>
 </div>
 <div class="section level2">
-<h2 id="step-1-connect-and-discover-studies">Step 1: Connect and Discover Studies<a class="anchor" aria-label="anchor" href="#step-1-connect-and-discover-studies"></a>
+<h2 id="part-1-live-data-from-the-public-test-server">Part 1: Live Data from the Public Test Server<a class="anchor" aria-label="anchor" href="#part-1-live-data-from-the-public-test-server"></a>
 </h2>
+<p>The three calls below return the pieces a multi-environment analysis
+is assembled from. <strong>Studies</strong> are the environments
+themselves: one trial grown at one site in one season.
+<strong>Locations</strong> carry the site metadata, latitude, longitude,
+altitude and so on, that lets you group environments sensibly or relate
+performance to conditions. <strong>Seasons</strong> identify the
+planting cycle, which for maize may be a single year in temperate
+programs or distinct long and short rains in East Africa.</p>
+<p>The distinction between a location and an environment is worth being
+precise about, because they are routinely conflated. An environment is a
+location and season combination. The same site in two seasons
+contributes two environments, and often two quite different ones, since
+rainfall and temperature in a given year can matter more for yield than
+the site itself. This is why a study, not a location, is the unit an
+AMMI or GGE analysis treats as an environment.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/josh45-source/brapiR2" class="external-link">brapiR2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span></span>
-<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_connection.html">brapi_connection</a></span><span class="op">(</span><span class="st">"https://my-breedbase.org"</span><span class="op">)</span></span>
-<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_login.html">brapi_login</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"username"</span>, <span class="st">"password"</span><span class="op">)</span></span>
+<span><span class="va">studies</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_studies.html">brapi_studies</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+<span><span class="va">studies</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 29</span></span></span>
+<span><span class="co">#&gt;   additionalInfo   externalReferences active commonCropName contacts  </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="color: #949494;">&lt;named list [1]&gt;</span> <span style="color: #949494;">&lt;list [1]&gt;</span>         TRUE   Tomatillo      <span style="color: #949494;">&lt;list [1]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> <span style="color: #949494;">&lt;named list [1]&gt;</span> <span style="color: #949494;">&lt;list [1]&gt;</span>         TRUE   Tomatillo      <span style="color: #949494;">&lt;list [1]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> <span style="color: #949494;">&lt;named list [1]&gt;</span> <span style="color: #949494;">&lt;list [1]&gt;</span>         TRUE   Tomatillo      <span style="color: #949494;">&lt;list [1]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 24 more variables: culturalPractices &lt;chr&gt;, dataLinks &lt;list&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   documentationURL &lt;chr&gt;, endDate &lt;chr&gt;, environmentParameters &lt;list&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   experimentalDesign &lt;list&gt;, growthFacility &lt;list&gt;, lastUpdate &lt;list&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   license &lt;chr&gt;, locationDbId &lt;chr&gt;, locationName &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   observationLevels &lt;list&gt;, observationUnitsDescription &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   seasons &lt;list&gt;, startDate &lt;chr&gt;, studyCode &lt;chr&gt;, studyDescription &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   studyName &lt;chr&gt;, studyPUI &lt;chr&gt;, studyType &lt;chr&gt;, trialDbId &lt;chr&gt;, …</span></span></span>
+<span></span>
+<span><span class="va">locations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_locations.html">brapi_locations</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+<span><span class="va">locations</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 21</span></span></span>
+<span><span class="co">#&gt;   additionalInfo   externalReferences abbreviation coordinateDescription        </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="color: #949494;">&lt;named list [1]&gt;</span> <span style="color: #949494;">&lt;list [1]&gt;</span>         L2           Outline of the institute bre…</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> <span style="color: #949494;">&lt;named list [1]&gt;</span> <span style="color: #949494;">&lt;list [1]&gt;</span>         L3           Northwest corner post        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> <span style="color: #949494;">&lt;named list [1]&gt;</span> <span style="color: #949494;">&lt;list [1]&gt;</span>         L1           Northwest corner of greenhou…</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 17 more variables: coordinateUncertainty &lt;chr&gt;, coordinates &lt;list&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   countryCode &lt;chr&gt;, countryName &lt;chr&gt;, documentationURL &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   environmentType &lt;chr&gt;, exposure &lt;chr&gt;, instituteAddress &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   instituteName &lt;chr&gt;, locationName &lt;chr&gt;, locationType &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   siteStatus &lt;chr&gt;, slope &lt;chr&gt;, topography &lt;chr&gt;, parentLocationDbId &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   parentLocationName &lt;chr&gt;, locationDbId &lt;chr&gt;</span></span></span>
+<span></span>
+<span><span class="va">seasons</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_seasons.html">brapi_seasons</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+<span><span class="va">seasons</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 3</span></span></span>
+<span><span class="co">#&gt;    seasonDbId  seasonName  year</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> fall_2011   fall        <span style="text-decoration: underline;">2</span>011</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> fall_2012   fall        <span style="text-decoration: underline;">2</span>012</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> fall_2013   fall        <span style="text-decoration: underline;">2</span>013</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> spring_2012 spring      <span style="text-decoration: underline;">2</span>012</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> spring_2013 spring      <span style="text-decoration: underline;">2</span>013</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> summer_2012 summer      <span style="text-decoration: underline;">2</span>012</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> summer_2013 summer      <span style="text-decoration: underline;">2</span>013</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> winter_2012 winter      <span style="text-decoration: underline;">2</span>012</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> winter_2013 winter      <span style="text-decoration: underline;">2</span>013</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> winter_2014 winter      <span style="text-decoration: underline;">2</span>014</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># brapi_study_data() falls back to an unfiltered fetch + client-side filter</span></span>
+<span><span class="co"># when a server doesn't honour the studyDbId filter on /observations, so it</span></span>
+<span><span class="co"># finds data that a direct brapi_observations(con, studyDbId = ...) call</span></span>
+<span><span class="co"># would miss on this server. It still returns an honest empty tibble (with</span></span>
+<span><span class="co"># a warning) for studies that genuinely have no observations.</span></span>
+<span><span class="va">met_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">studies</span><span class="op">$</span><span class="va">studyDbId</span>, <span class="va">brapi_study_data</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> No observations found for study <span style="color: #0000BB;">"study2"</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> No observations found for study <span style="color: #0000BB;">"study3"</span>.</span></span>
+<span><span class="va">met_raw</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 6</span></span></span>
+<span><span class="co">#&gt;   observationUnitDbId observationUnitName germplasmDbId germplasmName  studyDbId</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> observation_unit1   Plot 1              germplasm1    Tomatillo Fan… study1   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> observation_unit2   Plot 2              germplasm2    Tomatillo Fan… study1   </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: `Corn Stalk Height` &lt;list&gt;</span></span></span></code></pre></div>
+<p>Only one of these three studies (<code>study1</code>) actually has
+recorded observations on the public server today - two germplasm, one
+trait, as the survey at <a href="https://github.com/josh45-source/brapiR2/blob/main/dev/explore-test-server.R" class="external-link"><code>dev/explore-test-server.R</code></a>
+found. The other two studies come back empty. AMMI and GGE
+decompositions need many genotypes scored across several environments to
+estimate genotype, environment, and interaction effects separately; a
+mixed model with a <code>germplasmName:env</code> random term needs
+enough genotype-by-environment cells to avoid the fit being singular.
+Neither is possible with this data, so Part 3 below simulates a
+properly-sized trial instead.</p>
+</div>
+<div class="section level2">
+<h2 id="part-2-authenticated-parallel-access-to-your-own-server-illustrative">Part 2: Authenticated, Parallel Access to Your Own Server
+(illustrative)<a class="anchor" aria-label="anchor" href="#part-2-authenticated-parallel-access-to-your-own-server-illustrative"></a>
+</h2>
+<p>Production BrAPI servers require credentials the public test server
+doesn’t need, and <code><a href="../reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code> is most useful
+across many studies at once — this shows that pattern without running it
+here.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">con_priv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_connection.html">brapi_connection</a></span><span class="op">(</span><span class="st">"https://my-breedbase.org"</span><span class="op">)</span></span>
+<span><span class="va">con_priv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_login.html">brapi_login</a></span><span class="op">(</span><span class="va">con_priv</span>, <span class="st">"username"</span>, <span class="st">"password"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Cache responses to speed up re-runs and protect server bandwidth</span></span>
-<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_cache_enable.html">brapi_cache_enable</a></span><span class="op">(</span><span class="va">con</span>, ttl <span class="op">=</span> <span class="fl">7200</span><span class="op">)</span></span>
-<span><span class="co">#&gt; v Caching enabled at ~/.cache/brapiR2 (TTL: 7200s)</span></span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<span><span class="va">con_priv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_cache_enable.html">brapi_cache_enable</a></span><span class="op">(</span><span class="va">con_priv</span>, ttl <span class="op">=</span> <span class="fl">7200</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Discover all studies in the target trial</span></span>
-<span><span class="va">trials</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_trials.html">brapi_trials</a></span><span class="op">(</span><span class="va">con</span>, programDbId <span class="op">=</span> <span class="st">"wheat_program_01"</span><span class="op">)</span></span>
-<span><span class="va">trials</span></span>
-<span><span class="co">#&gt; # A tibble: 4 x 12</span></span>
-<span><span class="co">#&gt;   trialDbId   trialName           programDbId active</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;               &lt;chr&gt;       &lt;lgl&gt;</span></span>
-<span><span class="co">#&gt; 1 trial_2022  National Yield 2022 wheat_prog  TRUE</span></span>
-<span><span class="co">#&gt; 2 trial_2021  National Yield 2021 wheat_prog  FALSE</span></span>
-<span><span class="co">#&gt; 3 trial_2020  National Yield 2020 wheat_prog  FALSE</span></span>
-<span><span class="co">#&gt; 4 trial_drght Drought Nursery     wheat_prog  TRUE</span></span>
+<span><span class="va">trials_priv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_trials.html">brapi_trials</a></span><span class="op">(</span><span class="va">con_priv</span>, programDbId <span class="op">=</span> <span class="st">"wheat_program_01"</span><span class="op">)</span></span>
+<span><span class="va">trials_priv</span></span>
 <span></span>
 <span><span class="co"># Focus on the current MET</span></span>
-<span><span class="va">studies</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_studies.html">brapi_studies</a></span><span class="op">(</span><span class="va">con</span>, trialDbId <span class="op">=</span> <span class="st">"trial_2022"</span><span class="op">)</span></span>
-<span><span class="va">studies</span></span>
-<span><span class="co">#&gt; # A tibble: 8 x 15</span></span>
-<span><span class="co">#&gt;   studyDbId  studyName          locationDbId locationName  seasonDbId</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;      &lt;chr&gt;              &lt;chr&gt;        &lt;chr&gt;         &lt;chr&gt;</span></span>
-<span><span class="co">#&gt; 1 study_e1   Ithaca NY 2022     loc_ithaca   Ithaca        season_2022</span></span>
-<span><span class="co">#&gt; 2 study_e2   Geneva NY 2022     loc_geneva   Geneva        season_2022</span></span>
-<span><span class="co">#&gt; 3 study_e3   Riverhead NY 2022  loc_river    Riverhead     season_2022</span></span>
-<span><span class="co">#&gt; 4 study_e4   State College 2022 loc_psu      State College season_2022</span></span>
-<span><span class="co">#&gt; 5 study_e5   Wooster OH 2022    loc_wooster  Wooster       season_2022</span></span>
-<span><span class="co">#&gt; 6 study_e6   Lexington KY 2022  loc_lexing   Lexington     season_2022</span></span>
-<span><span class="co">#&gt; 7 study_e7   Raleigh NC 2022    loc_raleigh  Raleigh       season_2022</span></span>
-<span><span class="co">#&gt; 8 study_e8   Gainesville FL 22  loc_gnsvlle  Gainesville   season_2022</span></span>
+<span><span class="va">studies_priv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_studies.html">brapi_studies</a></span><span class="op">(</span><span class="va">con_priv</span>, trialDbId <span class="op">=</span> <span class="st">"trial_2022"</span><span class="op">)</span></span>
+<span><span class="va">studies_priv</span></span>
 <span></span>
-<span><span class="va">study_ids</span> <span class="op">&lt;-</span> <span class="va">studies</span><span class="op">$</span><span class="va">studyDbId</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="step-2-fetch-all-study-data-in-parallel">Step 2: Fetch All Study Data in Parallel<a class="anchor" aria-label="anchor" href="#step-2-fetch-all-study-data-in-parallel"></a>
-</h2>
+<span><span class="va">study_ids_priv</span> <span class="op">&lt;-</span> <span class="va">studies_priv</span><span class="op">$</span><span class="va">studyDbId</span></span></code></pre></div>
 <p><code><a href="../reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code> uses the <strong>furrr</strong>
-package to run one worker per study concurrently. With 8 environments
-and 4 workers, the fetch completes in roughly the time of 2 sequential
-requests.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org" class="external-link">future</a></span><span class="op">)</span> <span class="co"># plan() sets the parallel backend</span></span>
+package to run one worker per study concurrently, against whatever
+<code>future</code> plan is already active. It does not set a backend
+itself - per the future package’s best-practices vignette, that choice
+belongs to the caller, not to the package, so you set the plan yourself
+before calling it:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org" class="external-link">future</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Adjust .workers to match your CPU count or server rate limits</span></span>
-<span><span class="va">met_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_fetch_parallel.html">brapi_fetch_parallel</a></span><span class="op">(</span></span>
-<span>  <span class="va">con</span>, <span class="va">brapi_study_data</span>, <span class="va">study_ids</span>,</span>
-<span>  .workers <span class="op">=</span> <span class="fl">4L</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; i Fetching 8 items across 4 workers...</span></span>
-<span><span class="co">#&gt; v Fetched 2400 rows from 8 sources.</span></span>
-<span></span>
-<span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">met_raw</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 2,400</span></span>
-<span><span class="co">#&gt; Columns: 10</span></span>
-<span><span class="co">#&gt; $ observationUnitDbId  &lt;chr&gt; "ou_e1_001", "ou_e1_002", ...</span></span>
-<span><span class="co">#&gt; $ observationUnitName  &lt;chr&gt; "Plot 101", "Plot 102", ...</span></span>
-<span><span class="co">#&gt; $ germplasmDbId        &lt;chr&gt; "g001", "g002", ...</span></span>
-<span><span class="co">#&gt; $ germplasmName        &lt;chr&gt; "Variety_001", "Variety_002", ...</span></span>
-<span><span class="co">#&gt; $ studyDbId            &lt;chr&gt; "study_e1", "study_e1", ...</span></span>
-<span><span class="co">#&gt; $ studyName            &lt;chr&gt; "Ithaca NY 2022", ...</span></span>
-<span><span class="co">#&gt; $ Grain_Yield_t_ha     &lt;chr&gt; "5.12", "4.89", ...</span></span>
-<span><span class="co">#&gt; $ Days_to_Heading      &lt;chr&gt; "65", "68", ...</span></span>
-<span><span class="co">#&gt; $ Plant_Height_cm      &lt;chr&gt; "92", "88", ...</span></span>
-<span><span class="co">#&gt; $ Thousand_Grain_Wt    &lt;chr&gt; "38.4", "41.2", ...</span></span></code></pre></div>
+<span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="va"><a href="https://future.futureverse.org/reference/multisession.html" class="external-link">multisession</a></span>, workers <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">met_priv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_fetch_parallel.html">brapi_fetch_parallel</a></span><span class="op">(</span><span class="va">con_priv</span>, <span class="va">brapi_study_data</span>, <span class="va">study_ids_priv</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">met_priv</span><span class="op">)</span></span>
+<span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="va"><a href="https://future.futureverse.org/reference/sequential.html" class="external-link">sequential</a></span><span class="op">)</span> <span class="co"># shut the workers back down when done</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="step-3-attach-environment-metadata">Step 3: Attach Environment Metadata<a class="anchor" aria-label="anchor" href="#step-3-attach-environment-metadata"></a>
+<h2 id="part-3-gxe-analysis-on-a-simulated-trial">Part 3: GxE Analysis on a Simulated Trial<a class="anchor" aria-label="anchor" href="#part-3-gxe-analysis-on-a-simulated-trial"></a>
 </h2>
-<p>The study data already carries <code>studyDbId</code> and
-<code>studyName</code>. Join with location and season data from the
-<code>studies</code> tibble for richer environment labels.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Bring in location and season columns from the studies tibble</span></span>
-<span><span class="va">env_meta</span> <span class="op">&lt;-</span> <span class="va">studies</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">studyDbId</span>, <span class="va">studyName</span>, <span class="va">locationName</span>, <span class="va">seasonDbId</span><span class="op">)</span></span>
+<p>The design below is a 60 genotype by 6 environment trial with 2
+replicates, giving 720 plots. That is a realistic size for a regional
+maize yield trial at the advanced testing stage, and it is roughly the
+smallest design from which AMMI and GGE can estimate interaction
+patterns with any confidence.</p>
+<p>The relative sizes of the variance components are chosen to match how
+yield data actually behaves rather than to make the analysis look tidy.
+The environment effect is the largest of the three systematic terms
+(environment, genotype, and genotype-by-environment), consistent with
+site to site variation typically being the largest systematic source of
+variation in a multi-environment trial - larger than the spread between
+varieties within a site, though not so dominant that it drowns out the
+genotype and genotype-by-environment signal this analysis exists to
+recover. The genotype by environment variance is set larger than the
+genotype variance, which is the usual finding in maize METs and is
+precisely why this analysis exists at all. If varieties ranked the same
+way everywhere, one trial would answer the question and there would be
+nothing to decompose. The residual is larger still, reflecting plot to
+plot variation from soil heterogeneity, stand establishment and
+measurement error, which is why replication is not optional.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">met</span> <span class="op">&lt;-</span> <span class="va">met_raw</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">env_meta</span>, by <span class="op">=</span> <span class="st">"studyDbId"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">n_gen</span> <span class="op">&lt;-</span> <span class="fl">60L</span></span>
+<span><span class="va">n_env</span> <span class="op">&lt;-</span> <span class="fl">6L</span></span>
+<span><span class="va">n_rep</span> <span class="op">&lt;-</span> <span class="fl">2L</span></span>
+<span></span>
+<span><span class="va">genotypes</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Variety_%03d"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n_gen</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">environments</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Env_%d"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n_env</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">overall_mean</span> <span class="op">&lt;-</span> <span class="fl">5</span> <span class="co"># tonnes per hectare</span></span>
+<span></span>
+<span><span class="co"># SIMULATED variance components. Real yield heritabilities are usually</span></span>
+<span><span class="co"># around 0.3-0.6; sd_g/sd_ge/sd_e below are chosen to land broad-sense H2</span></span>
+<span><span class="co"># near 0.5, not near 1 (see Part 3's mixed model below for the fitted value).</span></span>
+<span><span class="va">sd_g</span>  <span class="op">&lt;-</span> <span class="fl">0.35</span></span>
+<span><span class="va">sd_ge</span> <span class="op">&lt;-</span> <span class="fl">0.55</span></span>
+<span><span class="va">sd_e</span>  <span class="op">&lt;-</span> <span class="fl">1.00</span></span>
+<span></span>
+<span><span class="va">gen_effect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_gen</span>, sd <span class="op">=</span> <span class="va">sd_g</span><span class="op">)</span>, <span class="va">genotypes</span><span class="op">)</span></span>
+<span><span class="va">env_effect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_env</span>, sd <span class="op">=</span> <span class="fl">0.60</span><span class="op">)</span>, <span class="va">environments</span><span class="op">)</span></span>
+<span><span class="va">ge_effect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/outer.html" class="external-link">outer</a></span><span class="op">(</span><span class="va">genotypes</span>, <span class="va">environments</span>, <span class="kw">function</span><span class="op">(</span><span class="va">g</span>, <span class="va">e</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">g</span><span class="op">)</span>, sd <span class="op">=</span> <span class="va">sd_ge</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="va">ge_effect</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">genotypes</span>, <span class="va">environments</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">met</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/expand_grid.html" class="external-link">expand_grid</a></span><span class="op">(</span></span>
+<span>  germplasmName <span class="op">=</span> <span class="va">genotypes</span>,</span>
+<span>  env <span class="op">=</span> <span class="va">environments</span>,</span>
+<span>  rep <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">n_rep</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    Grain_Yield_t_ha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">Grain_Yield_t_ha</span><span class="op">)</span>,</span>
-<span>    Days_to_Heading <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">Days_to_Heading</span><span class="op">)</span>,</span>
-<span>    Plant_Height_cm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">Plant_Height_cm</span><span class="op">)</span>,</span>
-<span>    Thousand_Grain_Wt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">Thousand_Grain_Wt</span><span class="op">)</span>,</span>
-<span>    env <span class="op">=</span> <span class="va">locationName</span> <span class="co"># short environment label</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Grain_Yield_t_ha</span><span class="op">)</span><span class="op">)</span></span>
+<span>    observationUnitDbId <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"plot_%04d"</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    Grain_Yield_t_ha <span class="op">=</span> <span class="va">overall_mean</span> <span class="op">+</span></span>
+<span>      <span class="va">gen_effect</span><span class="op">[</span><span class="va">germplasmName</span><span class="op">]</span> <span class="op">+</span></span>
+<span>      <span class="va">env_effect</span><span class="op">[</span><span class="va">env</span><span class="op">]</span> <span class="op">+</span></span>
+<span>      <span class="va">ge_effect</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">germplasmName</span>, <span class="va">env</span><span class="op">)</span><span class="op">]</span> <span class="op">+</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>, sd <span class="op">=</span> <span class="va">sd_e</span><span class="op">)</span> <span class="co"># SIMULATED residual (plot-to-plot) noise</span></span>
+<span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">met</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 2311   # some missing values removed</span></span>
-<span></span>
-<span><span class="co"># Confirm we have data from all 8 environments</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">met</span><span class="op">$</span><span class="va">env</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   Gainesville       Geneva  Ithaca  Lexington  Raleigh  Riverhead</span></span>
-<span><span class="co">#&gt;           285          289     291         278      283        286</span></span>
-<span><span class="co">#&gt;  State College  Wooster</span></span>
-<span><span class="co">#&gt;            304      295</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="step-4-means-matrix-for-gxe-analysis">Step 4: Means Matrix for GxE Analysis<a class="anchor" aria-label="anchor" href="#step-4-means-matrix-for-gxe-analysis"></a>
-</h2>
+<span><span class="co">#&gt; [1] 720</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">met</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 5</span></span></span>
+<span><span class="co">#&gt;   germplasmName env     rep observationUnitDbId Grain_Yield_t_ha</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Variety_001   Env_1     1 plot_0001                       7.68</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Variety_001   Env_1     2 plot_0002                       5.29</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Variety_001   Env_2     1 plot_0003                       6.27</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Variety_001   Env_2     2 plot_0004                       3.19</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Variety_001   Env_3     1 plot_0005                       5.02</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> Variety_001   Env_3     2 plot_0006                       5.59</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="means-matrix-for-gxe-analysis">Means Matrix for GxE Analysis<a class="anchor" aria-label="anchor" href="#means-matrix-for-gxe-analysis"></a>
+</h3>
 <p>Many GxE methods (AMMI, GGE biplot) require a two-way table of
 genotype means per environment.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Compute adjusted means (plot-level mean per genotype × environment)</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Compute adjusted means (plot-level mean per genotype x environment)</span></span>
 <span><span class="va">means</span> <span class="op">&lt;-</span> <span class="va">met</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">germplasmName</span>, <span class="va">env</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>yield <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">Grain_Yield_t_ha</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span></span>
@@ -211,18 +323,70 @@ genotype means per environment.</p>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">env</span>, values_from <span class="op">=</span> <span class="va">yield</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">means_wide</span></span>
-<span><span class="co">#&gt; # A tibble: 300 x 9</span></span>
-<span><span class="co">#&gt;   germplasmName  Gainesville Geneva Ithaca Lexington Raleigh Riverhead ...</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;                &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 Variety_001           5.23   4.98   5.12      5.41    4.87      5.03</span></span>
-<span><span class="co">#&gt; 2 Variety_002           4.89   5.34   4.91      4.72    5.12      5.28</span></span>
-<span><span class="co">#&gt; # ...</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 60 × 7</span></span></span>
+<span><span class="co">#&gt;    germplasmName Env_1 Env_2 Env_3 Env_4 Env_5 Env_6</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Variety_001    6.48  4.73  5.31  3.78  2.52  6.09</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Variety_002    4.68  4.27  5.00  3.32  5.05  2.74</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Variety_003    7.52  5.29  4.89  4.88  5.55  6.46</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> Variety_004    6.44  4.74  5.78  5.28  6.35  4.17</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> Variety_005    4.97  6.23  5.04  4.39  5.84  7.30</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> Variety_006    4.73  6.17  5.87  4.78  4.26  5.05</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> Variety_007    6.40  4.08  5.90  3.56  2.09  5.12</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Variety_008    4.45  4.57  3.19  4.08  2.97  5.62</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> Variety_009    4.12  4.16  4.53  4.95  3.97  4.58</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Variety_010    7.01  5.93  5.34  3.81  4.34  5.57</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 50 more rows</span></span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="step-5-ammi-and-gge-biplot-with-metan">Step 5: AMMI and GGE Biplot with metan<a class="anchor" aria-label="anchor" href="#step-5-ammi-and-gge-biplot-with-metan"></a>
-</h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="section level3">
+<h3 id="ammi-and-gge-biplot-with-metan">AMMI and GGE Biplot with metan<a class="anchor" aria-label="anchor" href="#ammi-and-gge-biplot-with-metan"></a>
+</h3>
+<p>Both methods start from the same observation: the two-way table of
+genotype by environment means contains a pattern that main effects alone
+cannot describe. They differ in what they do about it.</p>
+<p><strong>AMMI</strong> removes the additive part first, fitting
+genotype and environment main effects by analysis of variance, then
+applies principal components to what remains, which is the interaction.
+The first interaction principal component, IPCA1, captures the dominant
+pattern in how varieties respond differently across sites. In the AMMI1
+biplot below, the horizontal axis is mean yield and the vertical axis is
+the IPCA1 score. A genotype plotted near zero on the vertical axis
+performs consistently relative to the others across environments; one
+plotted far from zero has yield that depends strongly on where it is
+grown. The point far to the right on mean yield and close to the
+horizontal axis, high mean and near zero interaction, is the broadly
+adapted variety.</p>
+<p><strong>GGE</strong> keeps the genotype main effect together with the
+interaction and discards the environment main effect. The reasoning is
+that the environment effect, however large, is useless for choosing a
+variety: knowing that one site yields more than another tells you
+nothing about which line to release. What matters for selection is
+genotype and its interaction, hence G plus GE. The which-won-where view
+draws a polygon through the most extreme genotypes and divides it into
+sectors with perpendicular rays. The genotype at the vertex of each
+sector is the best performer for the environments falling in it. When
+all environments land in a single sector, one variety wins everywhere
+and the target region behaves as a single mega-environment. When they
+split across sectors, the region does not, and that is an argument for
+breeding for specific adaptation rather than for a single broadly
+adapted release.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/nepem-ufsc/metan" class="external-link">metan</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; |=========================================================|</span></span>
+<span><span class="co">#&gt; | Multi-Environment Trial Analysis (metan) v1.19.0        |</span></span>
+<span><span class="co">#&gt; | Author: Tiago Olivoto                                   |</span></span>
+<span><span class="co">#&gt; | Type 'citation('metan')' to know how to cite metan      |</span></span>
+<span><span class="co">#&gt; | Type 'vignette('metan_start')' for a short tutorial     |</span></span>
+<span><span class="co">#&gt; | Visit 'https://bit.ly/metanpkg' for a complete tutorial |</span></span>
+<span><span class="co">#&gt; |=========================================================|</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'metan'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:tidyr':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     replace_na</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     recode_factor</span></span>
 <span></span>
 <span><span class="co"># AMMI model: decompose GxE with additive main effects + multiplicative</span></span>
 <span><span class="co"># interaction</span></span>
@@ -230,46 +394,102 @@ genotype means per environment.</p>
 <span>  .data <span class="op">=</span> <span class="va">met</span>,</span>
 <span>  env <span class="op">=</span> <span class="va">env</span>,</span>
 <span>  gen <span class="op">=</span> <span class="va">germplasmName</span>,</span>
-<span>  rep <span class="op">=</span> <span class="va">observationUnitDbId</span>, <span class="co"># plot as replicate; adjust if you have block IDs</span></span>
+<span>  rep <span class="op">=</span> <span class="va">rep</span>, <span class="co"># replicate number, not the plot ID</span></span>
 <span>  resp <span class="op">=</span> <span class="va">Grain_Yield_t_ha</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: There was 1 warning in `summarise()`.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> In argument: `across(where(is.numeric), mean, na.rm = na.rm)`.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> In group 1: `GEN = Variety_001`, `ENV = Env_1`.</span></span>
+<span><span class="co">#&gt; Caused by warning:</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> The `...` argument of `across()` is deprecated as of dplyr 1.1.0.</span></span>
+<span><span class="co">#&gt; Supply arguments directly to `.fns` through an anonymous function instead.</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   # Previously</span></span>
+<span><span class="co">#&gt;   across(a:b, mean, na.rm = TRUE)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   # Now</span></span>
+<span><span class="co">#&gt;   across(a:b, \(x) mean(x, na.rm = TRUE))</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">metan</span> package.</span></span>
+<span><span class="co">#&gt;   Please report the issue at <span style="color: #0000BB; font-style: italic;">&lt;https://github.com/nepem-ufsc/metan/issues&gt;</span>.</span></span>
 <span></span>
-<span><span class="co"># AMMI stability value (ASV) — lower = more stable across environments</span></span>
+<span><span class="co"># AMMI stability value (ASV) - lower = more stable across environments</span></span>
 <span><span class="va">ammi_stable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://nepem-ufsc.github.io/metan/reference/ammi_indexes.html" class="external-link">ammi_indexes</a></span><span class="op">(</span><span class="va">ammi_model</span><span class="op">)</span></span>
 <span><span class="va">ammi_stable</span><span class="op">$</span><span class="va">Grain_Yield_t_ha</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">ASV</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 10 x 6</span></span>
-<span><span class="co">#&gt;   GEN          Y     IPCA1   IPCA2    ASV  WAAS</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 Var_089  5.34    0.00312  0.0041  0.012  0.51</span></span>
-<span><span class="co">#&gt; 2 Var_214  5.21    0.00891  0.0023  0.035  0.48</span></span>
-<span><span class="co">#&gt; # ...</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 42</span></span></span>
+<span><span class="co">#&gt;    GEN        Y   Y_R   ASTAB ASTAB_R ssiASTAB    ASI ASI_R ASI_SSI    ASV ASV_R</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Varie…  5.21    18 0.002<span style="text-decoration: underline;">95</span>       1       19 0.015<span style="text-decoration: underline;">0</span>     1      19 0.059<span style="text-decoration: underline;">1</span>     1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Varie…  4.63    40 0.008<span style="text-decoration: underline;">79</span>       2       42 0.023<span style="text-decoration: underline;">7</span>     2      42 0.093<span style="text-decoration: underline;">7</span>     2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Varie…  5.10    22 0.011<span style="text-decoration: underline;">0</span>        3       25 0.028<span style="text-decoration: underline;">5</span>     3      25 0.113      3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> Varie…  4.39    50 0.014<span style="text-decoration: underline;">5</span>        5       55 0.032<span style="text-decoration: underline;">5</span>     4      54 0.128      4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> Varie…  3.93    58 0.014<span style="text-decoration: underline;">3</span>        4       62 0.033<span style="text-decoration: underline;">6</span>     5      63 0.133      5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> Varie…  4.02    57 0.015<span style="text-decoration: underline;">7</span>        6       63 0.034<span style="text-decoration: underline;">3</span>     6      63 0.135      6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> Varie…  4.14    54 0.036<span style="text-decoration: underline;">1</span>        7       61 0.049<span style="text-decoration: underline;">2</span>     7      61 0.194      7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Varie…  4.94    26 0.045<span style="text-decoration: underline;">0</span>        8       34 0.053<span style="text-decoration: underline;">8</span>     8      34 0.213      8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> Varie…  5.14    20 0.047<span style="text-decoration: underline;">0</span>       12       32 0.055<span style="text-decoration: underline;">1</span>     9      29 0.218      9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Varie…  4.86    28 0.045<span style="text-decoration: underline;">1</span>       10       38 0.057<span style="text-decoration: underline;">6</span>    10      38 0.227     10</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 31 more variables: ASV_SSI &lt;dbl&gt;, AVAMGE &lt;dbl&gt;, AVAMGE_R &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   AVAMGE_SSI &lt;dbl&gt;, DA &lt;dbl&gt;, DA_R &lt;dbl&gt;, DA_SSI &lt;dbl&gt;, DZ &lt;dbl&gt;, DZ_R &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   DZ_SSI &lt;dbl&gt;, EV &lt;dbl&gt;, EV_R &lt;dbl&gt;, EV_SSI &lt;dbl&gt;, FA &lt;dbl&gt;, FA_R &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   FA_SSI &lt;dbl&gt;, MASI &lt;dbl&gt;, MASI_R &lt;dbl&gt;, MASI_SSI &lt;dbl&gt;, MASV &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   MASV_R &lt;dbl&gt;, MASV_SSI &lt;dbl&gt;, SIPC &lt;dbl&gt;, SIPC_R &lt;dbl&gt;, SIPC_SSI &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   ZA &lt;dbl&gt;, ZA_R &lt;dbl&gt;, ZA_SSI &lt;dbl&gt;, WAAS &lt;dbl&gt;, WAAS_R &lt;dbl&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   WAAS_SSI &lt;dbl&gt;</span></span></span>
 <span></span>
 <span><span class="co"># AMMI1 biplot: IPCA1 scores vs mean yield</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ammi_model</span>, type <span class="op">=</span> <span class="st">"AMMI1"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ammi_model</span>, type <span class="op">=</span> <span class="st">"AMMI1"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: The `size` argument of `element_rect()` is deprecated as of ggplot2 3.4.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use the `linewidth` argument instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">metan</span> package.</span></span>
+<span><span class="co">#&gt;   Please report the issue at <span style="color: #0000BB; font-style: italic;">&lt;https://github.com/nepem-ufsc/metan/issues&gt;</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
+<span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">metan</span> package.</span></span>
+<span><span class="co">#&gt;   Please report the issue at <span style="color: #0000BB; font-style: italic;">&lt;https://github.com/nepem-ufsc/metan/issues&gt;</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
+<span><span class="co">#&gt; Warning: `aes_()` was deprecated in ggplot2 3.0.0.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use tidy evaluation idioms with `aes()`</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">metan</span> package.</span></span>
+<span><span class="co">#&gt;   Please report the issue at <span style="color: #0000BB; font-style: italic;">&lt;https://github.com/nepem-ufsc/metan/issues&gt;</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
+<p><img src="multi-environment-analysis_files/figure-html/metan-ammi-1.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># GGE biplot</span></span>
 <span><span class="va">gge_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://nepem-ufsc.github.io/metan/reference/gge.html" class="external-link">gge</a></span><span class="op">(</span></span>
 <span>  .data <span class="op">=</span> <span class="va">met</span>,</span>
 <span>  env   <span class="op">=</span> <span class="va">env</span>,</span>
 <span>  gen   <span class="op">=</span> <span class="va">germplasmName</span>,</span>
-<span>  rep   <span class="op">=</span> <span class="va">observationUnitDbId</span>,</span>
+<span>  rep   <span class="op">=</span> <span class="va">rep</span>,</span>
 <span>  resp  <span class="op">=</span> <span class="va">Grain_Yield_t_ha</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gge_model</span>, type <span class="op">=</span> <span class="st">"which_won_where"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; (biplot showing mega-environments and winning genotypes per environment)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gge_model</span>, type <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="co"># "which-won-where" view</span></span></code></pre></div>
+<p><img src="multi-environment-analysis_files/figure-html/metan-gge-1.png" class="r-plt" alt="" width="700"></p>
 </div>
-<div class="section level2">
-<h2 id="step-6-mixed-model-stability-with-lme4">Step 6: Mixed Model Stability with lme4<a class="anchor" aria-label="anchor" href="#step-6-mixed-model-stability-with-lme4"></a>
-</h2>
+<div class="section level3">
+<h3 id="mixed-model-stability-with-lme4">Mixed Model Stability with lme4<a class="anchor" aria-label="anchor" href="#mixed-model-stability-with-lme4"></a>
+</h3>
 <p>For unbalanced data or when you need BLUPs rather than means, fit a
-mixed model with genotype × environment interaction as a random
+mixed model with genotype x environment interaction as a random
 effect.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/lme4/lme4/" class="external-link">lme4</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: Matrix</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'Matrix'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:tidyr':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     expand, pack, unpack</span></span>
 <span></span>
 <span><span class="co"># Basic mixed model: GxE interaction as random</span></span>
 <span><span class="va">fm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lme4/man/lmer.html" class="external-link">lmer</a></span><span class="op">(</span></span>
@@ -277,11 +497,39 @@ effect.</p>
 <span>  data <span class="op">=</span> <span class="va">met</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">fm</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Linear mixed model fit by REML ['lmerMod']</span></span>
+<span><span class="co">#&gt; Formula: Grain_Yield_t_ha ~ env + (1 | germplasmName) + (1 | germplasmName:env)</span></span>
+<span><span class="co">#&gt;    Data: met</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; REML criterion at convergence: 2264.3</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Scaled residuals: </span></span>
+<span><span class="co">#&gt;      Min       1Q   Median       3Q      Max </span></span>
+<span><span class="co">#&gt; -2.70727 -0.62082 -0.00321  0.56782  2.61456 </span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Random effects:</span></span>
-<span><span class="co">#&gt;  Groups               Name        Variance Std.Dev.</span></span>
-<span><span class="co">#&gt;  germplasmName:env    (Intercept) 0.0812   0.285</span></span>
-<span><span class="co">#&gt;  germplasmName        (Intercept) 0.1947   0.441</span></span>
-<span><span class="co">#&gt;  Residual                         0.0534   0.231</span></span>
+<span><span class="co">#&gt;  Groups            Name        Variance Std.Dev.</span></span>
+<span><span class="co">#&gt;  germplasmName:env (Intercept) 0.1912   0.4373  </span></span>
+<span><span class="co">#&gt;  germplasmName     (Intercept) 0.1530   0.3912  </span></span>
+<span><span class="co">#&gt;  Residual                      1.0784   1.0385  </span></span>
+<span><span class="co">#&gt; Number of obs: 720, groups:  germplasmName:env, 360; germplasmName, 60</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Fixed effects:</span></span>
+<span><span class="co">#&gt;             Estimate Std. Error t value</span></span>
+<span><span class="co">#&gt; (Intercept)   5.2908     0.1213  43.602</span></span>
+<span><span class="co">#&gt; envEnv_2     -0.5028     0.1560  -3.222</span></span>
+<span><span class="co">#&gt; envEnv_3     -0.3586     0.1560  -2.298</span></span>
+<span><span class="co">#&gt; envEnv_4     -0.7491     0.1560  -4.801</span></span>
+<span><span class="co">#&gt; envEnv_5     -0.9046     0.1560  -5.797</span></span>
+<span><span class="co">#&gt; envEnv_6     -0.2218     0.1560  -1.421</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Correlation of Fixed Effects:</span></span>
+<span><span class="co">#&gt;          (Intr) envE_2 envE_3 envE_4 envE_5</span></span>
+<span><span class="co">#&gt; envEnv_2 -0.643                            </span></span>
+<span><span class="co">#&gt; envEnv_3 -0.643  0.500                     </span></span>
+<span><span class="co">#&gt; envEnv_4 -0.643  0.500  0.500              </span></span>
+<span><span class="co">#&gt; envEnv_5 -0.643  0.500  0.500  0.500       </span></span>
+<span><span class="co">#&gt; envEnv_6 -0.643  0.500  0.500  0.500  0.500</span></span>
 <span></span>
 <span><span class="co"># Extract BLUPs for genotypic effects</span></span>
 <span><span class="va">blups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nlme/man/random.effects.html" class="external-link">ranef</a></span><span class="op">(</span><span class="va">fm</span><span class="op">)</span><span class="op">$</span><span class="va">germplasmName</span></span>
@@ -292,36 +540,70 @@ effect.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">BLUP</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">blups</span>, <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 10 x 2</span></span>
-<span><span class="co">#&gt;   germplasmName   BLUP</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 Variety_089    0.412</span></span>
-<span><span class="co">#&gt; 2 Variety_214    0.389</span></span>
-<span><span class="co">#&gt; 3 Variety_031    0.371</span></span>
-<span><span class="co">#&gt; # ...</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 2</span></span></span>
+<span><span class="co">#&gt;    germplasmName  BLUP</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Variety_027   0.667</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Variety_003   0.518</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Variety_045   0.503</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> Variety_005   0.443</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> Variety_049   0.398</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> Variety_038   0.382</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> Variety_004   0.349</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Variety_054   0.315</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> Variety_037   0.284</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Variety_010   0.277</span></span>
 <span></span>
 <span><span class="co"># Variance component partitioning</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/VarCorr.html" class="external-link">VarCorr</a></span><span class="op">(</span><span class="va">fm</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  Groups            Name        Std.Dev.</span></span>
-<span><span class="co">#&gt;  germplasmName:env (Intercept)  0.285    # GxE component</span></span>
-<span><span class="co">#&gt;  germplasmName     (Intercept)  0.441    # G (genetic signal)</span></span>
-<span><span class="co">#&gt;  Residual                       0.231</span></span>
+<span><span class="co">#&gt;  germplasmName:env (Intercept) 0.43730 </span></span>
+<span><span class="co">#&gt;  germplasmName     (Intercept) 0.39119 </span></span>
+<span><span class="co">#&gt;  Residual                      1.03845</span></span>
 <span></span>
-<span><span class="co"># H^2 broad-sense heritability (across-environment)</span></span>
+<span><span class="co"># H^2 broad-sense heritability (across-environment), from the FITTED</span></span>
+<span><span class="co"># variance components (not the true simulated ones above - estimation noise</span></span>
+<span><span class="co"># means these won't match exactly).</span></span>
 <span><span class="va">var_g</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/VarCorr.html" class="external-link">VarCorr</a></span><span class="op">(</span><span class="va">fm</span><span class="op">)</span><span class="op">$</span><span class="va">germplasmName</span><span class="op">)</span></span>
 <span><span class="va">var_ge</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/nlme/man/VarCorr.html" class="external-link">VarCorr</a></span><span class="op">(</span><span class="va">fm</span><span class="op">)</span><span class="op">$</span><span class="va">`germplasmName:env`</span><span class="op">)</span></span>
 <span><span class="va">var_e</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/sigma.html" class="external-link">sigma</a></span><span class="op">(</span><span class="va">fm</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span>
-<span><span class="va">n_env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">met</span><span class="op">$</span><span class="va">env</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">n_rep</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># one plot per genotype per env (adjust if replicated)</span></span>
+<span><span class="va">n_env_obs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">met</span><span class="op">$</span><span class="va">env</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">H2</span> <span class="op">&lt;-</span> <span class="va">var_g</span> <span class="op">/</span> <span class="op">(</span><span class="va">var_g</span> <span class="op">+</span> <span class="va">var_ge</span> <span class="op">/</span> <span class="va">n_env</span> <span class="op">+</span> <span class="va">var_e</span> <span class="op">/</span> <span class="op">(</span><span class="va">n_env</span> <span class="op">*</span> <span class="va">n_rep</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">H2</span> <span class="op">&lt;-</span> <span class="va">var_g</span> <span class="op">/</span> <span class="op">(</span><span class="va">var_g</span> <span class="op">+</span> <span class="va">var_ge</span> <span class="op">/</span> <span class="va">n_env_obs</span> <span class="op">+</span> <span class="va">var_e</span> <span class="op">/</span> <span class="op">(</span><span class="va">n_env_obs</span> <span class="op">*</span> <span class="va">n_rep</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Broad-sense H^2 (across environments): %.3f\n"</span>, <span class="va">H2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Broad-sense H^2 (across environments): 0.731</span></span></code></pre></div>
+<span><span class="co">#&gt; Broad-sense H^2 (across environments): 0.557</span></span></code></pre></div>
+<p>With <code>sd_g = 0.35</code>, <code>sd_ge = 0.55</code>,
+<code>sd_e = 1.00</code> the true (simulated) H2 is about 0.48; the
+model fitted above typically recovers something in the same
+neighborhood, comfortably inside the ~0.3-0.6 range real yield
+heritabilities fall in — not the unrealistically high value (0.9) that
+an earlier, less careful choice of variance components produced.</p>
 </div>
-<div class="section level2">
-<h2 id="step-7-final-selection-list">Step 7: Final Selection List<a class="anchor" aria-label="anchor" href="#step-7-final-selection-list"></a>
-</h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="section level3">
+<h3 id="final-selection-list">Final Selection List<a class="anchor" aria-label="anchor" href="#final-selection-list"></a>
+</h3>
+<p>The weights below, 0.6 on yield and 0.4 on stability, are a choice
+rather than a standard, and they should reflect what your program is
+actually selecting for.</p>
+<p>The tradeoff behind them is real. The highest yielding line is
+frequently not the most stable: it wins substantially at favourable
+sites and falls away under stress, which shows up as a high mean with a
+large ASV. A stable line yields moderately more or less everywhere.
+Which of the two a breeder should prefer depends on the target
+population of environments and on who is growing the crop. For maize
+under irrigation with reliable inputs, where the conditions the variety
+will meet are close to the favourable end of the trials, weighting yield
+heavily is defensible. For smallholder production under variable
+rainfall, where a failed season carries consequences a good season does
+not offset, stability deserves more weight than yield, and a 0.4/0.6
+split in the other direction would be the more sensible starting
+point.</p>
+<p>One limitation worth noting: both components are rank-normalised
+before combining, which makes them comparable but discards magnitude. A
+line marginally ahead on yield and one far ahead contribute the same
+rank difference. If the size of the yield advantage matters to the
+decision, scale the components rather than ranking them.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Combine BLUP ranking with stability</span></span>
 <span><span class="va">stability</span> <span class="op">&lt;-</span> <span class="va">ammi_stable</span><span class="op">$</span><span class="va">Grain_Yield_t_ha</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">GEN</span>, mean_yield <span class="op">=</span> <span class="va">Y</span>, <span class="va">ASV</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -337,15 +619,53 @@ effect.</p>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">score</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Top 20 selections: high yield + high stability</span></span>
-<span><span class="va">top20</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">selection</span>, <span class="fl">20</span><span class="op">)</span></span>
-<span><span class="va">top20</span></span>
-<span><span class="co">#&gt; # A tibble: 20 x 6</span></span>
-<span><span class="co">#&gt;   germplasmName    BLUP mean_yield   ASV rank_yield rank_stab score</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;      &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 Variety_089     0.412       5.34 0.012      0.998     0.997 0.998</span></span>
-<span><span class="co">#&gt; 2 Variety_214     0.389       5.21 0.035      0.991     0.989 0.991</span></span>
-<span><span class="co">#&gt; # ...</span></span></code></pre></div>
+<span><span class="co"># Top 10 selections: high yield + high stability</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">selection</span>, <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 7</span></span></span>
+<span><span class="co">#&gt;    germplasmName   BLUP mean_yield    ASV rank_yield rank_stab score</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Variety_003   0.518        5.77 0.285       0.983     0.733 0.883</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Variety_005   0.443        5.63 0.268       0.95      0.767 0.877</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Variety_032   0.210        5.21 0.059<span style="text-decoration: underline;">1</span>      0.717     0.983 0.823</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> Variety_051   0.237        5.26 0.236       0.783     0.8   0.79 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> Variety_013   0.145        5.10 0.113       0.65      0.95  0.77 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> Variety_044   0.239        5.26 0.312       0.8       0.7   0.76 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> Variety_006   0.172        5.14 0.218       0.683     0.85  0.75 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Variety_038   0.382        5.52 0.438       0.917     0.433 0.723</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> Variety_027   0.667        6.03 0.668       1         0.267 0.707</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Variety_035   0.060<span style="text-decoration: underline;">0</span>       4.94 0.213       0.583     0.867 0.697</span></span></code></pre></div>
+<p>As with the <a href="genomic-selection-pipeline.html">genomic
+selection article</a>, the numbers in Part 3 describe a simulated trial
+and are only meant to demonstrate that the pipeline (fetch -&gt; reshape
+-&gt; AMMI/GGE -&gt; mixed model -&gt; selection) runs end to end; they
+say nothing about any real breeding program.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<ul>
+<li>Selby, P., Abbeloos, R., Backlund, J.E., et al., &amp; The BrAPI
+Consortium (2019). BrAPI — an application programming interface for
+plant breeding applications. <em>Bioinformatics</em>, 35(20), 4147–4155.
+<a href="https://doi.org/10.1093/bioinformatics/btz190" class="external-link uri">https://doi.org/10.1093/bioinformatics/btz190</a>
+</li>
+<li>Zobel, R.W., Wright, M.J., &amp; Gauch, H.G. (1988). Statistical
+analysis of a yield trial. <em>Agronomy Journal</em>, 80(3), 388–393. <a href="https://doi.org/10.2134/agronj1988.00021962008000030002x" class="external-link uri">https://doi.org/10.2134/agronj1988.00021962008000030002x</a>
+</li>
+<li>Yan, W., Hunt, L.A., Sheng, Q., &amp; Szlavnics, Z. (2000). Cultivar
+evaluation and mega-environment investigation based on the GGE biplot.
+<em>Crop Science</em>, 40(3), 597–605. <a href="https://doi.org/10.2135/cropsci2000.403597x" class="external-link uri">https://doi.org/10.2135/cropsci2000.403597x</a>
+</li>
+<li>Olivoto, T., &amp; Lúcio, A.D. (2020). metan: An R package for
+multi-environment trial analysis. <em>Methods in Ecology and
+Evolution</em>, 11(6), 783–789. <a href="https://doi.org/10.1111/2041-210X.13384" class="external-link uri">https://doi.org/10.1111/2041-210X.13384</a>
+</li>
+<li>Bates, D., Mächler, M., Bolker, B., &amp; Walker, S. (2015). Fitting
+linear mixed-effects models using lme4. <em>Journal of Statistical
+Software</em>, 67(1), 1–48. <a href="https://doi.org/10.18637/jss.v067.i01" class="external-link uri">https://doi.org/10.18637/jss.v067.i01</a>
+</li>
+</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

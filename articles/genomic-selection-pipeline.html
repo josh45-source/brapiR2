@@ -34,12 +34,12 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="../articles/brapiR2.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/genomic-selection-pipeline.html">Genomic Selection Pipeline with brapiR2</a></li>
-    <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started with brapiR2</a></li>
     <li><a class="dropdown-item" href="../articles/multi-environment-analysis.html">Multi-Environment Trial (MET) Analysis with brapiR2</a></li>
   </ul>
 </li>
@@ -65,7 +65,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Genomic Selection Pipeline with brapiR2</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/josh45-source/brapiR2/blob/main/vignettes/genomic-selection-pipeline.Rmd" class="external-link"><code>vignettes/genomic-selection-pipeline.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/josh45-source/brapiR2/blob/main/vignettes/articles/genomic-selection-pipeline.Rmd" class="external-link"><code>vignettes/articles/genomic-selection-pipeline.Rmd</code></a></small>
       <div class="d-none name"><code>genomic-selection-pipeline.Rmd</code></div>
     </div>
 
@@ -74,11 +74,12 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>This vignette demonstrates a complete genomic selection (GS) workflow
-using brapiR2 to pull phenotypic and genotypic data directly from a
-BrAPI-compliant server into R, then running GS models with rrBLUP.</p>
+<p>This article demonstrates a complete genomic selection (GS) workflow
+using brapiR2 to pull phenotypic and genotypic data from a
+BrAPI-compliant server into R, then running GS models with rrBLUP, BGLR,
+sommer, and AGHmatrix.</p>
 <p>The <code><a href="../reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix()</a></code> function returns a
-standard numeric matrix (samples × markers) that is directly compatible
+standard numeric matrix (samples x markers) that is directly compatible
 with the major GS packages:</p>
 <table class="table">
 <colgroup>
@@ -108,119 +109,400 @@ with the major GS packages:</p>
 </tr>
 </tbody>
 </table>
+<p>It has three parts: <strong>Part 1</strong> fetches real data from
+the public BrAPI test server and shows exactly what brapiR2 returns.
+<strong>Part 2</strong> shows the authenticated pattern you’d use
+against your own server, without running it. <strong>Part 3</strong>
+runs the actual GS modeling on a simulated dataset, because (as Part 1
+demonstrates directly) the public server doesn’t have enough real
+individuals with both phenotype and genotype data to fit and validate a
+model.</p>
 </div>
 <div class="section level2">
-<h2 id="step-1-connect-and-fetch-phenotypic-data">Step 1: Connect and Fetch Phenotypic Data<a class="anchor" aria-label="anchor" href="#step-1-connect-and-fetch-phenotypic-data"></a>
+<h2 id="part-1-live-data-from-the-public-test-server">Part 1: Live Data from the Public Test Server<a class="anchor" aria-label="anchor" href="#part-1-live-data-from-the-public-test-server"></a>
 </h2>
+<p>These calls run against <code>https://test-server.brapi.org</code>
+and require no authentication.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/josh45-source/brapiR2" class="external-link">brapiR2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span></span>
-<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_connection.html">brapi_connection</a></span><span class="op">(</span><span class="st">"https://my-breedbase.org"</span><span class="op">)</span></span>
-<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_login.html">brapi_login</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"username"</span>, <span class="st">"password"</span><span class="op">)</span></span>
+<span><span class="va">studies</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_studies.html">brapi_studies</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+<span><span class="va">studies</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 29</span></span></span>
+<span><span class="co">#&gt;   additionalInfo   externalReferences active commonCropName contacts  </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="color: #949494;">&lt;named list [1]&gt;</span> <span style="color: #949494;">&lt;list [1]&gt;</span>         TRUE   Tomatillo      <span style="color: #949494;">&lt;list [1]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> <span style="color: #949494;">&lt;named list [1]&gt;</span> <span style="color: #949494;">&lt;list [1]&gt;</span>         TRUE   Tomatillo      <span style="color: #949494;">&lt;list [1]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> <span style="color: #949494;">&lt;named list [1]&gt;</span> <span style="color: #949494;">&lt;list [1]&gt;</span>         TRUE   Tomatillo      <span style="color: #949494;">&lt;list [1]&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 24 more variables: culturalPractices &lt;chr&gt;, dataLinks &lt;list&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   documentationURL &lt;chr&gt;, endDate &lt;chr&gt;, environmentParameters &lt;list&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   experimentalDesign &lt;list&gt;, growthFacility &lt;list&gt;, lastUpdate &lt;list&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   license &lt;chr&gt;, locationDbId &lt;chr&gt;, locationName &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   observationLevels &lt;list&gt;, observationUnitsDescription &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   seasons &lt;list&gt;, startDate &lt;chr&gt;, studyCode &lt;chr&gt;, studyDescription &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   studyName &lt;chr&gt;, studyPUI &lt;chr&gt;, studyType &lt;chr&gt;, trialDbId &lt;chr&gt;, …</span></span></span>
+<span></span>
+<span><span class="co"># brapi_study_data() falls back to fetching all observations and filtering</span></span>
+<span><span class="co"># client-side when a server (like this one) doesn't honour the studyDbId</span></span>
+<span><span class="co"># filter on /observations - so it succeeds even though a direct</span></span>
+<span><span class="co"># brapi_observations(con, studyDbId = ...) call would come back empty.</span></span>
+<span><span class="va">pheno_by_study</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">studies</span><span class="op">$</span><span class="va">studyDbId</span>, <span class="va">brapi_study_data</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> No observations found for study <span style="color: #0000BB;">"study2"</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> No observations found for study <span style="color: #0000BB;">"study3"</span>.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pheno_by_study</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">studies</span><span class="op">$</span><span class="va">studyDbId</span></span>
+<span><span class="va">pheno_by_study</span><span class="op">[[</span><span class="st">"study1"</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 6</span></span></span>
+<span><span class="co">#&gt;   observationUnitDbId observationUnitName germplasmDbId germplasmName  studyDbId</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> observation_unit1   Plot 1              germplasm1    Tomatillo Fan… study1   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> observation_unit2   Plot 2              germplasm2    Tomatillo Fan… study1   </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: `Corn Stalk Height` &lt;list&gt;</span></span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">vsets</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_variant_sets.html">brapi_variant_sets</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+<span><span class="va">vsets</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 11</span></span></span>
+<span><span class="co">#&gt;   additionalInfo   externalReferences analysis   availableFormats callSetCount</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="color: #949494;">&lt;named list [1]&gt;</span> <span style="color: #949494;">&lt;list [1]&gt;</span>         <span style="color: #949494;">&lt;list [1]&gt;</span> <span style="color: #949494;">&lt;list [3]&gt;</span>                 13</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 6 more variables: referenceSetDbId &lt;chr&gt;, studyDbId &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   variantCount &lt;int&gt;, variantSetDbId &lt;chr&gt;, variantSetName &lt;chr&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   metadataFields &lt;list&gt;</span></span></span>
+<span></span>
+<span><span class="va">vs_id</span> <span class="op">&lt;-</span> <span class="va">vsets</span><span class="op">$</span><span class="va">variantSetDbId</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span></span>
+<span><span class="va">markers</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_get_marker_map.html">brapi_get_marker_map</a></span><span class="op">(</span><span class="va">con</span>, <span class="va">vs_id</span><span class="op">)</span></span>
+<span><span class="va">markers</span> <span class="co"># referenceName/start are NA on this server; identity columns are real</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 20 × 4</span></span></span>
+<span><span class="co">#&gt;    variantDbId variantName referenceName start</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> variant01   M1          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> variant02   M2          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> variant03   M3          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> variant04   M4          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> variant05   M5          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> variant06   M6          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> variant07   M7          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> variant08   M8          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> variant09   M9          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> variant10   M10         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> variant11   M11         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> variant12   M12         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> variant13   M13         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> variant14   M14         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> variant15   M15         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> variant16   M16         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> variant17   M17         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> variant18   M18         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">19</span> variant19   M19         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">20</span> variant20   M20         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span></span>
+<span></span>
+<span><span class="va">dosage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix</a></span><span class="op">(</span><span class="va">con</span>, <span class="va">vs_id</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Fetching allele matrix for variant set <span style="color: #0000BB;">"variantset1"</span>...</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Encoding 260 genotype calls as allele dosages...</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Dosage matrix ready: 13 samples x 20 markers.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">dosage</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 13 20</span></span>
+<span><span class="va">dosage</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">dosage</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">dosage</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;           variant01 variant02 variant03 variant04 variant05 variant06</span></span>
+<span><span class="co">#&gt; callset01         0         0         0         0         0         1</span></span>
+<span><span class="co">#&gt; callset02         1         0        NA        NA        NA        NA</span></span>
+<span><span class="co">#&gt; callset03         1         0         1         1         0         0</span></span>
+<span><span class="co">#&gt; callset04         1         0         1         1         0         1</span></span>
+<span><span class="co">#&gt; callset05         1         0        NA         1         0         0</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="do-phenotype-and-genotype-records-share-any-germplasm-here">Do phenotype and genotype records share any germplasm here?<a class="anchor" aria-label="anchor" href="#do-phenotype-and-genotype-records-share-any-germplasm-here"></a>
+</h3>
+<p>This is the question that decides whether real genomic prediction is
+possible against this server. <code><a href="../reference/brapi_call_sets.html">brapi_call_sets()</a></code> links a
+genotyped sample to a <code>sampleDbId</code>, and
+<code><a href="../reference/brapi_samples.html">brapi_samples()</a></code> links that same <code>sampleDbId</code> to
+a <code>germplasmDbId</code> - joining on <code>sampleDbId</code> (not
+<code>callSetDbId</code>; they’re different ID spaces on this
+server).</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pheno_germplasm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">pheno_by_study</span>, <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;&amp;</span> <span class="st">"germplasmDbId"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">d</span><span class="op">$</span><span class="va">germplasmDbId</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">pheno_germplasm</span></span>
+<span><span class="co">#&gt; [1] "germplasm1" "germplasm2"</span></span>
+<span></span>
+<span><span class="va">call_sets</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_call_sets.html">brapi_call_sets</a></span><span class="op">(</span><span class="va">con</span>, variantSetDbId <span class="op">=</span> <span class="va">vs_id</span><span class="op">)</span></span>
+<span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_samples.html">brapi_samples</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">geno_germplasm</span> <span class="op">&lt;-</span> <span class="va">samples</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">sampleDbId</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">call_sets</span><span class="op">$</span><span class="va">sampleDbId</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">.data</span><span class="op">$</span><span class="va">germplasmDbId</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">geno_germplasm</span></span>
+<span><span class="co">#&gt; [1] "germplasm2" "germplasm1" "germplasm3"</span></span>
+<span></span>
+<span><span class="va">overlap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect</a></span><span class="op">(</span><span class="va">pheno_germplasm</span>, <span class="va">geno_germplasm</span><span class="op">)</span></span>
+<span><span class="va">overlap</span></span>
+<span><span class="co">#&gt; [1] "germplasm1" "germplasm2"</span></span></code></pre></div>
+<p>Real, live result: 2 germplasm have both phenotype and genotype
+records on this server today. That is genuinely more than zero, but far
+short of the dozens of individuals a real genomic prediction exercise
+needs to fit a model and hold out a validation set. See <a href="https://github.com/josh45-source/brapiR2/blob/main/dev/explore-test-server.R" class="external-link"><code>dev/explore-test-server.R</code></a>
+for the full survey this is drawn from. Part 3 below uses simulated data
+so the modeling section can actually run.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="part-2-authenticated-access-to-your-own-server-illustrative">Part 2: Authenticated Access to Your Own Server (illustrative)<a class="anchor" aria-label="anchor" href="#part-2-authenticated-access-to-your-own-server-illustrative"></a>
+</h2>
+<p>Production BrAPI servers (BreedBase, BMS, Germinate, …) require
+credentials the public test server doesn’t need. This shows the pattern
+— it is not run here, since it needs a real server and login of your
+own.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">con_priv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_connection.html">brapi_connection</a></span><span class="op">(</span><span class="st">"https://my-breedbase.org"</span><span class="op">)</span></span>
+<span><span class="va">con_priv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_login.html">brapi_login</a></span><span class="op">(</span><span class="va">con_priv</span>, <span class="st">"username"</span>, <span class="st">"password"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Optional: enable caching so re-runs don't hit the server again</span></span>
-<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_cache_enable.html">brapi_cache_enable</a></span><span class="op">(</span><span class="va">con</span>, ttl <span class="op">=</span> <span class="fl">7200</span><span class="op">)</span></span>
+<span><span class="va">con_priv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_cache_enable.html">brapi_cache_enable</a></span><span class="op">(</span><span class="va">con_priv</span>, ttl <span class="op">=</span> <span class="fl">7200</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get phenotype data in wide format (one row per plot, one column per trait)</span></span>
-<span><span class="va">pheno_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_study_data.html">brapi_study_data</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"my_study_id"</span><span class="op">)</span></span>
+<span><span class="va">pheno_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_study_data.html">brapi_study_data</a></span><span class="op">(</span><span class="va">con_priv</span>, <span class="st">"my_study_id"</span><span class="op">)</span></span>
 <span><span class="va">pheno_raw</span></span>
-<span><span class="co">#&gt; # A tibble: 250 x 8</span></span>
-<span><span class="co">#&gt;   observationUnitDbId germplasmDbId germplasmName  studyDbId</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;               &lt;chr&gt;         &lt;chr&gt;          &lt;chr&gt;</span></span>
-<span><span class="co">#&gt; 1 ou001               g001          Variety_001    study_01</span></span>
-<span><span class="co">#&gt; 2 ou002               g002          Variety_002    study_01</span></span>
-<span><span class="co">#&gt; # ... with 246 more rows, and 4 more variables:</span></span>
-<span><span class="co">#&gt; #   Grain_Yield_t_ha &lt;chr&gt;, Days_to_Heading &lt;chr&gt;,</span></span>
-<span><span class="co">#&gt; #   Plant_Height_cm &lt;chr&gt;, Thousand_Grain_Weight &lt;chr&gt;</span></span>
 <span></span>
 <span><span class="co"># Convert trait columns to numeric and drop missing</span></span>
 <span><span class="va">pheno</span> <span class="op">&lt;-</span> <span class="va">pheno_raw</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="va">Grain_Yield_t_ha</span><span class="op">:</span><span class="va">Thousand_Grain_Weight</span>, <span class="va">as.numeric</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Grain_Yield_t_ha</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pheno</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 241</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="step-2-fetch-genotypic-data">Step 2: Fetch Genotypic Data<a class="anchor" aria-label="anchor" href="#step-2-fetch-genotypic-data"></a>
-</h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Grain_Yield_t_ha</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># List available variant sets to find the right genotyping dataset</span></span>
-<span><span class="va">vsets</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_variant_sets.html">brapi_variant_sets</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
-<span><span class="va">vsets</span></span>
-<span><span class="co">#&gt; # A tibble: 3 x 8</span></span>
-<span><span class="co">#&gt;   variantSetDbId variantSetName callSetCount variantCount</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;          &lt;chr&gt;                 &lt;int&gt;        &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1 vs001          SNP50K_2022              250        45230</span></span>
-<span><span class="co">#&gt; 2 vs002          GBS_v2_2022              250        82100</span></span>
-<span><span class="co">#&gt; 3 vs003          DArTseq_panel            250        14500</span></span>
+<span><span class="va">vsets_priv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_variant_sets.html">brapi_variant_sets</a></span><span class="op">(</span><span class="va">con_priv</span><span class="op">)</span></span>
+<span><span class="va">vsets_priv</span></span>
 <span></span>
 <span><span class="co"># Get dosage matrix: rows = samples (callSetDbIds),</span></span>
 <span><span class="co"># cols = markers (variantDbIds). Values: 0 (hom ref), 1 (het), 2 (hom alt),</span></span>
 <span><span class="co"># NA (missing)</span></span>
-<span><span class="va">dosage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"vs001"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; i Fetching allele matrix for variant set 'vs001'...</span></span>
-<span><span class="co">#&gt; i Encoding 11307500 genotype calls as allele dosages...</span></span>
-<span><span class="co">#&gt; v Dosage matrix ready: 250 samples x 45230 markers.</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">dosage</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1]   250 45230</span></span>
-<span></span>
-<span><span class="co"># Preview dosage values</span></span>
-<span><span class="va">dosage</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span>
-<span><span class="co">#&gt;             SNP_chr1_1234 SNP_chr1_5678 SNP_chr2_234 SNP_chr2_890 ...</span></span>
-<span><span class="co">#&gt; Variety_001             0             1            2            0</span></span>
-<span><span class="co">#&gt; Variety_002             2             0            0            1</span></span>
-<span><span class="co">#&gt; Variety_003             1             1            1            1</span></span>
-<span><span class="co">#&gt; Variety_004             0             0            2            0</span></span>
+<span><span class="va">dosage_priv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix</a></span><span class="op">(</span><span class="va">con_priv</span>, <span class="st">"vs001"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">dosage_priv</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get marker map for downstream QTL / Manhattan plots</span></span>
-<span><span class="va">markers</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_get_marker_map.html">brapi_get_marker_map</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"vs001"</span><span class="op">)</span></span>
-<span><span class="va">markers</span></span>
-<span><span class="co">#&gt; # A tibble: 45230 x 4</span></span>
-<span><span class="co">#&gt;    variantDbId    variantName   referenceName  start</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;          &lt;chr&gt;         &lt;chr&gt;          &lt;int&gt;</span></span>
-<span><span class="co">#&gt;  1 var001         SNP_chr1_1234 1A              1234</span></span>
-<span><span class="co">#&gt;  2 var002         SNP_chr1_5678 1A              5678</span></span>
-<span><span class="co">#&gt;  # ... with 45228 more rows</span></span></code></pre></div>
+<span><span class="va">markers_priv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_get_marker_map.html">brapi_get_marker_map</a></span><span class="op">(</span><span class="va">con_priv</span>, <span class="st">"vs001"</span><span class="op">)</span></span>
+<span><span class="va">markers_priv</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="step-3-align-phenotypes-and-genotypes">Step 3: Align Phenotypes and Genotypes<a class="anchor" aria-label="anchor" href="#step-3-align-phenotypes-and-genotypes"></a>
+<h2 id="part-3-genomic-selection-on-simulated-data">Part 3: Genomic Selection on Simulated Data<a class="anchor" aria-label="anchor" href="#part-3-genomic-selection-on-simulated-data"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Match on germplasmName (rownames of dosage = callSetDbId = germplasmName</span></span>
-<span><span class="co"># on most servers; adjust if your server uses a different identifier)</span></span>
-<span><span class="va">common</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">dosage</span><span class="op">)</span>, <span class="va">pheno</span><span class="op">$</span><span class="va">germplasmName</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">common</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 237</span></span>
+<p>Genomic prediction needs the same germplasm scored on both sides —
+enough of them to fit marker effects and validate the fit. Part 1 showed
+real brapiR2 output; it also showed why the public server can’t support
+the model-fitting step: only 2 real germplasm have paired data there,
+and no public BrAPI server currently provides the dozens-to-hundreds of
+paired records genomic prediction actually needs. The rest of this
+article uses a <strong>simulated</strong> dataset built with <a href="https://cran.r-project.org/package=AlphaSimR" class="external-link">AlphaSimR</a>,
+generated with a fixed seed so it is fully reproducible without server
+access. Simulated values are labeled as such throughout.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># SIMULATED founder haplotypes. runMacs() runs a coalescent simulation</span></span>
+<span><span class="co"># (MaCS; Chen, Marjoram &amp; Wall 2009) that produces markers with realistic</span></span>
+<span><span class="co"># linkage disequilibrium (LD) and shared ancestry between founders - unlike</span></span>
+<span><span class="co"># the independent per-marker draws used in earlier drafts of this article.</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># Not run here: AlphaSimR does not expose R-level seed control for this</span></span>
+<span><span class="co"># coalescent step (set.seed() has no effect on runMacs() itself - verified,</span></span>
+<span><span class="co"># two runs with the same seed produce different founder haplotypes), so</span></span>
+<span><span class="co"># calling it at build time would make every number below change on every</span></span>
+<span><span class="co"># rebuild of this article. Instead, this call was run once, and its result</span></span>
+<span><span class="co"># saved to founderPop.rds (loaded below) so the article - including the</span></span>
+<span><span class="co"># reported cross-validation accuracy - is exactly reproducible.</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/gaynorr/AlphaSimR" class="external-link">AlphaSimR</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">pheno_aligned</span> <span class="op">&lt;-</span> <span class="va">pheno</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">germplasmName</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">common</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">germplasmName</span>, <span class="va">common</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">n_founders</span> <span class="op">&lt;-</span> <span class="fl">150L</span> <span class="co"># founder lines</span></span>
+<span><span class="va">n_sites</span>    <span class="op">&lt;-</span> <span class="fl">800L</span> <span class="co"># segregating sites simulated per chromosome</span></span>
 <span></span>
-<span><span class="va">geno_aligned</span> <span class="op">&lt;-</span> <span class="va">dosage</span><span class="op">[</span><span class="va">common</span>, <span class="op">]</span></span>
+<span><span class="va">founderPop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://gaynorr.github.io/AlphaSimR/reference/runMacs.html" class="external-link">runMacs</a></span><span class="op">(</span></span>
+<span>  nInd <span class="op">=</span> <span class="va">n_founders</span>, nChr <span class="op">=</span> <span class="fl">1L</span>, segSites <span class="op">=</span> <span class="va">n_sites</span>,</span>
+<span>  species <span class="op">=</span> <span class="st">"GENERIC"</span>, nThreads <span class="op">=</span> <span class="fl">1L</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">founderPop</span>, <span class="st">"founderPop.rds"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/gaynorr/AlphaSimR" class="external-link">AlphaSimR</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'AlphaSimR'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     mutate</span></span>
 <span></span>
-<span><span class="co"># Quick missing-data summary</span></span>
+<span><span class="va">n_founders</span> <span class="op">&lt;-</span> <span class="fl">150L</span> <span class="co"># founder lines (must match the frozen founderPop.rds)</span></span>
+<span><span class="va">n_qtl</span>      <span class="op">&lt;-</span> <span class="fl">100L</span> <span class="co"># of the founder genome's segregating sites, how many are QTL</span></span>
+<span><span class="va">n_snps</span>     <span class="op">&lt;-</span> <span class="fl">700L</span> <span class="co"># SNP chip size: the remaining sites, QTL excluded</span></span>
+<span><span class="va">h2</span>         <span class="op">&lt;-</span> <span class="fl">0.5</span>  <span class="co"># target narrow-sense heritability</span></span>
+<span></span>
+<span><span class="co"># Load the frozen founder population (see the eval = FALSE chunk above for</span></span>
+<span><span class="co"># how it was made) instead of calling runMacs() here, so this article's</span></span>
+<span><span class="co"># genotypes - and the cross-validation accuracy reported at the end of this</span></span>
+<span><span class="co"># section - are exactly reproducible across rebuilds. Every step *after*</span></span>
+<span><span class="co"># this one (trait assignment, crossing, cross-validation folds) was already</span></span>
+<span><span class="co"># fully reproducible given the founder population it starts from; freezing</span></span>
+<span><span class="co"># the founders makes the whole pipeline reproducible end to end.</span></span>
+<span><span class="va">founderPop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"founderPop.rds"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># SimParam defines the trait architecture on top of the founder genome:</span></span>
+<span><span class="co"># n_qtl randomly chosen segregating sites carry additive effects drawn to</span></span>
+<span><span class="co"># hit the target heritability; the remaining sites are neutral markers</span></span>
+<span><span class="co"># only informative through their LD with the causal ones. That's now a</span></span>
+<span><span class="co"># fact about the genome, not yet about what the model sees - the SNP chip</span></span>
+<span><span class="co"># defined next is drawn separately, only from those neutral sites, so it</span></span>
+<span><span class="co"># deliberately excludes the QTL themselves.</span></span>
+<span><span class="va">SP</span> <span class="op">&lt;-</span> <span class="va"><a href="https://gaynorr.github.io/AlphaSimR/reference/SimParam.html" class="external-link">SimParam</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">founderPop</span><span class="op">)</span></span>
+<span><span class="va">SP</span><span class="op">$</span><span class="fu">addTraitA</span><span class="op">(</span>nQtlPerChr <span class="op">=</span> <span class="va">n_qtl</span>, mean <span class="op">=</span> <span class="fl">5</span>, var <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="co"># SIMULATED yield (t/ha)</span></span>
+<span><span class="va">SP</span><span class="op">$</span><span class="fu">setVarE</span><span class="op">(</span>h2 <span class="op">=</span> <span class="va">h2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># A SNP chip is a genotyping platform's fixed marker panel, decided before</span></span>
+<span><span class="co"># anyone knows which sites are causal. addSnpChip() models that: it draws</span></span>
+<span><span class="co"># its n_snps markers only from the segregating sites addTraitA() did NOT</span></span>
+<span><span class="co"># designate as QTL, so every marker on the chip tags the causal variants</span></span>
+<span><span class="co"># only through LD, never by being one.</span></span>
+<span><span class="va">SP</span><span class="op">$</span><span class="fu">addSnpChip</span><span class="op">(</span>nSnpPerChr <span class="op">=</span> <span class="va">n_snps</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">founders</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://gaynorr.github.io/AlphaSimR/reference/newPop.html" class="external-link">newPop</a></span><span class="op">(</span><span class="va">founderPop</span>, simParam <span class="op">=</span> <span class="va">SP</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># One round of random crossing: each of n_founders progeny descends from</span></span>
+<span><span class="co"># two randomly chosen founders. Unlike independent markers, the resulting</span></span>
+<span><span class="co"># population has real family relatedness and real recombination</span></span>
+<span><span class="co"># breakpoints between founder haplotypes.</span></span>
+<span><span class="va">progeny</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://gaynorr.github.io/AlphaSimR/reference/randCross.html" class="external-link">randCross</a></span><span class="op">(</span></span>
+<span>  <span class="va">founders</span>, nCrosses <span class="op">=</span> <span class="va">n_founders</span>, nProgeny <span class="op">=</span> <span class="fl">1L</span>, simParam <span class="op">=</span> <span class="va">SP</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># pullSnpGeno() returns the dosage matrix for the SNP chip only, not the</span></span>
+<span><span class="co"># QTL: rows = individuals, columns = chip markers, values = 0/1/2 copies</span></span>
+<span><span class="co"># of the alternate allele - the same shape brapi_get_dosage_matrix()</span></span>
+<span><span class="co"># returns in Part 1. This is the deliberate difference from</span></span>
+<span><span class="co"># pullSegSiteGeno(), used in earlier drafts of this article: a real</span></span>
+<span><span class="co"># marker panel never includes the causal variants themselves, so a</span></span>
+<span><span class="co"># simulation that hands the model the true QTL directly would overstate</span></span>
+<span><span class="co"># how well genomic prediction works on a real genotyping platform.</span></span>
+<span><span class="va">geno_aligned</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://gaynorr.github.io/AlphaSimR/reference/pullSnpGeno.html" class="external-link">pullSnpGeno</a></span><span class="op">(</span><span class="va">progeny</span>, simParam <span class="op">=</span> <span class="va">SP</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">pheno_aligned</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>  germplasmName    <span class="op">=</span> <span class="va">progeny</span><span class="op">@</span><span class="va">id</span>,</span>
+<span>  Grain_Yield_t_ha <span class="op">=</span> <span class="fu"><a href="https://gaynorr.github.io/AlphaSimR/reference/pheno.html" class="external-link">pheno</a></span><span class="op">(</span><span class="va">progeny</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="co"># SIMULATED yield (t/ha)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span></span>
+<span>  <span class="st">"Simulated %d lines x %d SNP-chip markers, %d QTL (not on the chip), target h2 = %.2f\n"</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">geno_aligned</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">geno_aligned</span><span class="op">)</span>, <span class="va">n_qtl</span>, <span class="va">h2</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Simulated 150 lines x 700 SNP-chip markers, 100 QTL (not on the chip), target h2 = 0.50</span></span></code></pre></div>
+<p>As a sanity check, adjacent SNP-chip markers should be far more
+correlated with each other than distant ones - that’s LD, and it’s what
+genomic prediction exploits when the causal variants themselves aren’t
+observed. The independent-marker simulation in earlier drafts of this
+article had no such structure by construction.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">r2_adjacent</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">geno_aligned</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">j</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">geno_aligned</span><span class="op">[</span>, <span class="va">j</span><span class="op">]</span>, <span class="va">geno_aligned</span><span class="op">[</span>, <span class="va">j</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">}</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">45</span><span class="op">)</span></span>
+<span><span class="va">r2_random</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">j</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample.int</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">geno_aligned</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="va">j2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">geno_aligned</span><span class="op">)</span><span class="op">)</span>, <span class="va">j</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">geno_aligned</span><span class="op">[</span>, <span class="va">j</span><span class="op">]</span>, <span class="va">geno_aligned</span><span class="op">[</span>, <span class="va">j2</span><span class="op">]</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">}</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span></span>
+<span>  <span class="st">"Mean r^2, adjacent markers: %.3f | random marker pairs: %.3f\n"</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">r2_adjacent</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">r2_random</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Mean r^2, adjacent markers: 0.422 | random marker pairs: 0.023</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Introduce a small amount of missing genotype data, as real platforms do.</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">43</span><span class="op">)</span></span>
+<span><span class="va">n_missing</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="fl">0.03</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">geno_aligned</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">missing_idx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample.int</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">geno_aligned</span><span class="op">)</span>, <span class="va">n_missing</span><span class="op">)</span></span>
+<span><span class="va">geno_aligned</span><span class="op">[</span><span class="va">missing_idx</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
+<span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">geno_aligned</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.0312     # ~3.1% missing calls — impute before modelling</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="step-4-imputation-optional-but-recommended">Step 4: Imputation (Optional but Recommended)<a class="anchor" aria-label="anchor" href="#step-4-imputation-optional-but-recommended"></a>
-</h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Simple mean imputation (column means)</span></span>
-<span><span class="va">col_means</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">geno_aligned</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.03</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="imputation">Imputation<a class="anchor" aria-label="anchor" href="#imputation"></a>
+</h3>
+<p>Missing calls have to go somewhere before modelling, because the
+methods below are matrix operations with no notion of a missing cell.
+<code><a href="https://rdrr.io/pkg/rrBLUP/man/mixed.solve.html" class="external-link">mixed.solve()</a></code> will not accept <code>NA</code> in its design
+matrix, and dropping every individual with any missing call would
+discard most of a real panel, since missingness is scattered rather than
+concentrated.</p>
+<p>The usual first step is not imputation at all but filtering: markers
+missing in more than roughly 10 to 20 percent of individuals, and
+individuals missing more than roughly 20 to 30 percent of their calls,
+are typically removed rather than reconstructed, because there is too
+little information left to reconstruct them from. What remains is
+imputed. Below about 5 percent residual missingness, which is where this
+simulation sits, the choice of method makes very little difference to
+prediction accuracy.</p>
+<p>Mean imputation, used here, replaces a missing call with the marker’s
+mean dosage across individuals. It is unbiased for allele frequency and
+costs nothing, but it pulls imputed individuals toward the population
+mean and so slightly shrinks genetic variance. Rounding to whole
+numbers, which we do here because <code><a href="https://rdrr.io/pkg/AGHmatrix/man/Gmatrix.html" class="external-link">AGHmatrix::Gmatrix()</a></code>
+expects integer calls, discards the fractional information mean
+imputation supplies and is a further small compromise. The alternative
+shown in the comment, <code><a href="https://rdrr.io/pkg/rrBLUP/man/A.mat.html" class="external-link">rrBLUP::A.mat()</a></code>, handles missingness
+while computing the relationship matrix and so avoids modifying the
+genotype matrix at all. Where imputation genuinely matters, with high
+missingness or low marker density, a haplotype-based imputer such as
+Beagle that borrows information from linked markers and shared
+haplotypes will beat both, at the cost of an external tool and a
+reference panel.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Simple mean imputation (column means), rounded back to whole-number</span></span>
+<span><span class="co"># dosages since AGHmatrix::Gmatrix() expects integer genotype calls.</span></span>
+<span><span class="va">col_means</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">geno_aligned</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">geno_aligned</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">geno_aligned</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">geno_aligned</span><span class="op">[</span>, <span class="va">j</span><span class="op">]</span><span class="op">)</span>, <span class="va">j</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">col_means</span><span class="op">[</span><span class="va">j</span><span class="op">]</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="co"># Or use rrBLUP's A.mat which handles missing data internally</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">geno_aligned</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] FALSE</span></span>
+<span></span>
+<span><span class="co"># Or use rrBLUP's A.mat, which handles missing data internally.</span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="step-5-run-genomic-selection-with-rrblup">Step 5: Run Genomic Selection with rrBLUP<a class="anchor" aria-label="anchor" href="#step-5-run-genomic-selection-with-rrblup"></a>
-</h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="section level3">
+<h3 id="run-genomic-selection-with-rrblup">Run Genomic Selection with rrBLUP<a class="anchor" aria-label="anchor" href="#run-genomic-selection-with-rrblup"></a>
+</h3>
+<p><code><a href="https://rdrr.io/pkg/rrBLUP/man/mixed.solve.html" class="external-link">mixed.solve()</a></code> fits <code>y = mu + Zu + e</code>, where
+<code>Z</code> is the dosage matrix and <code>u</code> is a vector of
+marker effects treated as random draws from a common normal
+distribution. That last assumption is the substantive one: it says every
+marker contributes a small effect drawn from the same distribution,
+which is the infinitesimal model. Its practical consequence is that all
+effects are shrunk toward zero by an amount the model estimates from the
+data, so with far more markers than individuals the fit stays well
+behaved instead of chasing noise.</p>
+<p>The function returns <code>result$u</code>, one estimated effect per
+marker, and <code>result$beta</code>, the intercept. A genomic estimated
+breeding value is then just the sum of an individual’s marker effects
+weighted by its allele dosages, which is the matrix product computed
+below. GEBVs come out in trait units, tonnes per hectare here, and
+represent predicted genetic merit rather than expected phenotype: they
+carry the heritable component only, which is exactly what you want when
+ranking candidates for selection. This ridge formulation is
+mathematically equivalent to GBLUP fitted through a genomic relationship
+matrix; the two differ in computation, not in the model.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">rrBLUP</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Mixed model: phenotype ~ overall mean + random marker effects</span></span>
@@ -231,61 +513,161 @@ with the major GS packages:</p>
 <span></span>
 <span><span class="co"># Estimated marker effects</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">u</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 45230</span></span>
+<span><span class="co">#&gt; [1] 700</span></span>
 <span></span>
 <span><span class="co"># GEBVs (Genomic Estimated Breeding Values)</span></span>
-<span><span class="va">gebvs</span> <span class="op">&lt;-</span> <span class="va">geno_aligned</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">result</span><span class="op">$</span><span class="va">u</span> <span class="op">+</span> <span class="va">result</span><span class="op">$</span><span class="va">beta</span></span>
+<span><span class="co"># mixed.solve() returns u/beta as 1-D arrays; as.vector() drops the dim</span></span>
+<span><span class="co"># attribute so %*% treats them as plain vectors.</span></span>
+<span><span class="va">gebvs</span> <span class="op">&lt;-</span> <span class="va">geno_aligned</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">u</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gebvs</span><span class="op">)</span></span>
-<span><span class="co">#&gt;               [,1]</span></span>
-<span><span class="co">#&gt; Variety_001  4.82</span></span>
-<span><span class="co">#&gt; Variety_002  5.14</span></span>
-<span><span class="co">#&gt; Variety_003  4.67</span></span>
-<span><span class="co">#&gt; Variety_004  5.31</span></span>
-<span><span class="co">#&gt; Variety_005  4.91</span></span>
-<span><span class="co">#&gt; Variety_006  5.09</span></span>
+<span><span class="co">#&gt;         [,1]</span></span>
+<span><span class="co">#&gt; 151 4.832812</span></span>
+<span><span class="co">#&gt; 152 4.566174</span></span>
+<span><span class="co">#&gt; 153 5.481564</span></span>
+<span><span class="co">#&gt; 154 3.769689</span></span>
+<span><span class="co">#&gt; 155 5.531879</span></span>
+<span><span class="co">#&gt; 156 5.322381</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">gebvs</span>,</span>
-<span>  main <span class="op">=</span> <span class="st">"Distribution of GEBVs — Grain Yield"</span>,</span>
+<span>  main <span class="op">=</span> <span class="st">"Distribution of GEBVs (simulated data) - Grain Yield"</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">"GEBV (t/ha)"</span>, col <span class="op">=</span> <span class="st">"steelblue"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<p><img src="genomic-selection-pipeline_files/figure-html/gs-rrBLUP-1.png" class="r-plt" alt="" width="700"></p>
 </div>
-<div class="section level2">
-<h2 id="step-6-alternative-gs-packages">Step 6: Alternative GS Packages<a class="anchor" aria-label="anchor" href="#step-6-alternative-gs-packages"></a>
-</h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="section level3">
+<h3 id="alternative-gs-packages">Alternative GS Packages<a class="anchor" aria-label="anchor" href="#alternative-gs-packages"></a>
+</h3>
+<p>The four packages solve different problems, and the choice usually
+follows from what you believe about the trait rather than from
+performance.</p>
+<p><strong>rrBLUP</strong> assumes many markers of small effect. For a
+polygenic trait such as maize grain yield that assumption is close
+enough to true that rrBLUP is hard to beat, and it is the fastest of the
+four.</p>
+<p><strong>BGLR</strong> lets you change that assumption. Its
+<code>BRR</code> model is the Bayesian equivalent of what rrBLUP fits,
+but <code>BayesB</code> and <code>BayesC</code> place variable selection
+priors on marker effects, allowing a few markers to carry large effects
+while most carry none. For a trait with known major genes, such as
+resistance conferred by a single locus, those priors can outperform
+ridge substantially. For yield they usually do not. BGLR also accepts
+multiple terms in its <code>ETA</code> list, so you can fit markers
+alongside pedigree or environmental covariates in one model.</p>
+<p><strong>sommer</strong> is the choice when the model needs more than
+one random effect. Multi-trait analysis, explicit genotype by
+environment terms, and custom covariance structures all belong here, and
+it accepts a relationship matrix through <code>Gu</code> rather than a
+raw marker matrix.</p>
+<p><strong>AGHmatrix</strong> is not a fitting engine. It builds
+relationship matrices, genomic from markers, pedigree-based from a known
+pedigree, or the combined H matrix when only some individuals are
+genotyped, and hands them to something else. Its polyploid-aware methods
+matter for crops such as potato and sugarcane where the diploid
+assumptions elsewhere in this article do not hold.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ---- BGLR (Bayesian regression) ----</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">BGLR</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">bglr_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"bglr_"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">bglr_dir</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fm_bglr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BGLR/man/BGLR.html" class="external-link">BGLR</a></span><span class="op">(</span></span>
 <span>  y <span class="op">=</span> <span class="va">pheno_aligned</span><span class="op">$</span><span class="va">Grain_Yield_t_ha</span>,</span>
 <span>  ETA <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>MRK <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>X <span class="op">=</span> <span class="va">geno_aligned</span>, model <span class="op">=</span> <span class="st">"BRR"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  nIter <span class="op">=</span> <span class="fl">6000</span>, burnIn <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  nIter <span class="op">=</span> <span class="fl">1200</span>, burnIn <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>  saveAt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">bglr_dir</span>, <span class="st">"bglr_"</span><span class="op">)</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">gebvs_bglr</span> <span class="op">&lt;-</span> <span class="va">geno_aligned</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">fm_bglr</span><span class="op">$</span><span class="va">ETA</span><span class="op">$</span><span class="va">MRK</span><span class="op">$</span><span class="va">b</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gebvs_bglr</span><span class="op">)</span></span>
+<span><span class="co">#&gt;           [,1]</span></span>
+<span><span class="co">#&gt; 151 -0.9225619</span></span>
+<span><span class="co">#&gt; 152 -1.1793316</span></span>
+<span><span class="co">#&gt; 153 -0.2136794</span></span>
+<span><span class="co">#&gt; 154 -2.0190439</span></span>
+<span><span class="co">#&gt; 155 -0.2096473</span></span>
+<span><span class="co">#&gt; 156 -0.4108689</span></span>
 <span></span>
 <span><span class="co"># ---- sommer (mixed model with G matrix) ----</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/covaruber/sommer" class="external-link">sommer</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: Matrix</span></span>
+<span><span class="co">#&gt; Loading required package: MASS</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'MASS'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     select</span></span>
+<span><span class="co">#&gt; Loading required package: crayon</span></span>
+<span><span class="co">#&gt; Loading required package: enhancer</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'sommer'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:rrBLUP':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     A.mat, GWAS</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rramadeu/AGHmatrix" class="external-link">AGHmatrix</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Build genomic relationship matrix</span></span>
 <span><span class="va">G</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/AGHmatrix/man/Gmatrix.html" class="external-link">Gmatrix</a></span><span class="op">(</span><span class="va">geno_aligned</span>, method <span class="op">=</span> <span class="st">"VanRaden"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Gmatrix computation: VanRaden method</span></span>
-<span><span class="co">#&gt; Markers: 45230  Individuals: 237</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Missing data check: </span></span>
+<span><span class="co">#&gt;  Total SNPs: 700 </span></span>
+<span><span class="co">#&gt;   0 SNPs dropped due to missing data threshold of 0.5 </span></span>
+<span><span class="co">#&gt;  Total of: 700  SNPs </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; MAF check: </span></span>
+<span><span class="co">#&gt;  No SNPs with MAF below 0 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Heterozigosity data check: </span></span>
+<span><span class="co">#&gt;  No SNPs with heterozygosity, missing threshold of = 0 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Summary check: </span></span>
+<span><span class="co">#&gt;  Initial:  700 SNPs </span></span>
+<span><span class="co">#&gt;  Final:  700  SNPs ( 0  SNPs removed) </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Completed! Time = 0.01  seconds</span></span>
 <span></span>
 <span><span class="va">fm_sommer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sommer/man/mmer.html" class="external-link">mmer</a></span><span class="op">(</span></span>
 <span>  <span class="va">Grain_Yield_t_ha</span> <span class="op">~</span> <span class="fl">1</span>,</span>
 <span>  random  <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/sommer/man/DEPRECATED_VSR.html" class="external-link">vsr</a></span><span class="op">(</span><span class="va">germplasmName</span>, Gu <span class="op">=</span> <span class="va">G</span><span class="op">)</span>,</span>
 <span>  rcov    <span class="op">=</span> <span class="op">~</span><span class="va">units</span>,</span>
-<span>  data    <span class="op">=</span> <span class="va">pheno_aligned</span></span>
+<span>  data    <span class="op">=</span> <span class="va">pheno_aligned</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">gebvs_sommer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sommer/man/randef.html" class="external-link">randef</a></span><span class="op">(</span><span class="va">fm_sommer</span><span class="op">)</span><span class="op">$</span><span class="va">`u:germplasmName`</span></span></code></pre></div>
+<span><span class="va">gebvs_sommer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sommer/man/randef.html" class="external-link">randef</a></span><span class="op">(</span><span class="va">fm_sommer</span><span class="op">)</span><span class="op">$</span><span class="va">`u:germplasmName`</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gebvs_sommer</span><span class="op">)</span></span>
+<span><span class="co">#&gt; NULL</span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="step-7-cross-validation">Step 7: Cross-Validation<a class="anchor" aria-label="anchor" href="#step-7-cross-validation"></a>
-</h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
+<div class="section level3">
+<h3 id="cross-validation">Cross-Validation<a class="anchor" aria-label="anchor" href="#cross-validation"></a>
+</h3>
+<p>Fitting the model to all the data and correlating its fitted values
+with the observed phenotypes would tell you almost nothing. The marker
+effects were estimated from those very phenotypes, so the correlation
+reflects how well the model can reproduce data it has already seen. With
+more markers than individuals, which is the normal situation in genomic
+selection, that correlation can approach one while the model predicts
+new individuals no better than chance.</p>
+<p>The question that matters for breeding is different: how well does
+the model rank candidates it has never been phenotyped on, since the
+entire point is to select before phenotyping. Cross-validation answers
+that directly. The individuals are split into five folds, the model is
+refitted five times holding out one fold each time, and accuracy is the
+correlation between predicted and observed values in the held-out fold.
+Reporting the standard deviation across folds matters too, since a mean
+accuracy resting on wildly variable folds is not a stable estimate.</p>
+<p>Two things help interpret the number. Prediction accuracy is bounded
+above by the square root of heritability, because the phenotype you are
+validating against is itself an imperfect measure of genetic merit. With
+<code>h2</code> set to 0.5 here the ceiling is about 0.71, so the
+accuracy reported below is a substantial fraction of what is
+theoretically attainable. And random fold assignment implicitly assumes
+the individuals you want to predict are related to the ones you trained
+on, which is true within a breeding population but optimistic if the
+real question is predicting a new family or an unrelated germplasm
+source. Where that is the question, splitting by family rather than at
+random gives a more honest and considerably lower estimate.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">44</span><span class="op">)</span></span>
 <span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pheno_aligned</span><span class="op">)</span></span>
 <span><span class="va">folds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, length.out <span class="op">=</span> <span class="va">n</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">cors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span>
@@ -299,15 +681,84 @@ with the major GS packages:</p>
 <span>    Z <span class="op">=</span> <span class="va">geno_aligned</span><span class="op">[</span><span class="va">train</span>, <span class="op">]</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span>  <span class="va">pred</span> <span class="op">&lt;-</span> <span class="va">geno_aligned</span><span class="op">[</span><span class="va">test</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">fit</span><span class="op">$</span><span class="va">u</span> <span class="op">+</span> <span class="va">fit</span><span class="op">$</span><span class="va">beta</span></span>
+<span>  <span class="va">pred</span> <span class="op">&lt;-</span> <span class="va">geno_aligned</span><span class="op">[</span><span class="va">test</span>, <span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">u</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">beta</span><span class="op">)</span></span>
 <span>  <span class="va">cors</span><span class="op">[</span><span class="va">k</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pred</span><span class="op">)</span>, <span class="va">pheno_aligned</span><span class="op">$</span><span class="va">Grain_Yield_t_ha</span><span class="op">[</span><span class="va">test</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span></span>
-<span>  <span class="st">"5-fold CV prediction accuracy: %.3f ± %.3f\n"</span>,</span>
+<span>  <span class="st">"5-fold CV prediction accuracy (simulated data): %.3f +/- %.3f\n"</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">cors</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">cors</span><span class="op">)</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 5-fold CV prediction accuracy: 0.612 ± 0.054</span></span></code></pre></div>
+<span><span class="co">#&gt; 5-fold CV prediction accuracy (simulated data): 0.521 +/- 0.168</span></span></code></pre></div>
+<p>Prediction accuracy on simulated data is not a stand-in for accuracy
+on any particular real breeding program. Its purpose here is only to
+demonstrate that the pipeline (fetch -&gt; align -&gt; impute -&gt;
+model -&gt; validate) runs end to end.</p>
+</div>
+<div class="section level3">
+<h3 id="a-note-on-realism">A note on realism<a class="anchor" aria-label="anchor" href="#a-note-on-realism"></a>
+</h3>
+<p>This simulation is more realistic than the independent-marker version
+used in earlier drafts of this article, but it is still a simulation,
+and it is worth being precise about what it does and does not
+capture.</p>
+<p>What it captures: the founder haplotypes come from a coalescent
+simulation (<code><a href="https://gaynorr.github.io/AlphaSimR/reference/runMacs.html" class="external-link">runMacs()</a></code>), so nearby markers are correlated
+the way real linked markers are - the LD-decay check above shows this
+directly (adjacent-marker r² well above random-pair r²). The population
+also has real family structure from one round of random crossing among
+the founders, and a genetic architecture where <code>n_qtl</code> causal
+sites drive the trait but never appear on the <code>n_snps</code>-marker
+SNP chip the model actually sees - the chip tags the causal variants
+through LD rather than containing them, which is the realistic case: no
+real genotyping platform hands you the true causal variant, only markers
+correlated with it.</p>
+<p>On reproducibility: <code><a href="https://gaynorr.github.io/AlphaSimR/reference/runMacs.html" class="external-link">runMacs()</a></code>’s founder haplotypes are
+<strong>not</strong> fixed by this article’s seed - AlphaSimR doesn’t
+expose R-level seed control for that coalescent step, so two calls to it
+produce different founders even with the same <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code>
+(see the <code>eval = FALSE</code> chunk above). Calling it at
+<em>build</em> time would therefore make the cross-validation accuracy
+below change on every rebuild. Instead, <code><a href="https://gaynorr.github.io/AlphaSimR/reference/runMacs.html" class="external-link">runMacs()</a></code> was run
+once and its result frozen to <code>founderPop.rds</code>, which this
+article loads instead of regenerating - every run of this article,
+including the exact cross-validation number below, is now identical.
+Regenerating <code>founderPop.rds</code> (by running the
+<code>eval = FALSE</code> chunk again) would shift that number to a new,
+equally-arbitrary value.</p>
+<p>What it still does not capture: a single chromosome and a single
+generation of random mating is a much simpler pedigree than a real
+breeding program’s history of selection, multiple founders per era, and
+population structure across subpopulations or breeding cycles. The
+heritability (<code>h2</code>) and QTL count are chosen, not estimated
+from any real trait. The accuracy is realistic in magnitude for a small,
+single-chromosome training population, but it describes this simulation,
+not any particular real breeding program.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<ul>
+<li>Selby, P., Abbeloos, R., Backlund, J.E., et al., &amp; The BrAPI
+Consortium (2019). BrAPI — an application programming interface for
+plant breeding applications. <em>Bioinformatics</em>, 35(20), 4147–4155.
+<a href="https://doi.org/10.1093/bioinformatics/btz190" class="external-link uri">https://doi.org/10.1093/bioinformatics/btz190</a>
+</li>
+<li>Meuwissen, T.H.E., Hayes, B.J., &amp; Goddard, M.E. (2001).
+Prediction of total genetic value using genome-wide dense marker maps.
+<em>Genetics</em>, 157(4), 1819–1829. <a href="https://doi.org/10.1093/genetics/157.4.1819" class="external-link uri">https://doi.org/10.1093/genetics/157.4.1819</a>
+</li>
+<li>Endelman, J.B. (2011). Ridge regression and other kernels for
+genomic selection with R package rrBLUP. <em>The Plant Genome</em>, 4,
+250–255.</li>
+<li>Pérez, P., &amp; de los Campos, G. (2014). Genome-wide regression
+and prediction with the BGLR statistical package. <em>Genetics</em>,
+198(2), 483–495.</li>
+<li>Covarrubias-Pazaran, G. (2016). Genome assisted prediction of
+quantitative traits using the R package sommer. <em>PLoS ONE</em>, 11,
+1–15.</li>
+</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

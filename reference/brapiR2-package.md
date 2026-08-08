@@ -1,14 +1,16 @@
-# brapiR2: A Tidyverse-Native Client for the BrAPI v2 (Breeding API) Specification
+# brapiR2: A Tidyverse-Native Client for the 'BrAPI' v2 (Breeding API) Specification
 
 Provides pipe-friendly, stateless access to every endpoint in the
-Breeding API (BrAPI) v2.1 specification. Covers all four BrAPI modules —
-Core, Germplasm, Phenotyping, and Genotyping — returning tidy tibbles
-ready for analysis. Features include automatic pagination, async search
-handling, response caching, parallel batch fetching, and convenience
-functions for genomic selection workflows (e.g. dosage matrix
-extraction). Designed for plant breeders and bioinformaticians who need
-programmatic access to BreedBase, BMS, EBS, GIGWA, Germinate, and any
-BrAPI-compliant server.
+Breeding API ('BrAPI') v2.1 specification, an open community standard
+for plant breeding data interchange maintained by the BrAPI project
+<https://brapi.org>. Covers all four 'BrAPI' modules — Core, Germplasm,
+Phenotyping, and Genotyping — returning tidy tibbles ready for analysis.
+Features include automatic pagination, async search handling, response
+caching, parallel batch fetching, and convenience functions for genomic
+selection workflows (e.g. dosage matrix extraction). Designed for plant
+breeders and bioinformaticians who need programmatic access to
+'BreedBase', 'BMS', 'EBS', 'GIGWA', 'Germinate', and any
+'BrAPI'-compliant server.
 
 ## See also
 

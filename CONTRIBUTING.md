@@ -27,9 +27,27 @@ Thank you for your interest in contributing to brapiR2!
 2.  Follow the existing pattern: `con` as first argument, `...` for
     query params
 3.  Use `brapi_get()` or `brapi_post_search()` internally
-4.  Add the function to `NAMESPACE` exports
+4.  Add `#' @export` to the function’s roxygen block and run
+    `devtools::document()` to regenerate `NAMESPACE` (it carries a
+    roxygen2 “do not edit by hand” header, so never edit it directly)
 5.  Write tests in `tests/testthat/`
 6.  Update `NEWS.md`
+
+## Running the Test Suite
+
+- Integration tests run against the public BrAPI test server at
+  <https://test-server.brapi.org> and require no authentication token.
+- These tests are guarded by `skip_on_cran()` and `skip_if_offline()`,
+  so they are skipped automatically when there’s no network access.
+- Mocked tests use
+  [`testthat::local_mocked_bindings()`](https://testthat.r-lib.org/reference/local_mocked_bindings.html)
+  and run fully offline.
+- Some tests exercise optional integrations and require their packages
+  to be installed for the full suite to run: `furrr` and `future`
+  (parallel batch fetching), `rappdirs` (response caching), and
+  `AGHmatrix`, `BGLR`, `lme4`, `metan`, `rrBLUP`, and `sommer` (genomic
+  selection workflows). Tests that depend on a missing package are
+  skipped rather than failed.
 
 ## Reporting Issues
 

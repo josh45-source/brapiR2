@@ -3,8 +3,8 @@
 <url><loc>https://josh45-source.github.io/brapiR2/CONTRIBUTING.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/DESIGN.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/LICENSE-text.html</loc></url>
+<url><loc>https://josh45-source.github.io/brapiR2/articles/brapiR2.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/articles/genomic-selection-pipeline.html</loc></url>
-<url><loc>https://josh45-source.github.io/brapiR2/articles/getting-started.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/articles/index.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/articles/multi-environment-analysis.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/authors.html</loc></url>
@@ -55,7 +55,10 @@
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_seed_lots.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_server_info.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_set_token.html</loc></url>
+<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_shared_filters.html</loc></url>
+<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_shared_ids.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_shared_params.html</loc></url>
+<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_shared_search.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_studies.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_study.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_study_data.html</loc></url>
