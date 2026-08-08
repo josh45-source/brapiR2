@@ -29,7 +29,7 @@ brapi_programs <- function(con, ...) {
 #' Get a Single Program by ID
 #'
 #' @inheritParams brapi_shared_params
-#' @param programDbId Character. The unique program identifier.
+#' @inheritParams brapi_shared_ids
 #'
 #' @return A single-row tibble with program details.
 #'
@@ -50,8 +50,7 @@ brapi_program <- function(con, programDbId) {
 #' Retrieves trials, optionally filtered by program.
 #'
 #' @inheritParams brapi_shared_params
-#' @param programDbId Character or NULL. Filter by program.
-#' @param ... Additional query parameters.
+#' @inheritParams brapi_shared_filters
 #'
 #' @return A tibble with one row per trial.
 #'
@@ -72,7 +71,7 @@ brapi_trials <- function(con, programDbId = NULL, ...) {
 #' Get a Single Trial by ID
 #'
 #' @inheritParams brapi_shared_params
-#' @param trialDbId Character. The unique trial identifier.
+#' @inheritParams brapi_shared_ids
 #'
 #' @return A single-row tibble with trial details.
 #'
@@ -93,8 +92,7 @@ brapi_trial <- function(con, trialDbId) {
 #' Retrieves studies (occurrences/environments), optionally filtered by trial.
 #'
 #' @inheritParams brapi_shared_params
-#' @param trialDbId Character or NULL. Filter by trial.
-#' @param ... Additional query parameters.
+#' @inheritParams brapi_shared_filters
 #'
 #' @return A tibble with one row per study.
 #'
@@ -116,7 +114,7 @@ brapi_studies <- function(con, trialDbId = NULL, ...) {
 #' Get a Single Study by ID
 #'
 #' @inheritParams brapi_shared_params
-#' @param studyDbId Character. The unique study identifier.
+#' @inheritParams brapi_shared_ids
 #'
 #' @return A single-row tibble with study metadata.
 #'
@@ -192,7 +190,6 @@ brapi_lists <- function(con, ...) {
 #' List People
 #'
 #' @inheritParams brapi_shared_params
-#' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per person.
 #'

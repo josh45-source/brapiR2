@@ -26,8 +26,7 @@ brapi_samples <- function(con, ...) {
 #' List Variants (Markers/SNPs)
 #'
 #' @inheritParams brapi_shared_params
-#' @param variantSetDbId Character or NULL. Filter by variant set.
-#' @param ... Additional query parameters.
+#' @inheritParams brapi_shared_filters
 #'
 #' @return A tibble with one row per variant.
 #'
@@ -48,8 +47,7 @@ brapi_variants <- function(con, variantSetDbId = NULL, ...) {
 #' List Variant Sets (Datasets)
 #'
 #' @inheritParams brapi_shared_params
-#' @param studyDbId Character or NULL. Filter by study.
-#' @param ... Additional query parameters.
+#' @inheritParams brapi_shared_filters
 #'
 #' @return A tibble with one row per variant set.
 #'
@@ -70,8 +68,7 @@ brapi_variant_sets <- function(con, studyDbId = NULL, ...) {
 #' List Genotype Calls
 #'
 #' @inheritParams brapi_shared_params
-#' @param variantSetDbId Character or NULL. Filter by variant set.
-#' @param ... Additional query parameters.
+#' @inheritParams brapi_shared_filters
 #'
 #' @return A tibble with one row per genotype call.
 #'
@@ -92,7 +89,6 @@ brapi_calls <- function(con, variantSetDbId = NULL, ...) {
 #' List Call Sets (Samples with Genotype Data)
 #'
 #' @inheritParams brapi_shared_params
-#' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per call set.
 #'
@@ -111,7 +107,6 @@ brapi_call_sets <- function(con, ...) {
 #' List References (Chromosomes/Contigs)
 #'
 #' @inheritParams brapi_shared_params
-#' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per reference sequence.
 #'
@@ -130,7 +125,6 @@ brapi_references <- function(con, ...) {
 #' List Reference Sets (Genome Assemblies)
 #'
 #' @inheritParams brapi_shared_params
-#' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per reference set.
 #'
@@ -154,7 +148,7 @@ brapi_reference_sets <- function(con, ...) {
 #' `result$data` envelope) so it cannot use the generic `brapi_get()`.
 #'
 #' @inheritParams brapi_shared_params
-#' @param variantSetDbId Character or NULL. Filter by variant set.
+#' @inheritParams brapi_shared_filters
 #' @param ... Additional query parameters
 #'   (e.g. `expandHomozygotes`, `unknownString`, `sepPhased`, `sepUnphased`).
 #'
@@ -196,7 +190,7 @@ brapi_allele_matrix <- function(con, variantSetDbId = NULL, ...) {
 #' Accumulates variant IDs, call set IDs, and the genotype data matrix
 #' across all `callSetPage` pages of the `/allelematrix` response.
 #'
-#' @param con A `brapi_con` object.
+#' @inheritParams brapi_shared_params
 #' @param query Named list. Query parameters, including `pageSize` and any
 #'   user-supplied filters.
 #'
@@ -264,9 +258,8 @@ fetch_allele_matrix_pages <- function(con, query) {
 
 #' Search Variants
 #'
-#' @inheritParams brapi_shared_params
+#' @inheritParams brapi_shared_search
 #' @param variantSetDbIds Character vector. Filter by variant set IDs.
-#' @param ... Additional search body parameters.
 #'
 #' @return A tibble of matching variants.
 #'
@@ -285,10 +278,9 @@ brapi_search_variants <- function(con, variantSetDbIds = NULL, ...) {
 
 #' Search Genotype Calls
 #'
-#' @inheritParams brapi_shared_params
+#' @inheritParams brapi_shared_search
 #' @param variantSetDbIds Character vector. Filter by variant set IDs.
 #' @param callSetDbIds Character vector. Filter by call set IDs.
-#' @param ... Additional search body parameters.
 #'
 #' @return A tibble of matching genotype calls.
 #'

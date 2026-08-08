@@ -3,18 +3,20 @@
 \name{brapi_shared_params}
 \alias{brapi_shared_params}
 \title{Internal: Shared Parameter Documentation}
-\usage{
-brapi_shared_params(con)
-}
 \arguments{
 \item{con}{A \code{\link[=brapi_connection]{brapi_connection()}} object.}
-}
-\value{
-\code{NULL}, invisibly.
+
+\item{...}{Additional query parameters.}
 }
 \description{
-Not a real function; exists only so other topics can
-\verb{@inheritParams brapi_shared_params} instead of repeating the
-description of the \code{con} argument in every file.
+Not a real function - no object is assigned here at all, only a
+documentation topic. Other topics use \verb{@inheritParams brapi_shared_params}
+to pull in this description instead of repeating it in every file.
+Deliberately limited to \code{con}: \link{brapi_shared_ids} and
+\link{brapi_shared_filters} cover the (mutually exclusive, per parameter name)
+ID and filter argument families, and are always inherited alongside this
+one rather than merged into it, so that a function combining \code{con} with
+either family never has two conflicting descriptions to choose between
+for the same parameter name.
 }
 \keyword{internal}

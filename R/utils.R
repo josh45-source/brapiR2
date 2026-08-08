@@ -5,7 +5,7 @@
 #'
 #' Tests whether the BrAPI server is reachable and responding.
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #'
 #' @return Logical. `TRUE` if the server responds, `FALSE` otherwise.
 #'
@@ -43,7 +43,7 @@ brapi_ping <- function(con) {
 #' Queries the `/serverinfo` endpoint to list which BrAPI calls the
 #' server supports, along with their HTTP methods and versions.
 #'
-#' @param con A [brapi_connection()] object.
+#' @inheritParams brapi_shared_params
 #'
 #' @return A tibble with columns for endpoint service, method(s), and
 #'   version(s).

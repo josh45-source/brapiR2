@@ -66,12 +66,14 @@ brapi_connection <- function(url,
 #'
 #' @export
 print.brapi_con <- function(x, ...) {
-  auth_status <- if (!is.null(x$token)) {
+  # auth_status/cache_status are used below via cli's glue-style string
+  # interpolation ("{auth_status}"), which lintr's static analysis can't see.
+  auth_status <- if (!is.null(x$token)) { # nolint: object_usage_linter.
     cli::col_green("\u2713 authenticated")
   } else {
     cli::col_yellow("\u2717 no token")
   }
-  cache_status <- if (!is.null(x$cache)) {
+  cache_status <- if (!is.null(x$cache)) { # nolint: object_usage_linter.
     glue("enabled ({x$cache$dir})")
   } else {
     "disabled"

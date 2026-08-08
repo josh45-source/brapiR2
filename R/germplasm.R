@@ -25,7 +25,7 @@ brapi_germplasm <- function(con, ...) {
 #' Get a Single Germplasm by ID
 #'
 #' @inheritParams brapi_shared_params
-#' @param germplasmDbId Character. The unique germplasm identifier.
+#' @inheritParams brapi_shared_ids
 #'
 #' @return A single-row tibble with germplasm details.
 #'
@@ -44,7 +44,7 @@ brapi_germplasm_detail <- function(con, germplasmDbId) {
 #' Get Germplasm Pedigree
 #'
 #' @inheritParams brapi_shared_params
-#' @param germplasmDbId Character. The unique germplasm identifier.
+#' @inheritParams brapi_shared_ids
 #'
 #' @return A tibble with pedigree information (parents, crosses).
 #'
@@ -63,7 +63,7 @@ brapi_germplasm_pedigree <- function(con, germplasmDbId) {
 #' Get Germplasm Progeny
 #'
 #' @inheritParams brapi_shared_params
-#' @param germplasmDbId Character. The unique germplasm identifier.
+#' @inheritParams brapi_shared_ids
 #'
 #' @return A tibble with progeny information.
 #'
@@ -82,7 +82,6 @@ brapi_germplasm_progeny <- function(con, germplasmDbId) {
 #' List Germplasm Attributes
 #'
 #' @inheritParams brapi_shared_params
-#' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per attribute definition.
 #'
@@ -101,7 +100,6 @@ brapi_germplasm_attributes <- function(con, ...) {
 #' List Crosses
 #'
 #' @inheritParams brapi_shared_params
-#' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per cross.
 #'
@@ -120,7 +118,6 @@ brapi_crosses <- function(con, ...) {
 #' List Crossing Projects
 #'
 #' @inheritParams brapi_shared_params
-#' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per crossing project.
 #'
@@ -139,7 +136,6 @@ brapi_crossing_projects <- function(con, ...) {
 #' List Seed Lots
 #'
 #' @inheritParams brapi_shared_params
-#' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per seed lot.
 #'

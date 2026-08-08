@@ -9,6 +9,10 @@
 #'
 #' @return A new `brapi_con` object with the token populated.
 #'
+#' @seealso The "Handling Credentials Safely" section of
+#'   `vignette("brapiR2")` for how to keep `username`/`password` out of
+#'   your script, using `.Renviron` or the keyring package.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -115,6 +119,10 @@ brapi_login_oauth2 <- function(con, client_id, client_secret,
 #' @param token Character. The Bearer token string.
 #'
 #' @return A new `brapi_con` object with the token populated.
+#'
+#' @seealso The "Handling Credentials Safely" section of
+#'   `vignette("brapiR2")` for how to keep `token` out of your script,
+#'   using `.Renviron` or the keyring package.
 #'
 #' @examples
 #' con <- brapi_connection("https://test-server.brapi.org")

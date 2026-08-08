@@ -3,7 +3,7 @@
 #' Constructs an httr2 request object with the correct base URL, path,
 #' authentication headers, and timeout.
 #'
-#' @param con A `brapi_con` object.
+#' @inheritParams brapi_shared_params
 #' @param endpoint Character. The API endpoint path (e.g. "/programs").
 #'
 #' @return An httr2 request object.
@@ -35,7 +35,7 @@ brapi_req <- function(con, endpoint) {
 #' sorted query parameters. Subsequent calls within the TTL window skip
 #' the HTTP request and return the cached result.
 #'
-#' @param con A `brapi_con` object.
+#' @inheritParams brapi_shared_params
 #' @param endpoint Character. The API endpoint (e.g. "/programs").
 #' @param query Named list. Query parameters to append to the URL.
 #'
@@ -85,7 +85,7 @@ brapi_get <- function(con, endpoint, query = list()) {
 #' deterministic cache key from the URL and sorted query parameters
 #' (excluding `page`, since the key covers the full multi-page result).
 #'
-#' @param con A `brapi_con` object.
+#' @inheritParams brapi_shared_params
 #' @param endpoint Character. The API endpoint.
 #' @param query Named list. Query parameters.
 #'
@@ -142,7 +142,7 @@ brapi_cache_read <- function(cache_file, ttl, endpoint) {
 
 #' Internal: Fetch All Pages of a GET Endpoint
 #'
-#' @param con A `brapi_con` object.
+#' @inheritParams brapi_shared_params
 #' @param endpoint Character. The API endpoint.
 #' @param query Named list. Query parameters (the `page` element is
 #'   overwritten on each iteration).
@@ -199,7 +199,7 @@ brapi_get_pages <- function(con, endpoint, query) {
 #' - If 202: server returns a `searchResultsDbId`; poll
 #'   `GET /search/{entity}/{searchResultsDbId}` until results are ready
 #'
-#' @param con A `brapi_con` object.
+#' @inheritParams brapi_shared_params
 #' @param endpoint Character. The search endpoint (e.g. "/search/germplasm").
 #' @param body Named list. The search request body.
 #' @param poll_interval Numeric. Seconds between polling attempts. Default 2.
@@ -254,7 +254,7 @@ brapi_post_search <- function(con, endpoint, body = list(),
 
 #' Internal: Poll an Async BrAPI Search Until Results Are Ready
 #'
-#' @param con A `brapi_con` object.
+#' @inheritParams brapi_shared_params
 #' @param endpoint Character. The original search endpoint.
 #' @param search_id Character. The `searchResultsDbId` from the initial POST.
 #' @param poll_interval Numeric. Seconds between polling attempts.
