@@ -28,3 +28,8 @@ con
 }
 
 }
+\seealso{
+The "Handling Credentials Safely" section of
+\code{vignette("brapiR2")} for how to keep \code{username}/\code{password} out of
+your script, using \code{.Renviron} or the keyring package.
+}

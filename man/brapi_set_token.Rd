@@ -23,3 +23,8 @@ con <- brapi_connection("https://test-server.brapi.org")
 con <- brapi_set_token(con, "my_existing_token")
 
 }
+\seealso{
+The "Handling Credentials Safely" section of
+\code{vignette("brapiR2")} for how to keep \code{token} out of your script,
+using \code{.Renviron} or the keyring package.
+}
