@@ -1,0 +1,405 @@
+---
+title: "Multi-Environment Trial (MET) Analysis with brapiR2"
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+con <- brapiR2::brapi_connection("https://test-server.brapi.org")
+server_up <- isTRUE(tryCatch(
+  brapiR2::brapi_ping(con),
+  error = function(e) FALSE
+))
+```
+
+```{r server-down-notice, eval = !server_up, echo = FALSE, results = "asis"}
+cat(
+  "> **Note:** the public BrAPI test server",
+  "(`https://test-server.brapi.org`) was unreachable when this article was",
+  "built, so Part 1's live output below was skipped. Part 3 (simulated",
+  "data) is unaffected and still ran."
+)
+```
+
+## Overview
+
+Multi-environment trial (MET) analysis is a core workflow of a plant
+breeding program: gather phenotypic observations from many locations and
+years, then decompose genotype x environment (GxE) interaction to identify
+stable, high-performing varieties.
+
+This article has three parts: **Part 1** fetches real study, location, and
+phenotype data from the public BrAPI test server and shows exactly what
+brapiR2 returns. **Part 2** shows the authenticated, parallel-fetch pattern
+you'd use against your own server, without running it. **Part 3** runs the
+actual GxE analysis — AMMI/GGE biplots (**metan**) and mixed-model stability
+(**lme4**) — on a simulated trial, because Part 1's real data is nowhere
+near large enough for either method.
+
+## Part 1: Live Data from the Public Test Server
+
+The three calls below return the pieces a multi-environment analysis is
+assembled from. **Studies** are the environments themselves: one trial grown
+at one site in one season. **Locations** carry the site metadata, latitude,
+longitude, altitude and so on, that lets you group environments sensibly or
+relate performance to conditions. **Seasons** identify the planting cycle,
+which for maize may be a single year in temperate programs or distinct long
+and short rains in East Africa.
+
+The distinction between a location and an environment is worth being precise
+about, because they are routinely conflated. An environment is a location and
+season combination. The same site in two seasons contributes two
+environments, and often two quite different ones, since rainfall and
+temperature in a given year can matter more for yield than the site itself.
+This is why a study, not a location, is the unit an AMMI or GGE analysis
+treats as an environment.
+
+```{r explore-live, eval = server_up}
+library(brapiR2)
+library(dplyr)
+
+studies <- brapi_studies(con)
+studies
+
+locations <- brapi_locations(con)
+locations
+
+seasons <- brapi_seasons(con)
+seasons
+```
+
+```{r pheno-live, eval = server_up}
+# brapi_study_data() falls back to an unfiltered fetch + client-side filter
+# when a server doesn't honour the studyDbId filter on /observations, so it
+# finds data that a direct brapi_observations(con, studyDbId = ...) call
+# would miss on this server. It still returns an honest empty tibble (with
+# a warning) for studies that genuinely have no observations.
+met_raw <- lapply(studies$studyDbId, brapi_study_data, con = con) |>
+  bind_rows()
+met_raw
+```
+
+Only one of these three studies (`study1`) actually has recorded
+observations on the public server today - two germplasm, one trait, as the
+survey at
+[`dev/explore-test-server.R`](https://github.com/josh45-source/brapiR2/blob/main/dev/explore-test-server.R)
+found. The other two studies come back empty. AMMI and GGE decompositions
+need many genotypes scored across several environments to estimate
+genotype, environment, and interaction effects separately; a mixed model
+with a `germplasmName:env` random term needs enough genotype-by-environment
+cells to avoid the fit being singular. Neither is possible with this data,
+so Part 3 below simulates a properly-sized trial instead.
+
+## Part 2: Authenticated, Parallel Access to Your Own Server (illustrative)
+
+Production BrAPI servers require credentials the public test server
+doesn't need, and `brapi_fetch_parallel()` is most useful across many
+studies at once — this shows that pattern without running it here.
+
+```{r setup-illustrative, eval = FALSE}
+con_priv <- brapi_connection("https://my-breedbase.org")
+con_priv <- brapi_login(con_priv, "username", "password")
+
+# Cache responses to speed up re-runs and protect server bandwidth
+con_priv <- brapi_cache_enable(con_priv, ttl = 7200)
+```
+
+```{r discover-illustrative, eval = FALSE}
+# Discover all studies in the target trial
+trials_priv <- brapi_trials(con_priv, programDbId = "wheat_program_01")
+trials_priv
+
+# Focus on the current MET
+studies_priv <- brapi_studies(con_priv, trialDbId = "trial_2022")
+studies_priv
+
+study_ids_priv <- studies_priv$studyDbId
+```
+
+`brapi_fetch_parallel()` uses the **furrr** package to run one worker per
+study concurrently, against whatever `future` plan is already active. It
+does not set a backend itself - per the future package's best-practices
+vignette, that choice belongs to the caller, not to the package, so you
+set the plan yourself before calling it:
+
+```{r parallel-illustrative, eval = FALSE}
+library(future)
+
+future::plan(future::multisession, workers = 2)
+met_priv <- brapi_fetch_parallel(con_priv, brapi_study_data, study_ids_priv)
+glimpse(met_priv)
+future::plan(future::sequential) # shut the workers back down when done
+```
+
+## Part 3: GxE Analysis on a Simulated Trial
+
+The design below is a 60 genotype by 6 environment trial with 2 replicates,
+giving 720 plots. That is a realistic size for a regional maize yield trial
+at the advanced testing stage, and it is roughly the smallest design from
+which AMMI and GGE can estimate interaction patterns with any confidence.
+
+The relative sizes of the variance components are chosen to match how yield
+data actually behaves rather than to make the analysis look tidy. The
+environment effect is the largest of the three systematic terms (environment,
+genotype, and genotype-by-environment), consistent with site to site
+variation typically being the largest systematic source of variation in a
+multi-environment trial - larger than the spread between varieties within a
+site, though not so dominant that it drowns out the genotype and
+genotype-by-environment signal this analysis exists to recover. The genotype
+by environment variance is set larger than the genotype variance, which is
+the usual finding in maize METs and is precisely why this analysis exists at
+all. If varieties ranked the same way everywhere, one trial would answer the
+question and there would be nothing to decompose. The residual is larger
+still, reflecting plot to plot variation from soil heterogeneity, stand
+establishment and measurement error, which is why replication is not
+optional.
+
+```{r simulate}
+library(dplyr)
+library(tidyr)
+
+set.seed(123)
+
+n_gen <- 60L
+n_env <- 6L
+n_rep <- 2L
+
+genotypes    <- sprintf("Variety_%03d", seq_len(n_gen))
+environments <- sprintf("Env_%d", seq_len(n_env))
+
+overall_mean <- 5 # tonnes per hectare
+
+# SIMULATED variance components. Real yield heritabilities are usually
+# around 0.3-0.6; sd_g/sd_ge/sd_e below are chosen to land broad-sense H2
+# near 0.5, not near 1 (see Part 3's mixed model below for the fitted value).
+sd_g  <- 0.35
+sd_ge <- 0.55
+sd_e  <- 1.00
+
+gen_effect <- setNames(rnorm(n_gen, sd = sd_g), genotypes)
+env_effect <- setNames(rnorm(n_env, sd = 0.60), environments)
+ge_effect <- outer(genotypes, environments, function(g, e) {
+  rnorm(length(g), sd = sd_ge)
+})
+dimnames(ge_effect) <- list(genotypes, environments)
+
+met <- expand_grid(
+  germplasmName = genotypes,
+  env = environments,
+  rep = seq_len(n_rep)
+) |>
+  mutate(
+    observationUnitDbId = sprintf("plot_%04d", row_number()),
+    Grain_Yield_t_ha = overall_mean +
+      gen_effect[germplasmName] +
+      env_effect[env] +
+      ge_effect[cbind(germplasmName, env)] +
+      rnorm(n(), sd = sd_e) # SIMULATED residual (plot-to-plot) noise
+  )
+
+nrow(met)
+head(met)
+```
+
+### Means Matrix for GxE Analysis
+
+Many GxE methods (AMMI, GGE biplot) require a two-way table of genotype
+means per environment.
+
+```{r means-matrix}
+# Compute adjusted means (plot-level mean per genotype x environment)
+means <- met |>
+  group_by(germplasmName, env) |>
+  summarise(yield = mean(Grain_Yield_t_ha, na.rm = TRUE), .groups = "drop")
+
+# Wide format: rows = genotypes, columns = environments
+means_wide <- means |>
+  pivot_wider(names_from = env, values_from = yield)
+
+means_wide
+```
+
+### AMMI and GGE Biplot with metan
+
+Both methods start from the same observation: the two-way table of genotype
+by environment means contains a pattern that main effects alone cannot
+describe. They differ in what they do about it.
+
+**AMMI** removes the additive part first, fitting genotype and environment
+main effects by analysis of variance, then applies principal components to
+what remains, which is the interaction. The first interaction principal
+component, IPCA1, captures the dominant pattern in how varieties respond
+differently across sites. In the AMMI1 biplot below, the horizontal axis is
+mean yield and the vertical axis is the IPCA1 score. A genotype plotted near
+zero on the vertical axis performs consistently relative to the others across
+environments; one plotted far from zero has yield that depends strongly on
+where it is grown. The point far to the right on mean yield and close to the
+horizontal axis, high mean and near zero interaction, is the broadly
+adapted variety.
+
+**GGE** keeps the genotype main effect together with the interaction and
+discards the environment main effect. The reasoning is that the environment
+effect, however large, is useless for choosing a variety: knowing that one
+site yields more than another tells you nothing about which line to release.
+What matters for selection is genotype and its interaction, hence G plus GE.
+The which-won-where view draws a polygon through the most extreme genotypes
+and divides it into sectors with perpendicular rays. The genotype at the
+vertex of each sector is the best performer for the environments falling in
+it. When all environments land in a single sector, one variety wins
+everywhere and the target region behaves as a single mega-environment. When
+they split across sectors, the region does not, and that is an argument for
+breeding for specific adaptation rather than for a single broadly adapted
+release.
+
+```{r metan-ammi}
+library(metan)
+
+# AMMI model: decompose GxE with additive main effects + multiplicative
+# interaction
+ammi_model <- performs_ammi(
+  .data = met,
+  env = env,
+  gen = germplasmName,
+  rep = rep, # replicate number, not the plot ID
+  resp = Grain_Yield_t_ha,
+  verbose = FALSE
+)
+
+# AMMI stability value (ASV) - lower = more stable across environments
+ammi_stable <- ammi_indexes(ammi_model)
+ammi_stable$Grain_Yield_t_ha |>
+  arrange(ASV) |>
+  head(10)
+
+# AMMI1 biplot: IPCA1 scores vs mean yield
+plot(ammi_model, type = "AMMI1")
+```
+
+```{r metan-gge}
+# GGE biplot
+gge_model <- gge(
+  .data = met,
+  env   = env,
+  gen   = germplasmName,
+  rep   = rep,
+  resp  = Grain_Yield_t_ha
+)
+
+plot(gge_model, type = 3) # "which-won-where" view
+```
+
+### Mixed Model Stability with lme4
+
+For unbalanced data or when you need BLUPs rather than means, fit a mixed
+model with genotype x environment interaction as a random effect.
+
+```{r lme4}
+library(lme4)
+
+# Basic mixed model: GxE interaction as random
+fm <- lmer(
+  Grain_Yield_t_ha ~ env + (1 | germplasmName) + (1 | germplasmName:env),
+  data = met
+)
+summary(fm)
+
+# Extract BLUPs for genotypic effects
+blups <- ranef(fm)$germplasmName
+blups <- tibble(
+  germplasmName = rownames(blups),
+  BLUP          = blups[["(Intercept)"]]
+) |>
+  arrange(desc(BLUP))
+
+head(blups, 10)
+
+# Variance component partitioning
+VarCorr(fm)
+
+# H^2 broad-sense heritability (across-environment), from the FITTED
+# variance components (not the true simulated ones above - estimation noise
+# means these won't match exactly).
+var_g <- as.numeric(VarCorr(fm)$germplasmName)
+var_ge <- as.numeric(VarCorr(fm)$`germplasmName:env`)
+var_e <- sigma(fm)^2
+n_env_obs <- length(unique(met$env))
+
+H2 <- var_g / (var_g + var_ge / n_env_obs + var_e / (n_env_obs * n_rep))
+cat(sprintf("Broad-sense H^2 (across environments): %.3f\n", H2))
+```
+
+With `sd_g = 0.35`, `sd_ge = 0.55`, `sd_e = 1.00` the true (simulated) H2 is
+about 0.48; the model fitted above typically recovers something in the same
+neighborhood, comfortably inside the ~0.3-0.6 range real yield
+heritabilities fall in — not the unrealistically high value (0.9) that an
+earlier, less careful choice of variance components produced.
+
+### Final Selection List
+
+The weights below, 0.6 on yield and 0.4 on stability, are a choice rather
+than a standard, and they should reflect what your program is actually
+selecting for.
+
+The tradeoff behind them is real. The highest yielding line is frequently not
+the most stable: it wins substantially at favourable sites and falls away
+under stress, which shows up as a high mean with a large ASV. A stable line
+yields moderately more or less everywhere. Which of the two a breeder should
+prefer depends on the target population of environments and on who is
+growing the crop. For maize under irrigation with reliable inputs, where the
+conditions the variety will meet are close to the favourable end of the
+trials, weighting yield heavily is defensible. For smallholder production
+under variable rainfall, where a failed season carries consequences a good
+season does not offset, stability deserves more weight than yield, and a
+0.4/0.6 split in the other direction would be the more sensible starting
+point.
+
+One limitation worth noting: both components are rank-normalised before
+combining, which makes them comparable but discards magnitude. A line
+marginally ahead on yield and one far ahead contribute the same rank
+difference. If the size of the yield advantage matters to the decision, scale
+the components rather than ranking them.
+
+```{r selection}
+# Combine BLUP ranking with stability
+stability <- ammi_stable$Grain_Yield_t_ha |>
+  select(GEN, mean_yield = Y, ASV) |>
+  rename(germplasmName = GEN)
+
+selection <- blups |>
+  left_join(stability, by = "germplasmName") |>
+  mutate(
+    # Normalise both metrics (0 = worst, 1 = best)
+    rank_yield = rank(BLUP) / n(),
+    rank_stab  = 1 - rank(ASV) / n(), # lower ASV = more stable = better
+    score      = 0.6 * rank_yield + 0.4 * rank_stab
+  ) |>
+  arrange(desc(score))
+
+# Top 10 selections: high yield + high stability
+head(selection, 10)
+```
+
+As with the [genomic selection article](genomic-selection-pipeline.html),
+the numbers in Part 3 describe a simulated trial and are only meant to
+demonstrate that the pipeline (fetch -> reshape -> AMMI/GGE -> mixed model
+-> selection) runs end to end; they say nothing about any real breeding
+program.
+
+## References
+
+- Selby, P., Abbeloos, R., Backlund, J.E., et al., & The BrAPI Consortium
+  (2019). BrAPI — an application programming interface for plant breeding
+  applications. *Bioinformatics*, 35(20), 4147–4155.
+  <https://doi.org/10.1093/bioinformatics/btz190>
+- Zobel, R.W., Wright, M.J., & Gauch, H.G. (1988). Statistical analysis of
+  a yield trial. *Agronomy Journal*, 80(3), 388–393.
+  <https://doi.org/10.2134/agronj1988.00021962008000030002x>
+- Yan, W., Hunt, L.A., Sheng, Q., & Szlavnics, Z. (2000). Cultivar
+  evaluation and mega-environment investigation based on the GGE biplot.
+  *Crop Science*, 40(3), 597–605.
+  <https://doi.org/10.2135/cropsci2000.403597x>
+- Olivoto, T., & Lúcio, A.D. (2020). metan: An R package for
+  multi-environment trial analysis. *Methods in Ecology and Evolution*,
+  11(6), 783–789. <https://doi.org/10.1111/2041-210X.13384>
+- Bates, D., Mächler, M., Bolker, B., & Walker, S. (2015). Fitting
+  linear mixed-effects models using lme4. *Journal of Statistical
+  Software*, 67(1), 1–48. <https://doi.org/10.18637/jss.v067.i01>

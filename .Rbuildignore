@@ -13,3 +13,5 @@
 ^CONTRIBUTING\.md$
 ^NEWS\.md$
 ^DESIGN\.md$
+^vignettes/articles$
+^dev$
