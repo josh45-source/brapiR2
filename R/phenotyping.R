@@ -6,8 +6,7 @@
 #' List Observation Units
 #'
 #' @inheritParams brapi_shared_params
-#' @param studyDbId Character or NULL. Filter by study.
-#' @param ... Additional query parameters.
+#' @inheritParams brapi_shared_filters
 #'
 #' @return A tibble with one row per observation unit (plot/plant/sample).
 #'
@@ -28,8 +27,7 @@ brapi_observation_units <- function(con, studyDbId = NULL, ...) {
 #' List Observations
 #'
 #' @inheritParams brapi_shared_params
-#' @param studyDbId Character or NULL. Filter by study.
-#' @param ... Additional query parameters.
+#' @inheritParams brapi_shared_filters
 #'
 #' @return A tibble with one row per observation (trait measurement).
 #'
@@ -52,7 +50,6 @@ brapi_observations <- function(con, studyDbId = NULL, ...) {
 #' Returns the ontology of observation variables (trait + method + scale).
 #'
 #' @inheritParams brapi_shared_params
-#' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per variable definition.
 #'
@@ -71,7 +68,6 @@ brapi_observation_variables <- function(con, ...) {
 #' List Traits
 #'
 #' @inheritParams brapi_shared_params
-#' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per trait.
 #'
@@ -90,7 +86,6 @@ brapi_traits <- function(con, ...) {
 #' List Scales
 #'
 #' @inheritParams brapi_shared_params
-#' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per scale definition.
 #'
@@ -109,7 +104,6 @@ brapi_scales <- function(con, ...) {
 #' List Methods
 #'
 #' @inheritParams brapi_shared_params
-#' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per measurement method.
 #'
@@ -128,7 +122,6 @@ brapi_methods <- function(con, ...) {
 #' List Images
 #'
 #' @inheritParams brapi_shared_params
-#' @param ... Additional query parameters.
 #'
 #' @return A tibble with one row per image record.
 #'
@@ -147,8 +140,7 @@ brapi_images <- function(con, ...) {
 #' List Events
 #'
 #' @inheritParams brapi_shared_params
-#' @param studyDbId Character or NULL. Filter by study.
-#' @param ... Additional query parameters.
+#' @inheritParams brapi_shared_filters
 #'
 #' @return A tibble with one row per event.
 #'
@@ -168,10 +160,9 @@ brapi_events <- function(con, studyDbId = NULL, ...) {
 
 #' Search Observations
 #'
-#' @inheritParams brapi_shared_params
+#' @inheritParams brapi_shared_search
 #' @param studyDbIds Character vector. Filter by study IDs.
 #' @param observationVariableDbIds Character vector. Filter by variable IDs.
-#' @param ... Additional search body parameters.
 #'
 #' @return A tibble of matching observations.
 #'
@@ -197,9 +188,8 @@ brapi_search_observations <- function(con,
 
 #' Search Observation Variables
 #'
-#' @inheritParams brapi_shared_params
+#' @inheritParams brapi_shared_search
 #' @param traitClasses Character vector. Filter by trait class.
-#' @param ... Additional search body parameters.
 #'
 #' @return A tibble of matching observation variables.
 #'
@@ -223,7 +213,7 @@ brapi_search_variables <- function(con, traitClasses = NULL, ...) {
 #' row per observation unit and one column per trait — ready for analysis.
 #'
 #' @inheritParams brapi_shared_params
-#' @param studyDbId Character. The unique study identifier.
+#' @inheritParams brapi_shared_ids
 #'
 #' @return A wide-format tibble with columns for plot metadata and
 #'   one column per observed trait containing the measurement values.
@@ -245,7 +235,13 @@ brapi_study_data <- function(con, studyDbId) {
   if (nrow(obs) == 0L) {
     all_obs <- brapi_observations(con)
     if ("studyDbId" %in% names(all_obs)) {
-      obs <- dplyr::filter(all_obs, .data$studyDbId == studyDbId)
+      # .env$studyDbId (not bare studyDbId) is required here: dplyr's data
+      # mask resolves an unqualified name to the data column first, so
+      # `.data$studyDbId == studyDbId` would silently compare the column to
+      # itself (always TRUE) since the argument is also named studyDbId.
+      obs <- dplyr::filter(
+        all_obs, .data$studyDbId == .env$studyDbId # nolint
+      )
     }
   }
 
