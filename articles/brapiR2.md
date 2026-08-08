@@ -360,7 +360,7 @@ fetching don’t need authentication).
 cache_dir <- tempfile("brapi_cache_")
 dir.create(cache_dir)
 perf_con <- brapi_cache_enable(con, ttl = 3600, dir = cache_dir)
-#> ✔ Caching enabled at /tmp/RtmpIen1Fc/brapi_cache_20a522435914 (TTL: 3600s)
+#> ✔ Caching enabled at /tmp/RtmpGuYt9Z/brapi_cache_1f2e498a3484 (TTL: 3600s)
 
 # First call: hits the server
 invisible(brapi_programs(perf_con))
