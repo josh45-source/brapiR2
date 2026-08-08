@@ -1,27 +1,26 @@
----
-output: github_document
----
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
-
 
 # brapiR2 <img src="man/figures/logo.png" align="right" height="139" alt="brapiR2 hex sticker" />
 
 <!-- badges: start -->
+
 [![R-CMD-check](https://github.com/josh45-source/brapiR2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/josh45-source/brapiR2/actions/workflows/R-CMD-check.yaml)
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![CRAN status](https://www.r-pkg.org/badges/version/brapiR2)](https://CRAN.R-project.org/package=brapiR2)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-**brapiR2** is a tidyverse-native, stateless R client for the [BrAPI v2](https://brapi.org/) (Breeding API) specification. It provides pipe-friendly access to **all four BrAPI modules** - Core, Germplasm, Phenotyping, and Genotyping - returning tidy tibbles ready for analysis.
+**brapiR2** is a tidyverse-native, stateless R client for the [BrAPI
+v2](https://brapi.org/) (Breeding API) specification. It provides
+pipe-friendly access to **all four BrAPI modules** - Core, Germplasm,
+Phenotyping, and Genotyping - returning tidy tibbles ready for analysis.
 
 Developed by **Joash Joshua Ayo** (<joashjoshua789@gmail.com>).
 
 ## Why brapiR2?
 
 | Feature | brapiR2 | QBMS |
-|---------|---------|------|
+|----|----|----|
 | Design | Stateless, functional, pipeable | Stateful, menu-driven |
 | BrAPI v2 coverage | Full spec (all 4 modules) | Partial (phenotyping focus) |
 | Genotyping support | Native variants, callsets, dosage matrix | Via GIGWA wrapper |
@@ -29,19 +28,27 @@ Developed by **Joash Joshua Ayo** (<joashjoshua789@gmail.com>).
 | Auth | Unified token/OAuth2 | Engine-specific functions |
 | Caching | Built-in response caching | Limited |
 
-**brapiR2 complements [QBMS](https://cran.r-project.org/package=QBMS)** - use QBMS for interactive exploration, use brapiR2 for programmatic pipelines and custom tooling.
+**brapiR2 complements
+[QBMS](https://cran.r-project.org/package=QBMS)** - use QBMS for
+interactive exploration, use brapiR2 for programmatic pipelines and
+custom tooling.
+
+[brapir-v2](https://github.com/mverouden/brapir-v2) is another R client
+that, like brapiR2, targets the BrAPI v2 specification directly rather
+than v1. Its own README describes it as still under development, and the
+repository has had no commits in roughly four years (last pushed April
+2022) - it does not appear to be actively maintained.
 
 ## Installation
 
 Install the development version from GitHub:
 
-```r
+``` r
 # install.packages("remotes")
 remotes::install_github("josh45-source/brapiR2")
 ```
 
 ## Quick Start
-
 
 ``` r
 library(brapiR2)
@@ -63,19 +70,22 @@ data <- brapi_study_data(con, "study_01")
 # 4. Get genotypic data as a dosage matrix for GS
 dosage <- brapi_get_dosage_matrix(con, "variantset_01")
 
-# 5. Parallel fetch across multiple studies
+# 5. Parallel fetch across multiple studies - set the backend yourself;
+#    brapi_fetch_parallel() uses whatever plan is active rather than
+#    setting one for you
+future::plan(future::multisession, workers = 4)
 all_data <- brapi_fetch_parallel(
   con,
   brapi_study_data,
-  ids = c("study_01", "study_02", "study_03"),
-  .workers = 4
+  ids = c("study_01", "study_02", "study_03")
 )
+future::plan(future::sequential) # shut the workers back down when done
 ```
 
 ## Pipe-Friendly Design
 
-Every function takes a connection object as its first argument and returns a tibble, making it natural to chain with dplyr:
-
+Every function takes a connection object as its first argument and
+returns a tibble, making it natural to chain with dplyr:
 
 ``` r
 con <- brapi_connection("https://my-breedbase.org", token = "my_token")
@@ -94,12 +104,14 @@ brapi_get_marker_map(con, "my_variantset") |>
 ## Supported BrAPI Modules
 
 - **Core**: Programs, Trials, Studies, Locations, Seasons, Lists, People
-- **Germplasm**: Germplasm, Pedigrees, Progeny, Attributes, Crosses, Seed Lots
-- **Phenotyping**: Observation Units, Observations, Variables, Traits, Scales, Methods, Images, Events
-- **Genotyping**: Samples, Variants, Variant Sets, Calls, Call Sets, References, Allele Matrix
+- **Germplasm**: Germplasm, Pedigrees, Progeny, Attributes, Crosses,
+  Seed Lots
+- **Phenotyping**: Observation Units, Observations, Variables, Traits,
+  Scales, Methods, Images, Events
+- **Genotyping**: Samples, Variants, Variant Sets, Calls, Call Sets,
+  References, Allele Matrix
 
 ## Authentication
-
 
 ``` r
 # Token-based (most BrAPI servers)
@@ -121,13 +133,17 @@ con <- brapi_set_token(con, "my_existing_token")
 
 ## Related Packages
 
-- [QBMS](https://cran.r-project.org/package=QBMS) — High-level, stateful BrAPI client for interactive use
-- [rrBLUP](https://cran.r-project.org/package=rrBLUP) — Genomic selection (use brapiR2 to fetch the dosage matrix)
-- [sommer](https://cran.r-project.org/package=sommer) — Mixed models for multi-environment trials
+- [QBMS](https://cran.r-project.org/package=QBMS) — High-level, stateful
+  BrAPI client for interactive use
+- [rrBLUP](https://cran.r-project.org/package=rrBLUP) — Genomic
+  selection (use brapiR2 to fetch the dosage matrix)
+- [sommer](https://cran.r-project.org/package=sommer) — Mixed models for
+  multi-environment trials
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md)
+for guidelines.
 
 ## License
 

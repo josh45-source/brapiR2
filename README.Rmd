@@ -18,10 +18,9 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/josh45-source/brapiR2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/josh45-source/brapiR2/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![CRAN status](https://www.r-pkg.org/badges/version/brapiR2)](https://CRAN.R-project.org/package=brapiR2)
 <!-- badges: end -->
 
-**brapiR2** is a tidyverse-native, stateless R client for the [BrAPI v2](https://brapi.org/) (Breeding API) specification. It provides pipe-friendly access to **all four BrAPI modules** — Core, Germplasm, Phenotyping, and Genotyping — returning tidy tibbles ready for analysis.
+**brapiR2** is a tidyverse-native, stateless R client for the [BrAPI v2](https://brapi.org/) (Breeding API) specification. It provides pipe-friendly access to **all four BrAPI modules** - Core, Germplasm, Phenotyping, and Genotyping - returning tidy tibbles ready for analysis.
 
 Developed by **Joash Joshua Ayo** (<joashjoshua789@gmail.com>).
 
@@ -36,7 +35,13 @@ Developed by **Joash Joshua Ayo** (<joashjoshua789@gmail.com>).
 | Auth | Unified token/OAuth2 | Engine-specific functions |
 | Caching | Built-in response caching | Limited |
 
-**brapiR2 complements [QBMS](https://cran.r-project.org/package=QBMS)** — use QBMS for interactive exploration, use brapiR2 for programmatic pipelines and custom tooling.
+**brapiR2 complements [QBMS](https://cran.r-project.org/package=QBMS)** - use QBMS for interactive exploration, use brapiR2 for programmatic pipelines and custom tooling.
+
+[brapir-v2](https://github.com/mverouden/brapir-v2) is another R client that,
+like brapiR2, targets the BrAPI v2 specification directly rather than v1.
+Its own README describes it as still under development, and the repository
+has had no commits in roughly four years (last pushed April 2022) - it does
+not appear to be actively maintained.
 
 ## Installation
 
@@ -69,13 +74,16 @@ data <- brapi_study_data(con, "study_01")
 # 4. Get genotypic data as a dosage matrix for GS
 dosage <- brapi_get_dosage_matrix(con, "variantset_01")
 
-# 5. Parallel fetch across multiple studies
+# 5. Parallel fetch across multiple studies - set the backend yourself;
+#    brapi_fetch_parallel() uses whatever plan is active rather than
+#    setting one for you
+future::plan(future::multisession, workers = 4)
 all_data <- brapi_fetch_parallel(
   con,
   brapi_study_data,
-  ids = c("study_01", "study_02", "study_03"),
-  .workers = 4
+  ids = c("study_01", "study_02", "study_03")
 )
+future::plan(future::sequential) # shut the workers back down when done
 ```
 
 ## Pipe-Friendly Design

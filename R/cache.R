@@ -83,11 +83,26 @@ brapi_cache_clear <- function(con) {
 #' the `furrr` package. Useful for retrieving data across many studies,
 #' trials, or germplasm records simultaneously.
 #'
+#' This function uses whatever `future` plan is already active when it is
+#' called, and does not set or restore one itself. If you have not called
+#' [future::plan()], `furrr::future_map_dfr()` falls back to
+#' `future::sequential`, so nothing runs in parallel until you set a plan
+#' yourself - call `future::plan(future::multisession, workers = N)` before
+#' this function to fetch in parallel, and `future::plan(future::sequential)`
+#' afterwards to shut the workers back down. Per the future package's
+#' best-practices vignette, choosing the parallel backend is the caller's
+#' decision: a package that sets and restores a plan on every call still
+#' mutates session-wide state the caller did not ask it to touch, and can
+#' silently replace a backend they configured deliberately.
+#'
 #' @inheritParams brapi_shared_params
 #' @param .fn A brapiR2 function to call for each item
 #'   (e.g. `brapi_study_data`).
 #' @param ids Character vector. A set of IDs to iterate over.
-#' @param .workers Integer. Number of parallel workers. Default 4.
+#' @param .workers Deprecated. No longer used - the parallel backend is now
+#'   the caller's choice, set via [future::plan()] before calling this
+#'   function. Supplying a non-`NULL` value emits a deprecation warning and
+#'   otherwise has no effect.
 #' @param ... Additional arguments passed to `.fn`.
 #'
 #' @return A tibble with results from all IDs combined.
@@ -96,11 +111,16 @@ brapi_cache_clear <- function(con) {
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
 #' study_ids <- c("study1", "study2", "study3")
+#'
+#' # Set the parallel backend yourself before calling; brapi_fetch_parallel()
+#' # uses whatever plan is active rather than setting one for you.
+#' future::plan(future::multisession, workers = 2)
 #' all_data <- brapi_fetch_parallel(con, brapi_study_data, study_ids)
+#' future::plan(future::sequential) # shut the workers back down when done
 #' }
 #'
 #' @export
-brapi_fetch_parallel <- function(con, .fn, ids, .workers = 4L, ...) {
+brapi_fetch_parallel <- function(con, .fn, ids, .workers = NULL, ...) {
   validate_con(con)
 
   if (!requireNamespace("furrr", quietly = TRUE) ||
@@ -108,13 +128,15 @@ brapi_fetch_parallel <- function(con, .fn, ids, .workers = 4L, ...) {
     cli_abort("Install {.pkg furrr} and {.pkg future} for parallel fetching.")
   }
 
-  old_plan <- future::plan()
-  on.exit(future::plan(old_plan), add = TRUE)
+  if (!is.null(.workers)) {
+    cli_warn(c(
+      "{.arg .workers} is deprecated and no longer has any effect.",
+      "i" = "The parallel backend is now the caller's choice.",
+      "i" = "Call {.fn future::plan} before {.fn brapi_fetch_parallel}."
+    ))
+  }
 
-  future::plan(future::multisession, workers = .workers)
-
-  n_workers <- .workers
-  cli_alert_info("Fetching {length(ids)} items across {n_workers} workers...")
+  cli_alert_info("Fetching {length(ids)} items...")
 
   results <- furrr::future_map_dfr(ids, function(id) {
     tryCatch(

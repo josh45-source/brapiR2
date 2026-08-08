@@ -24,13 +24,21 @@ test_that("brapi_cache_clear removes populated cache files", {
   expect_length(list.files(tmpdir), 0L)
 })
 
-test_that("brapi_fetch_parallel maps over ids and combines results", {
+test_that("brapi_fetch_parallel calls future_map_dfr() and combines results", {
+  # brapi_fetch_parallel() no longer sets a future::plan() itself - it uses
+  # whatever plan is already active (sequential, absent a caller-set one),
+  # so there is nothing to mock on the future side any more. Mocking
+  # furrr::future_map_dfr() still avoids actually spinning up workers.
+  skip_if_not_installed("future")
+  skip_if_not_installed("furrr")
+
+  called <- new.env()
+  called$n <- 0L
   local_mocked_bindings(
-    plan = function(...) invisible(NULL),
-    .package = "future"
-  )
-  local_mocked_bindings(
-    future_map_dfr = function(.x, .f, ...) purrr::map_dfr(.x, .f),
+    future_map_dfr = function(.x, .f, ...) {
+      called$n <- called$n + 1L
+      purrr::map_dfr(.x, .f)
+    },
     .package = "furrr"
   )
 
@@ -38,14 +46,13 @@ test_that("brapi_fetch_parallel maps over ids and combines results", {
   fn <- function(con, id) tibble::tibble(id = id)
   result <- brapi_fetch_parallel(con, fn, c("a", "b"))
 
+  expect_identical(called$n, 1L)
   expect_identical(result$id, c("a", "b"))
 })
 
 test_that("brapi_fetch_parallel warns and continues when .fn errors", {
-  local_mocked_bindings(
-    plan = function(...) invisible(NULL),
-    .package = "future"
-  )
+  skip_if_not_installed("future")
+  skip_if_not_installed("furrr")
   local_mocked_bindings(
     future_map_dfr = function(.x, .f, ...) purrr::map_dfr(.x, .f),
     .package = "furrr"
@@ -62,4 +69,36 @@ test_that("brapi_fetch_parallel warns and continues when .fn errors", {
     "Failed for ID"
   )
   expect_identical(result$id, "good")
+})
+
+test_that("brapi_fetch_parallel warns that .workers is deprecated", {
+  skip_if_not_installed("future")
+  skip_if_not_installed("furrr")
+  local_mocked_bindings(
+    future_map_dfr = function(.x, .f, ...) purrr::map_dfr(.x, .f),
+    .package = "furrr"
+  )
+
+  con <- brapi_connection("https://example.org")
+  fn <- function(con, id) tibble::tibble(id = id)
+
+  expect_warning(
+    result <- brapi_fetch_parallel(con, fn, c("a", "b"), .workers = 2),
+    "deprecated"
+  )
+  expect_identical(result$id, c("a", "b"))
+})
+
+test_that("brapi_fetch_parallel does not warn when .workers is omitted", {
+  skip_if_not_installed("future")
+  skip_if_not_installed("furrr")
+  local_mocked_bindings(
+    future_map_dfr = function(.x, .f, ...) purrr::map_dfr(.x, .f),
+    .package = "furrr"
+  )
+
+  con <- brapi_connection("https://example.org")
+  fn <- function(con, id) tibble::tibble(id = id)
+
+  expect_no_warning(brapi_fetch_parallel(con, fn, c("a", "b")))
 })

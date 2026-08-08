@@ -4,7 +4,7 @@
 \alias{brapi_fetch_parallel}
 \title{Parallel Batch Fetching}
 \usage{
-brapi_fetch_parallel(con, .fn, ids, .workers = 4L, ...)
+brapi_fetch_parallel(con, .fn, ids, .workers = NULL, ...)
 }
 \arguments{
 \item{con}{A \code{\link[=brapi_connection]{brapi_connection()}} object.}
@@ -14,7 +14,10 @@ brapi_fetch_parallel(con, .fn, ids, .workers = 4L, ...)
 
 \item{ids}{Character vector. A set of IDs to iterate over.}
 
-\item{.workers}{Integer. Number of parallel workers. Default 4.}
+\item{.workers}{Deprecated. No longer used - the parallel backend is now
+the caller's choice, set via \code{\link[future:plan]{future::plan()}} before calling this
+function. Supplying a non-\code{NULL} value emits a deprecation warning and
+otherwise has no effect.}
 
 \item{...}{Additional arguments passed to \code{.fn}.}
 }
@@ -26,11 +29,29 @@ Fetches data from multiple BrAPI endpoints or IDs in parallel using
 the \code{furrr} package. Useful for retrieving data across many studies,
 trials, or germplasm records simultaneously.
 }
+\details{
+This function uses whatever \code{future} plan is already active when it is
+called, and does not set or restore one itself. If you have not called
+\code{\link[future:plan]{future::plan()}}, \code{furrr::future_map_dfr()} falls back to
+\code{future::sequential}, so nothing runs in parallel until you set a plan
+yourself - call \code{future::plan(future::multisession, workers = N)} before
+this function to fetch in parallel, and \code{future::plan(future::sequential)}
+afterwards to shut the workers back down. Per the future package's
+best-practices vignette, choosing the parallel backend is the caller's
+decision: a package that sets and restores a plan on every call still
+mutates session-wide state the caller did not ask it to touch, and can
+silently replace a backend they configured deliberately.
+}
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 study_ids <- c("study1", "study2", "study3")
+
+# Set the parallel backend yourself before calling; brapi_fetch_parallel()
+# uses whatever plan is active rather than setting one for you.
+future::plan(future::multisession, workers = 2)
 all_data <- brapi_fetch_parallel(con, brapi_study_data, study_ids)
+future::plan(future::sequential) # shut the workers back down when done
 }
 
 }
