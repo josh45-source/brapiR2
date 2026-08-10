@@ -204,7 +204,14 @@ skips the variant-set lookup and returns the same shape:
 ```{r geno-map-by-id, eval = server_up}
 maps <- brapi_maps(con)
 maps[, c("mapDbId", "mapName", "type", "unit")]
+```
 
+Both maps on this test server declare a "Physical Map" type with a "cM"
+unit. That's inconsistent fixture data on this particular server, not
+something brapiR2 or the BrAPI specification produces. On a real server
+the two fields agree.
+
+```{r geno-map-by-id-2, eval = server_up}
 brapi_get_marker_map(con, mapDbId = maps$mapDbId[1])
 ```
 
