@@ -1,6 +1,6 @@
 # ---- BrAPI Phenotyping Module ----
 # Endpoints: /observationunits, /observations, /variables, /traits,
-#            /scales, /methods, /images, /events
+#            /scales, /methods, /images, /events, /ontologies
 
 
 #' List Observation Units
@@ -53,6 +53,9 @@ brapi_observations <- function(con, studyDbId = NULL, ...) {
 #'
 #' @return A tibble with one row per variable definition.
 #'
+#' @seealso [brapi_ontologies()] and [brapi_ontology()] to resolve the
+#'   ontology a variable's `ontologyDbId`/`ontologyReference` points to.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -70,6 +73,9 @@ brapi_observation_variables <- function(con, ...) {
 #' @inheritParams brapi_shared_params
 #'
 #' @return A tibble with one row per trait.
+#'
+#' @seealso [brapi_ontologies()] and [brapi_ontology()] to resolve the
+#'   ontology a trait's `ontologyDbId`/`ontologyReference` points to.
 #'
 #' @examples
 #' \donttest{
@@ -89,6 +95,9 @@ brapi_traits <- function(con, ...) {
 #'
 #' @return A tibble with one row per scale definition.
 #'
+#' @seealso [brapi_ontologies()] and [brapi_ontology()] to resolve the
+#'   ontology a scale's `ontologyDbId`/`ontologyReference` points to.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -107,6 +116,9 @@ brapi_scales <- function(con, ...) {
 #'
 #' @return A tibble with one row per measurement method.
 #'
+#' @seealso [brapi_ontologies()] and [brapi_ontology()] to resolve the
+#'   ontology a method's `ontologyDbId`/`ontologyReference` points to.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -116,6 +128,58 @@ brapi_scales <- function(con, ...) {
 #' @export
 brapi_methods <- function(con, ...) {
   brapi_get(con, "/methods", query = list(...))
+}
+
+
+#' List Ontologies
+#'
+#' Retrieves the ontologies registered on the server: metadata about each
+#' ontology (name, version, authors, description, ...), not the trait
+#' terms that belong to it. [brapi_traits()], [brapi_scales()],
+#' [brapi_methods()], and [brapi_observation_variables()] each carry an
+#' ontology reference back to one of these records.
+#'
+#' @inheritParams brapi_shared_params
+#'
+#' @return A tibble with one row per ontology.
+#'
+#' @seealso [brapi_ontology()] for a single ontology by ID;
+#'   [brapi_traits()], [brapi_scales()], [brapi_methods()], and
+#'   [brapi_observation_variables()] for the records that reference these
+#'   ontologies.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_ontologies(con)
+#' }
+#'
+#' @export
+brapi_ontologies <- function(con, ...) {
+  brapi_get(con, "/ontologies", query = list(...))
+}
+
+
+#' Get a Single Ontology by ID
+#'
+#' @inheritParams brapi_shared_params
+#' @inheritParams brapi_shared_ids
+#'
+#' @return A single-row tibble with ontology details.
+#'
+#' @seealso [brapi_ontologies()]; [brapi_traits()], [brapi_scales()],
+#'   [brapi_methods()], and [brapi_observation_variables()] for the
+#'   records that reference ontologies.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_ontology(con, "O_001")
+#' }
+#'
+#' @export
+brapi_ontology <- function(con, ontologyDbId) {
+  brapi_get(con, glue("/ontologies/{ontologyDbId}"))
 }
 
 
