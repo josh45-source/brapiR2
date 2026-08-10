@@ -4,26 +4,50 @@
 \alias{brapi_get_marker_map}
 \title{Get Marker Map}
 \usage{
-brapi_get_marker_map(con, variantSetDbId)
+brapi_get_marker_map(con, variantSetDbId = NULL, mapDbId = NULL)
 }
 \arguments{
 \item{con}{A \code{\link[=brapi_connection]{brapi_connection()}} object.}
 
-\item{variantSetDbId}{Character. The variant set to retrieve markers from.}
+\item{variantSetDbId}{Character or NULL. A variant set to retrieve
+marker positions for. Mutually exclusive with \code{mapDbId}.}
+
+\item{mapDbId}{Character or NULL. A single genome map to retrieve all
+marker positions from. Mutually exclusive with \code{variantSetDbId}.}
 }
 \value{
-A tibble with columns: \code{variantDbId}, \code{variantName},
-\code{referenceName} (chromosome), \code{start} (position in bp).
+A tibble with columns \code{variantDbId}, \code{variantName}, \code{mapDbId},
+\code{mapName}, \code{type}, \code{unit}, \code{linkageGroupName}, and \code{position} - one
+row per marker-map placement, so a marker on several maps appears
+more than once. \code{type} and \code{unit} are joined in from \code{\link[=brapi_maps]{brapi_maps()}}
+so a caller can tell a genetic (cM) map from a physical (bp) one.
 }
 \description{
-Convenience function that retrieves variant positions as a tidy tibble
-with columns for marker name, chromosome, and position.
+Convenience function that retrieves marker positions on a genome map as
+a tidy tibble. Positions come from the Genome Maps entity
+(\code{\link[=brapi_marker_positions]{brapi_marker_positions()}} / \verb{/markerpositions}), which places a
+marker on a named \code{\link[=brapi_map]{brapi_map()}} - genetic (cM) or physical (bp), per
+the map's \code{type} and \code{unit} - not from \code{\link[=brapi_variants]{brapi_variants()}}'s
+\code{start}/\code{referenceName}, which places a variant on a reference assembly
+instead. A server may populate either, both, or neither; the two are
+independent coordinate systems, not duplicates of each other.
+}
+\details{
+Supply exactly one of \code{mapDbId} (every marker placed on that one map)
+or \code{variantSetDbId} (positions for every variant in that set, wherever
+they have been placed). The \code{variantSetDbId} path looks variant IDs up
+first via \code{\link[=brapi_variants]{brapi_variants()}}, then retrieves their positions in one
+call via \code{\link[=brapi_search_marker_positions]{brapi_search_marker_positions()}} rather than the GET
+\verb{/markerpositions} filter, which only accepts a single \code{variantDbId}.
+
+If a marker is placed on more than one map, it contributes one row per
+placement - the result is never collapsed to one row per marker.
 }
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-markers <- brapi_get_marker_map(con, "variantset1")
-head(markers)
+brapi_get_marker_map(con, mapDbId = "genome_map1")
+brapi_get_marker_map(con, variantSetDbId = "variantset1")
 }
 
 }

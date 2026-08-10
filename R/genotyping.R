@@ -1,6 +1,8 @@
 # ---- BrAPI Genotyping Module ----
 # Endpoints: /samples, /variants, /variantsets, /calls, /callsets,
 #            /references, /referencesets, /allelematrix, /vendor/orders
+# Genome Maps (/maps, /markerpositions) lives in R/genome_maps.R instead;
+# brapi_get_marker_map() below builds on top of it.
 
 
 #' List Samples
@@ -390,58 +392,128 @@ brapi_get_dosage_matrix <- function(con, variantSetDbId,
 
 #' Get Marker Map
 #'
-#' Convenience function that retrieves variant positions as a tidy tibble
-#' with columns for marker name, chromosome, and position.
+#' Convenience function that retrieves marker positions on a genome map as
+#' a tidy tibble. Positions come from the Genome Maps entity
+#' ([brapi_marker_positions()] / `/markerpositions`), which places a
+#' marker on a named [brapi_map()] - genetic (cM) or physical (bp), per
+#' the map's `type` and `unit` - not from [brapi_variants()]'s
+#' `start`/`referenceName`, which places a variant on a reference assembly
+#' instead. A server may populate either, both, or neither; the two are
+#' independent coordinate systems, not duplicates of each other.
+#'
+#' Supply exactly one of `mapDbId` (every marker placed on that one map)
+#' or `variantSetDbId` (positions for every variant in that set, wherever
+#' they have been placed). The `variantSetDbId` path looks variant IDs up
+#' first via [brapi_variants()], then retrieves their positions in one
+#' call via [brapi_search_marker_positions()] rather than the GET
+#' `/markerpositions` filter, which only accepts a single `variantDbId`.
+#'
+#' If a marker is placed on more than one map, it contributes one row per
+#' placement - the result is never collapsed to one row per marker.
 #'
 #' @inheritParams brapi_shared_params
-#' @param variantSetDbId Character. The variant set to retrieve markers from.
+#' @param variantSetDbId Character or NULL. A variant set to retrieve
+#'   marker positions for. Mutually exclusive with `mapDbId`.
+#' @param mapDbId Character or NULL. A single genome map to retrieve all
+#'   marker positions from. Mutually exclusive with `variantSetDbId`.
 #'
-#' @return A tibble with columns: `variantDbId`, `variantName`,
-#'   `referenceName` (chromosome), `start` (position in bp).
+#' @return A tibble with columns `variantDbId`, `variantName`, `mapDbId`,
+#'   `mapName`, `type`, `unit`, `linkageGroupName`, and `position` - one
+#'   row per marker-map placement, so a marker on several maps appears
+#'   more than once. `type` and `unit` are joined in from [brapi_maps()]
+#'   so a caller can tell a genetic (cM) map from a physical (bp) one.
 #'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' markers <- brapi_get_marker_map(con, "variantset1")
-#' head(markers)
+#' brapi_get_marker_map(con, mapDbId = "genome_map1")
+#' brapi_get_marker_map(con, variantSetDbId = "variantset1")
 #' }
 #'
 #' @export
-brapi_get_marker_map <- function(con, variantSetDbId) {
-  variants <- brapi_variants(con, variantSetDbId = variantSetDbId)
-
-  if (nrow(variants) == 0) {
-    cli_alert_warning("No variants found for {.val {variantSetDbId}}.")
-    return(tibble(
-      variantDbId   = character(),
-      variantName   = character(),
-      referenceName = character(),
-      start         = integer()
+brapi_get_marker_map <- function(con, variantSetDbId = NULL, mapDbId = NULL) {
+  if (is.null(variantSetDbId) && is.null(mapDbId)) {
+    cli_abort(c(
+      "Supply exactly one of {.arg variantSetDbId} or {.arg mapDbId}.",
+      "i" = "Neither was supplied."
+    ))
+  }
+  if (!is.null(variantSetDbId) && !is.null(mapDbId)) {
+    cli_abort(c(
+      "Supply exactly one of {.arg variantSetDbId} or {.arg mapDbId}.",
+      "i" = "Both were supplied; only one identifier is allowed at a time."
     ))
   }
 
-  # Select key columns; handle both variantName (scalar) and variantNames
-  # (list-column) depending on the server's response format.
-  cols <- intersect(
-    c("variantDbId", "variantName", "variantNames", "referenceName", "start"),
-    names(variants)
-  )
-  result <- variants[, cols, drop = FALSE]
+  if (!is.null(mapDbId)) {
+    positions <- brapi_marker_positions(con, mapDbId = mapDbId)
+    if (nrow(positions) == 0L) {
+      cli_warn("No marker positions found for map {.val {mapDbId}}.")
+      return(empty_marker_map())
+    }
+  } else {
+    variants <- brapi_variants(con, variantSetDbId = variantSetDbId)
+    if (nrow(variants) == 0L) {
+      cli_warn("No variants found for {.val {variantSetDbId}}.")
+      return(empty_marker_map())
+    }
 
-  if ("variantNames" %in% names(result) && !"variantName" %in% names(result)) {
-    result$variantName <- vapply(
-      result$variantNames,
-      function(x) {
-        x <- unlist(x)
-        if (length(x) > 0L) as.character(x[[1L]]) else NA_character_
-      },
-      character(1L)
-    )
-    result$variantNames <- NULL
+    variant_ids <- unique(variants$variantDbId)
+    positions <- brapi_search_marker_positions(con, variantDbIds = variant_ids)
+    n_found <- if (nrow(positions) == 0L) {
+      0L
+    } else {
+      length(unique(positions$variantDbId))
+    }
+
+    if (n_found < length(variant_ids)) {
+      cli_warn(paste0(
+        "{length(variant_ids) - n_found} of {length(variant_ids)} ",
+        "variants in {.val {variantSetDbId}} have no marker position ",
+        "record; returning positions for the remaining {n_found}."
+      ))
+    }
+
+    if (nrow(positions) == 0L) {
+      return(empty_marker_map())
+    }
   }
 
-  result[, intersect(
-    c("variantDbId", "variantName", "referenceName", "start"),
+  # Join in mapName/type/unit from the Genome Maps entity rather than
+  # trusting /markerpositions' own (spec-optional) mapName field.
+  map_ids <- unique(positions$mapDbId)
+  all_maps <- brapi_maps(con)
+  meta_cols <- intersect(
+    c("mapDbId", "mapName", "type", "unit"), names(all_maps)
+  )
+  map_meta <- all_maps[all_maps$mapDbId %in% map_ids, meta_cols, drop = FALSE]
+
+  positions$mapName <- NULL
+  result <- dplyr::left_join(positions, map_meta, by = "mapDbId")
+
+  cols <- intersect(
+    c("variantDbId", "variantName", "mapDbId", "mapName", "type", "unit",
+      "linkageGroupName", "position"),
     names(result)
-  ), drop = FALSE]
+  )
+  result[, cols, drop = FALSE]
+}
+
+
+#' Internal: Empty Marker-Map Result Tibble
+#'
+#' @return A zero-row tibble with [brapi_get_marker_map()]'s column set.
+#' @keywords internal
+#' @noRd
+empty_marker_map <- function() {
+  tibble(
+    variantDbId      = character(),
+    variantName      = character(),
+    mapDbId          = character(),
+    mapName          = character(),
+    type             = character(),
+    unit             = character(),
+    linkageGroupName = character(),
+    position         = integer()
+  )
 }
