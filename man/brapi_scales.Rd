@@ -24,3 +24,7 @@ brapi_scales(con)
 }
 
 }
+\seealso{
+\code{\link[=brapi_ontologies]{brapi_ontologies()}} and \code{\link[=brapi_ontology]{brapi_ontology()}} to resolve the
+ontology a scale's \code{ontologyDbId}/\code{ontologyReference} points to.
+}

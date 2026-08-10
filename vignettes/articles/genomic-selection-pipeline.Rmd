@@ -71,8 +71,14 @@ vsets
 
 vs_id <- vsets$variantSetDbId[1]
 
-markers <- brapi_get_marker_map(con, vs_id)
-markers # referenceName/start are NA on this server; identity columns are real
+## brapi_variants()'s referenceName/start are NA on this server (the BrAPI
+## spec makes them optional - they place a variant on a reference
+## assembly, and this server has none configured). brapi_get_marker_map()
+## instead reads the Genome Maps entity (/markerpositions), which places
+## each marker on a named map (genetic, cM, or physical, bp) and is
+## populated here.
+markers <- brapi_get_marker_map(con, variantSetDbId = vs_id)
+markers
 
 dosage <- brapi_get_dosage_matrix(con, vs_id)
 dim(dosage)
@@ -154,7 +160,7 @@ dosage_priv <- brapi_get_dosage_matrix(con_priv, "vs001")
 dim(dosage_priv)
 
 # Get marker map for downstream QTL / Manhattan plots
-markers_priv <- brapi_get_marker_map(con_priv, "vs001")
+markers_priv <- brapi_get_marker_map(con_priv, variantSetDbId = "vs001")
 markers_priv
 ```
 

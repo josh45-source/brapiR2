@@ -171,15 +171,42 @@ vsets <- brapi_variant_sets(con)
 vsets
 
 vs_id <- vsets$variantSetDbId[1]
+```
 
-# Get marker chromosome / position map
-markers <- brapi_get_marker_map(con, vs_id)
+`brapi_get_marker_map()` used to read a marker's chromosome and position off
+`brapi_variants()`'s `referenceName`/`start` columns. On this server those
+come back `NA` for every variant — and per the BrAPI spec, that is legal:
+`Variant.start` and `Variant.referenceName` place a variant on a reference
+*assembly*, and the spec explicitly allows a server to leave them unset if
+it has no such assembly configured for that variant, rather than treating
+`NA` as an error condition.
+
+This server has simply chosen not to populate assembly coordinates on its
+variants. Positions for the same markers do exist, just under a different
+resource: the **Genome Maps** entity (`/maps`, `/markerpositions`) places a
+marker on a named *map* instead of a reference assembly — genetic
+(measured in cM) or physical (measured in bp), per the map's own `type`
+and `unit` fields — and the same marker can appear on more than one map.
+`brapi_get_marker_map()` now reads from there instead:
+
+```{r geno-map, eval = server_up}
+# Positions for every variant in the set, wherever they have been placed
+markers <- brapi_get_marker_map(con, variantSetDbId = vs_id)
 markers
 ```
 
-On this server `referenceName` and `start` are not populated for these
-markers (both come back `NA`) — the map's identity and name columns are
-still real and usable.
+Not every variant in a set is guaranteed to have a map placement. On this
+server, only some of the variant set's variants have one — the warning
+above states the exact count rather than silently returning a shorter
+tibble. If you already know which map you care about, querying it directly
+skips the variant-set lookup and returns the same shape:
+
+```{r geno-map-by-id, eval = server_up}
+maps <- brapi_maps(con)
+maps[, c("mapDbId", "mapName", "type", "unit")]
+
+brapi_get_marker_map(con, mapDbId = maps$mapDbId[1])
+```
 
 ```{r geno-dosage, eval = server_up}
 # Get dosage matrix for genomic selection (samples x markers, values 0/1/2)
@@ -335,9 +362,14 @@ different workflows**.
 | Pipe-friendly | Partial | Yes, all functions follow `f(con, ...)` |
 | Caching | No | Yes, disk-based with TTL |
 | Parallel fetch | No | Via the caller's own `future` backend |
-| Genotypics | Limited | Full (allele matrix, dosage matrix, marker map) |
-| BrAPI version | v1 + v2 | v2 only |
+| Genotypics | Limited | Allele matrix, dosage matrix, marker map (32/36 BrAPI entities covered overall, read-only) |
 | Authentication | Yes | Yes |
+
+brapiR2 targets BrAPI v2 only, by design - see the "Design History" section
+of [DESIGN.md](https://github.com/josh45-source/brapiR2/blob/main/DESIGN.md)
+for why. QBMS's own BrAPI version support is a separate question from this
+comparison; check QBMS's own documentation for its current v1/v2 coverage
+rather than relying on a claim made here.
 
 ### Same workflow, different style
 

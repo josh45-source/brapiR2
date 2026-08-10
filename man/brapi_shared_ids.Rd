@@ -11,6 +11,10 @@
 \item{trialDbId}{Character. The unique trial identifier.}
 
 \item{programDbId}{Character. The unique program identifier.}
+
+\item{mapDbId}{Character. The unique genome map identifier.}
+
+\item{ontologyDbId}{Character. The unique ontology identifier.}
 }
 \description{
 Not a real function - like \link{brapi_shared_params}, this exists only as an

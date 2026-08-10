@@ -42,6 +42,8 @@ reference:
       - brapi_crossing_projects
       - brapi_seed_lots
       - brapi_search_germplasm
+      - brapi_pedigree
+      - brapi_search_pedigree
 
   - title: "Phenotyping Module"
     desc: Observations, variables, traits, and analysis-ready data.
@@ -52,6 +54,8 @@ reference:
       - brapi_traits
       - brapi_scales
       - brapi_methods
+      - brapi_ontologies
+      - brapi_ontology
       - brapi_images
       - brapi_events
       - brapi_search_observations
@@ -69,8 +73,13 @@ reference:
       - brapi_references
       - brapi_reference_sets
       - brapi_allele_matrix
+      - brapi_maps
+      - brapi_map
+      - brapi_map_linkage_groups
+      - brapi_marker_positions
       - brapi_search_variants
       - brapi_search_calls
+      - brapi_search_marker_positions
       - brapi_get_dosage_matrix
       - brapi_get_marker_map
 

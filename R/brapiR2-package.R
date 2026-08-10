@@ -49,6 +49,8 @@ NULL
 #' @param germplasmDbId Character. The unique germplasm identifier.
 #' @param trialDbId Character. The unique trial identifier.
 #' @param programDbId Character. The unique program identifier.
+#' @param mapDbId Character. The unique genome map identifier.
+#' @param ontologyDbId Character. The unique ontology identifier.
 #'
 #' @keywords internal
 #' @name brapi_shared_ids

@@ -133,6 +133,46 @@ test_that("brapi_germplasm_pedigree returns a single-row tibble", {
   expect_true("germplasmDbId" %in% names(ped))
 })
 
+test_that("brapi_pedigree returns pedigree nodes with tidied relative columns", {
+  skip_on_cran()
+  skip_if_offline_brapi()
+
+  con <- brapi_connection(SERVER)
+  ped <- brapi_pedigree(
+    con,
+    includeParents = TRUE, includeSiblings = TRUE, includeProgeny = TRUE
+  )
+
+  skip_if(nrow(ped) == 0L, "No pedigree records on test server")
+
+  expect_s3_class(ped, "data.frame")
+  expect_true("germplasmDbId" %in% names(ped))
+  # As of this writing the server returns 3 pedigree nodes, at least one of
+  # which (germplasm3) has 2 populated parents - confirms the parents
+  # list-column really is tidied into per-node tibbles against live data,
+  # not just against the mocked shape.
+  expect_true("parents" %in% names(ped))
+  non_empty_parents <- vapply(ped$parents, nrow, integer(1)) > 0L
+  skip_if(!any(non_empty_parents), "No node with populated parents on test server")
+  one_node <- ped$parents[[which(non_empty_parents)[1L]]]
+  expect_s3_class(one_node, "data.frame")
+  expect_true(all(c("germplasmDbId", "germplasmName", "parentType") %in% names(one_node)))
+  expect_gt(nrow(one_node), 0L)
+})
+
+test_that("brapi_search_pedigree returns the same node shape as brapi_pedigree", {
+  skip_on_cran()
+  skip_if_offline_brapi()
+
+  con <- brapi_connection(SERVER)
+  ped <- brapi_search_pedigree(con, includeParents = TRUE)
+
+  skip_if(nrow(ped) == 0L, "No pedigree records on test server")
+
+  expect_s3_class(ped, "data.frame")
+  expect_true(all(c("germplasmDbId", "parents") %in% names(ped)))
+})
+
 # ---------------------------------------------------------------------------
 # Phenotyping module
 # ---------------------------------------------------------------------------
@@ -160,6 +200,53 @@ test_that("brapi_observation_units returns a non-empty tibble", {
   expect_s3_class(ou, "data.frame")
   expect_gt(nrow(ou), 0L)
   expect_true("observationUnitDbId" %in% names(ou))
+})
+
+test_that("brapi_ontologies returns a non-empty tibble", {
+  skip_on_cran()
+  skip_if_offline_brapi()
+
+  con <- brapi_connection(SERVER)
+  onto <- brapi_ontologies(con)
+
+  expect_s3_class(onto, "data.frame")
+  expect_gt(nrow(onto), 0L)
+  expect_true(all(c("ontologyDbId", "ontologyName") %in% names(onto)))
+})
+
+test_that("brapi_ontology returns a single-row tibble for a retrievable ID", {
+  skip_on_cran()
+  skip_if_offline_brapi()
+
+  con <- brapi_connection(SERVER)
+  onto <- brapi_ontologies(con)
+  skip_if(nrow(onto) == 0L, "No ontologies on test server")
+
+  # As of this writing, most ontologyDbIds returned by GET /ontologies
+  # (UUID-shaped ones) 404 on GET /ontologies/{id} - a real inconsistency
+  # in this server's seed data, confirmed directly with curl, not a
+  # brapiR2 bug. Only the small number of "O_NNN"-style IDs resolve. Try
+  # each ID in turn and skip only if the server has no working one at all,
+  # so this test fails loudly if brapiR2 itself breaks, but doesn't fail
+  # because of that already-known server data gap.
+  working_id <- NULL
+  candidates <- utils::head(onto$ontologyDbId, 20L)
+  for (id in candidates) {
+    result <- tryCatch(brapi_ontology(con, id), error = function(e) NULL)
+    if (!is.null(result) && nrow(result) == 1L) {
+      working_id <- id
+      break
+    }
+  }
+  skip_if(
+    is.null(working_id),
+    "No individually-retrievable ontologyDbId among the first 20 on test server"
+  )
+
+  one <- brapi_ontology(con, working_id)
+  expect_s3_class(one, "data.frame")
+  expect_identical(nrow(one), 1L)
+  expect_identical(one$ontologyDbId[[1L]], working_id)
 })
 
 test_that("brapi_study_data returns a wide tibble with trait columns", {
@@ -262,18 +349,119 @@ test_that("brapi_get_dosage_matrix returns a numeric matrix", {
   expect_true(valid_vals)
 })
 
-test_that("brapi_get_marker_map returns a tibble with variantDbId", {
+test_that("brapi_maps returns a non-empty tibble with type and unit", {
+  skip_on_cran()
+  skip_if_offline_brapi()
+
+  con <- brapi_connection(SERVER)
+  maps <- brapi_maps(con)
+
+  expect_s3_class(maps, "data.frame")
+  expect_gt(nrow(maps), 0L)
+  expect_true(all(c("mapDbId", "type", "unit") %in% names(maps)))
+})
+
+test_that("brapi_map returns a single-row tibble for a valid ID", {
+  skip_on_cran()
+  skip_if_offline_brapi()
+
+  con <- brapi_connection(SERVER)
+  map_id <- brapi_maps(con)$mapDbId[[1L]]
+
+  m <- brapi_map(con, map_id)
+
+  expect_s3_class(m, "data.frame")
+  expect_identical(nrow(m), 1L)
+  expect_identical(m$mapDbId[[1L]], map_id)
+})
+
+test_that("brapi_map_linkage_groups returns a non-empty tibble", {
+  skip_on_cran()
+  skip_if_offline_brapi()
+
+  con <- brapi_connection(SERVER)
+  map_id <- brapi_maps(con)$mapDbId[[1L]]
+
+  lgs <- brapi_map_linkage_groups(con, map_id)
+
+  expect_s3_class(lgs, "data.frame")
+  expect_gt(nrow(lgs), 0L)
+  expect_true("linkageGroupName" %in% names(lgs))
+})
+
+test_that("brapi_marker_positions filtered by mapDbId returns populated positions", {
+  skip_on_cran()
+  skip_if_offline_brapi()
+
+  con <- brapi_connection(SERVER)
+  map_id <- brapi_maps(con)$mapDbId[[1L]]
+
+  mp <- brapi_marker_positions(con, mapDbId = map_id)
+
+  expect_s3_class(mp, "data.frame")
+  expect_gt(nrow(mp), 0L)
+  expect_true(all(c("variantDbId", "linkageGroupName", "position") %in% names(mp)))
+  # This is the whole point of the Genome Maps entity: positions here are
+  # actually populated, unlike brapi_variants()'s start/referenceName on
+  # this server.
+  expect_false(anyNA(mp$position))
+})
+
+test_that("brapi_search_marker_positions returns positions for given variant IDs", {
+  skip_on_cran()
+  skip_if_offline_brapi()
+
+  con <- brapi_connection(SERVER)
+  map_id <- brapi_maps(con)$mapDbId[[1L]]
+  v_ids <- brapi_marker_positions(con, mapDbId = map_id)$variantDbId
+
+  sp <- brapi_search_marker_positions(con, variantDbIds = v_ids)
+
+  expect_s3_class(sp, "data.frame")
+  expect_gt(nrow(sp), 0L)
+  expect_true(all(v_ids %in% sp$variantDbId))
+})
+
+test_that("brapi_get_marker_map(mapDbId=) returns a tibble with type and unit", {
+  skip_on_cran()
+  skip_if_offline_brapi()
+
+  con <- brapi_connection(SERVER)
+  map_id <- brapi_maps(con)$mapDbId[[1L]]
+
+  mmap <- brapi_get_marker_map(con, mapDbId = map_id)
+
+  expect_s3_class(mmap, "data.frame")
+  expect_gt(nrow(mmap), 0L)
+  expect_true(all(c("variantDbId", "type", "unit", "position") %in% names(mmap)))
+  expect_false(anyNA(mmap$position))
+})
+
+test_that("brapi_get_marker_map(variantSetDbId=) returns positions for the set", {
   skip_on_cran()
   skip_if_offline_brapi()
 
   con <- brapi_connection(SERVER)
   vs_id <- brapi_variant_sets(con)$variantSetDbId[[1L]]
 
-  mmap <- brapi_get_marker_map(con, vs_id)
+  # On the public test server only some variants in the set have a
+  # marker position record, so a partial-coverage warning is expected;
+  # this test only asserts on the returned data, not on the warning.
+  mmap <- suppressWarnings(brapi_get_marker_map(con, variantSetDbId = vs_id))
 
   expect_s3_class(mmap, "data.frame")
-  expect_gt(nrow(mmap), 0L)
-  expect_true("variantDbId" %in% names(mmap))
+  expect_true(all(c("variantDbId", "mapDbId", "type", "unit") %in% names(mmap)))
+  if (nrow(mmap) > 0L) {
+    expect_false(anyNA(mmap$position))
+  }
+})
+
+test_that("brapi_get_marker_map errors when neither identifier is given", {
+  skip_on_cran()
+  skip_if_offline_brapi()
+
+  con <- brapi_connection(SERVER)
+  expect_error(brapi_get_marker_map(con), "exactly one")
 })
 
 # ---------------------------------------------------------------------------

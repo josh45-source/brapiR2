@@ -68,9 +68,10 @@ alongside the existing live-server integration tests.
 | Authentication | `R/auth.R` | `brapi_login()`, `brapi_login_oauth2()`, `brapi_set_token()` - populate the connection's Bearer token via password grant, OAuth2 client-credentials grant, or direct assignment |
 | Request engine | `R/request.R` | `brapi_req()`, `brapi_get()`, `brapi_get_pages()`, `brapi_cache_path()`, `brapi_cache_read()`, `brapi_post_search()`, `brapi_poll_search()`, `parse_brapi_result()` - shared HTTP plumbing: headers/auth/retry, GET pagination, cache key/lookup, the POST-search 200/202-poll protocol, and list-to-tibble parsing |
 | Core module | `R/core.R` | Programs, trials, studies, locations, seasons, lists, people, server info |
-| Germplasm module | `R/germplasm.R` | Germplasm records, pedigree, progeny, attributes, crosses, crossing projects, seed lots, germplasm search |
-| Phenotyping module | `R/phenotyping.R` | Observation units, observations, observation variables, traits, scales, methods, images, events, phenotyping search, and `brapi_study_data()` (wide-format pivot) |
+| Germplasm module | `R/germplasm.R` | Germplasm records, progeny, attributes, crosses, crossing projects, seed lots, germplasm search; pedigree via both the single-germplasm sub-resource (`brapi_germplasm_pedigree()`) and the batch Pedigree entity (`brapi_pedigree()`, `brapi_search_pedigree()`) |
+| Phenotyping module | `R/phenotyping.R` | Observation units, observations, observation variables, traits, scales, methods, ontologies, images, events, phenotyping search, and `brapi_study_data()` (wide-format pivot) |
 | Genotyping module | `R/genotyping.R` | Samples, variants, variant sets, calls, call sets, references, reference sets, the allele matrix, genotyping search, and the `brapi_get_dosage_matrix()` / `brapi_get_marker_map()` convenience functions |
+| Genome Maps | `R/genome_maps.R` | Genome maps, linkage groups, and marker positions (`brapi_maps()`, `brapi_map()`, `brapi_map_linkage_groups()`, `brapi_marker_positions()`, `brapi_search_marker_positions()`) - a distinct entity from Variants: a marker's position on a named map (genetic or physical) rather than a variant's position on a reference assembly |
 | Caching | `R/cache.R` | `brapi_cache_enable()`, `brapi_cache_clear()` - opt-in disk cache configuration and invalidation, keyed via `rlang::hash()` |
 | Parallel fetching | `R/cache.R` | `brapi_fetch_parallel()` - `furrr`/`future`-based batch fetching across many IDs |
 | Utilities | `R/utils.R` | `brapi_ping()`, `brapi_endpoints()` - connectivity check and supported-endpoint introspection |
@@ -132,11 +133,14 @@ of `brapiR2`'s request-engine internals (mockable in tests via
 ### Genotyping module as the key differentiator
 
 Core, Germplasm, and Phenotyping coverage exist in other BrAPI clients.
-Full genotyping support - the allele matrix's non-standard 2D pagination,
-and the `brapi_get_dosage_matrix()` / `brapi_get_marker_map()` conversion
-into genomic-selection-ready numeric matrices does not, and is the main
+Handling the allele matrix's non-standard 2D pagination, and converting
+it via `brapi_get_dosage_matrix()` / `brapi_get_marker_map()` into
+genomic-selection-ready numeric matrices, does not - and is the main
 reason `brapiR2` exists as a separate package rather than a QBMS
-contribution.
+contribution. This is a depth claim about the genotyping data path
+specifically, not a claim that `brapiR2` covers the Genotyping module (or
+any module) exhaustively; see the coverage figures in
+[Boundaries](#boundaries).
 
 ### Disk-based caching keyed with `rlang::hash()`
 
@@ -164,7 +168,16 @@ The current design deliberately leaves several things out of scope:
 
 - **Read-only.** `brapiR2` retrieves BrAPI data; it does not implement the
   BrAPI `POST`/`PUT` endpoints for writing germplasm, observations, or
-  other records back to a server.
+  other records back to a server. Of the BrAPI v2.1 specification's 201
+  endpoints (114 `GET`, 57 `POST` - 24 of them search, 30 `PUT`), the 63
+  write and update endpoints are out of scope by design, not an oversight.
+- **Read coverage is intentionally partial, not exhaustive.** `brapiR2`
+  wraps 32 of the specification's 36 top-level entities across all four
+  modules, covering 56 of the 138 retrieval (`GET` + search `POST`)
+  endpoints - 56 of 123 endpoints within the entities it does cover.
+  Common Crop Names, Germplasm Attribute Values, Plates, and Vendor
+  (lab/vendor order-tracking) currently have no coverage at all. New
+  entities are added as real analysis needs surface, not to chase 100%.
 - **No analysis.** Dosage matrices and wide phenotyping tibbles are
   produced in shapes that downstream genomic-selection and analysis
   packages expect, but `brapiR2` does not itself fit models, compute BLUPs,
@@ -178,6 +191,30 @@ The current design deliberately leaves several things out of scope:
   left to downstream packages that consume `brapiR2`'s tibbles.
 
 ## Relationship to Other Tools
+
+### Other BrAPI R clients
+
+[QBMS](https://cran.r-project.org/package=QBMS), [brapir-v2](https://github.com/mverouden/brapir-v2)
+(see [Design History](#design-history)), and
+[BrAPI.R](https://github.com/TriticeaeToolbox/BrAPI.R) (David Waring,
+Cornell) all target the same specification from different angles.
+BrAPI.R in particular is complementary rather than competing: its own
+DESCRIPTION calls it "simple wrapper functions for httr that make it
+easier to make manual HTTP calls to a BrAPI server", and its README
+states plainly that it "does not have any knowledge of the currently
+supported BrAPI endpoints." It is a transport layer - callers pass an
+endpoint path as a string and get back a raw nested list; it supports
+`GET`, `POST`, and `PUT` (with a `version` argument covering both BrAPI
+v1 and v2), plus a two-step search helper and Breedbase-specific
+functions explicitly outside the BrAPI spec. `brapiR2` takes the
+opposite position on the same trade-off: named, individually documented
+functions per endpoint that always return tibbles, at the cost of
+needing an explicit function for each entity. The two are usable
+together rather than as alternatives - and BrAPI.R's `POST`/`PUT`
+support covers exactly the write operations `brapiR2` deliberately
+leaves out (see [Boundaries](#boundaries)).
+
+### Downstream analysis tools
 
 `brapiR2` is designed to sit at the start of a breeding-data analysis
 pipeline, not to replace the tools downstream of it:
