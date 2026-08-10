@@ -244,7 +244,7 @@ now reads from there instead:
 
 # Positions for every variant in the set, wherever they have been placed
 markers <- brapi_get_marker_map(con, variantSetDbId = vs_id)
-#> ℹ Async search started (ID: 73f31e06-243c-43a3-a0f0-96369e96d09d). Polling...
+#> ℹ Async search started (ID: ae54573d-bc6a-4635-94de-af171e262e6a). Polling...
 #> Warning: 14 of 20 variants in "variantset1" have no marker position record; returning
 #> positions for the remaining 6.
 markers
@@ -274,6 +274,14 @@ maps[, c("mapDbId", "mapName", "type", "unit")]
 #>   <chr>       <chr>               <chr>        <chr>
 #> 1 genome_map1 Primary Paw Paw Map Physical Map cM   
 #> 2 genome_map2 Primary Paw Paw Map Physical Map cM
+```
+
+Both maps on this test server declare a “Physical Map” type with a “cM”
+unit. That’s inconsistent fixture data on this particular server, not
+something brapiR2 or the BrAPI specification produces. On a real server
+the two fields agree.
+
+``` r
 
 brapi_get_marker_map(con, mapDbId = maps$mapDbId[1])
 #> # A tibble: 3 × 8
@@ -393,7 +401,7 @@ fetching don’t need authentication).
 cache_dir <- tempfile("brapi_cache_")
 dir.create(cache_dir)
 perf_con <- brapi_cache_enable(con, ttl = 3600, dir = cache_dir)
-#> ✔ Caching enabled at /tmp/RtmpRcXwK1/brapi_cache_1fe236ecffbd (TTL: 3600s)
+#> ✔ Caching enabled at /tmp/RtmpSs93qo/brapi_cache_1ff76fbe8b54 (TTL: 3600s)
 
 # First call: hits the server
 invisible(brapi_programs(perf_con))

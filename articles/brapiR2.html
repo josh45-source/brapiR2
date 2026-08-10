@@ -292,7 +292,7 @@ instead:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Positions for every variant in the set, wherever they have been placed</span></span>
 <span><span class="va">markers</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_get_marker_map.html">brapi_get_marker_map</a></span><span class="op">(</span><span class="va">con</span>, variantSetDbId <span class="op">=</span> <span class="va">vs_id</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Async search started (ID: 73f31e06-243c-43a3-a0f0-96369e96d09d). Polling...</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Async search started (ID: ae54573d-bc6a-4635-94de-af171e262e6a). Polling...</span></span>
 <span><span class="co">#&gt; Warning: 14 of 20 variants in <span style="color: #0000BB;">"variantset1"</span> have no marker position record; returning</span></span>
 <span><span class="co">#&gt; positions for the remaining 6.</span></span>
 <span><span class="va">markers</span></span>
@@ -317,16 +317,20 @@ it directly skips the variant-set lookup and returns the same shape:</p>
 <span><span class="co">#&gt;   mapDbId     mapName             type         unit </span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> genome_map1 Primary Paw Paw Map Physical Map cM   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> genome_map2 Primary Paw Paw Map Physical Map cM</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/brapi_get_marker_map.html">brapi_get_marker_map</a></span><span class="op">(</span><span class="va">con</span>, mapDbId <span class="op">=</span> <span class="va">maps</span><span class="op">$</span><span class="va">mapDbId</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> genome_map2 Primary Paw Paw Map Physical Map cM</span></span></code></pre></div>
+<p>Both maps on this test server declare a “Physical Map” type with a
+“cM” unit. That’s inconsistent fixture data on this particular server,
+not something brapiR2 or the BrAPI specification produces. On a real
+server the two fields agree.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/brapi_get_marker_map.html">brapi_get_marker_map</a></span><span class="op">(</span><span class="va">con</span>, mapDbId <span class="op">=</span> <span class="va">maps</span><span class="op">$</span><span class="va">mapDbId</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 8</span></span></span>
 <span><span class="co">#&gt;   variantDbId variantName mapDbId  mapName type  unit  linkageGroupName position</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> variant01   M1          genome_… Primar… Phys… cM    Chromosome 1          200</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> variant02   M2          genome_… Primar… Phys… cM    Chromosome 1         <span style="text-decoration: underline;">4</span>000</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> variant03   M3          genome_… Primar… Phys… cM    Chromosome 1        <span style="text-decoration: underline;">60</span>000</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get dosage matrix for genomic selection (samples x markers, values 0/1/2)</span></span>
 <span><span class="va">dosage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix</a></span><span class="op">(</span><span class="va">con</span>, <span class="va">vs_id</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Fetching allele matrix for variant set <span style="color: #0000BB;">"variantset1"</span>...</span></span>
@@ -346,7 +350,7 @@ it directly skips the variant-set lookup and returns the same shape:</p>
 <p>Most production BrAPI servers require authentication. These calls
 need your own server and credentials, so they are shown but not run
 here.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Username/password login - used by BreedBase, BMS, and Germinate</span></span>
 <span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_connection.html">brapi_connection</a></span><span class="op">(</span><span class="st">"https://my-breedbase.org"</span><span class="op">)</span></span>
 <span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_login.html">brapi_login</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"username"</span>, <span class="st">"password"</span><span class="op">)</span></span>
@@ -381,7 +385,7 @@ all projects, or in the project directory for that project only) as
 <p>R reads <code>.Renviron</code> automatically at startup, so after
 restarting your R session the values are available via
 <code><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv()</a></code>:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_connection.html">brapi_connection</a></span><span class="op">(</span><span class="st">"https://my-breedbase.org"</span><span class="op">)</span></span>
 <span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_login.html">brapi_login</a></span><span class="op">(</span></span>
 <span>  <span class="va">con</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"BRAPI_USERNAME"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"BRAPI_PASSWORD"</span><span class="op">)</span></span>
@@ -397,7 +401,7 @@ plaintext file, use <a href="https://cran.r-project.org/package=keyring" class="
 <code>key_get()</code> retrieves it later, in this session or a future
 one, without the value ever appearing in your script or your R
 history:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run once, interactively - prompts for the password and stores it</span></span>
 <span><span class="fu">keyring</span><span class="fu">::</span><span class="fu"><a href="https://keyring.r-lib.org/reference/key_get.html" class="external-link">key_set</a></span><span class="op">(</span><span class="st">"brapiR2_my-breedbase"</span>, username <span class="op">=</span> <span class="st">"my_username"</span><span class="op">)</span></span>
 <span></span>
@@ -418,12 +422,12 @@ share.</p>
 </h2>
 <p>These run against the public test server again (caching and parallel
 fetching don’t need authentication).</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Enable caching — repeated calls within the TTL return instantly</span></span>
 <span><span class="va">cache_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"brapi_cache_"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">cache_dir</span><span class="op">)</span></span>
 <span><span class="va">perf_con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_cache_enable.html">brapi_cache_enable</a></span><span class="op">(</span><span class="va">con</span>, ttl <span class="op">=</span> <span class="fl">3600</span>, dir <span class="op">=</span> <span class="va">cache_dir</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Caching enabled at <span style="color: #0000BB;">/tmp/RtmpRcXwK1/brapi_cache_1fe236ecffbd</span> (TTL: 3600s)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Caching enabled at <span style="color: #0000BB;">/tmp/RtmpSs93qo/brapi_cache_1ff76fbe8b54</span> (TTL: 3600s)</span></span>
 <span></span>
 <span><span class="co"># First call: hits the server</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="fu"><a href="../reference/brapi_programs.html">brapi_programs</a></span><span class="op">(</span><span class="va">perf_con</span><span class="op">)</span><span class="op">)</span></span>
@@ -454,7 +458,7 @@ and can silently replace a plan you configured deliberately (a specific
 worker count, a cluster spanning several machines, callr workers for
 extra isolation). So it’s your call to make, before this function
 runs:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="va"><a href="https://future.futureverse.org/reference/multisession.html" class="external-link">multisession</a></span>, workers <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Fetch study data from multiple studies in parallel (all studies on the</span></span>
@@ -480,7 +484,7 @@ the parallel-fetch mechanics, are real.</p>
 <p>Since you set the plan, shutting the workers back down when you’re
 done with them is your responsibility too, not something the package
 does for you on exit:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="va"><a href="https://future.futureverse.org/reference/sequential.html" class="external-link">sequential</a></span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
@@ -553,7 +557,7 @@ coverage rather than relying on a claim made here.</p>
 <p>The examples below use a private BreedBase-style server and
 credentials, so they are illustrative only.</p>
 <p><strong>QBMS</strong> — navigational, stateful:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://icarda.github.io/QBMS/" class="external-link">QBMS</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">set_crop</span><span class="op">(</span><span class="st">"Wheat"</span><span class="op">)</span></span>
@@ -570,7 +574,7 @@ credentials, so they are illustrative only.</p>
 <span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">get_study_data</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><strong>brapiR2</strong> — functional, pipe-friendly:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/josh45-source/brapiR2" class="external-link">brapiR2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>

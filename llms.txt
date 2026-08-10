@@ -14,7 +14,7 @@ Developed by **Joash Joshua Ayo** (<joashjoshua789@gmail.com>).
 | Feature | brapiR2 | QBMS |
 |----|----|----|
 | Design | Stateless, functional, pipeable | Stateful, menu-driven |
-| BrAPI v2 coverage | 32/36 entities, all 4 modules, read-only | Partial (phenotyping focus) |
+| BrAPI v2 coverage | 32/36 entities, all 4 modules, read-only | See QBMS’s own documentation |
 | Genotyping support | Native variants, callsets, dosage matrix | Via GIGWA wrapper |
 | Return type | Always tibbles | Mixed lists/dataframes |
 | Auth | Unified token/OAuth2 | Engine-specific functions |
@@ -159,6 +159,9 @@ con <- brapi_set_token(con, "my_existing_token")
 
 - [QBMS](https://cran.r-project.org/package=QBMS) — High-level, stateful
   BrAPI client for interactive use
+- [BrAPI.R](https://github.com/TriticeaeToolbox/BrAPI.R) — HTTP
+  transport layer for manual BrAPI calls, complementary to brapiR2’s
+  named per-endpoint functions
 - [rrBLUP](https://cran.r-project.org/package=rrBLUP) — Genomic
   selection (use brapiR2 to fetch the dosage matrix)
 - [sommer](https://cran.r-project.org/package=sommer) — Mixed models for
