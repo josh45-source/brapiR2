@@ -2,8 +2,10 @@
 
 **brapiR2** is a tidyverse-native, stateless R client for the [BrAPI
 v2](https://brapi.org/) (Breeding API) specification. It provides
-pipe-friendly access to **all four BrAPI modules** - Core, Germplasm,
-Phenotyping, and Genotyping - returning tidy tibbles ready for analysis.
+pipe-friendly, read-only access across all four BrAPI modules - Core,
+Germplasm, Phenotyping, and Genotyping - wrapping 32 of the
+specification’s 36 entities (56 of 138 retrieval endpoints) and
+returning tidy tibbles ready for analysis.
 
 Developed by **Joash Joshua Ayo** (<joashjoshua789@gmail.com>).
 
@@ -12,7 +14,7 @@ Developed by **Joash Joshua Ayo** (<joashjoshua789@gmail.com>).
 | Feature | brapiR2 | QBMS |
 |----|----|----|
 | Design | Stateless, functional, pipeable | Stateful, menu-driven |
-| BrAPI v2 coverage | Full spec (all 4 modules) | Partial (phenotyping focus) |
+| BrAPI v2 coverage | 32/36 entities, all 4 modules, read-only | Partial (phenotyping focus) |
 | Genotyping support | Native variants, callsets, dosage matrix | Via GIGWA wrapper |
 | Return type | Always tibbles | Mixed lists/dataframes |
 | Auth | Unified token/OAuth2 | Engine-specific functions |
@@ -28,6 +30,21 @@ that, like brapiR2, targets the BrAPI v2 specification directly rather
 than v1. Its own README describes it as still under development, and the
 repository has had no commits in roughly four years (last pushed April
 2022) - it does not appear to be actively maintained.
+
+[BrAPI.R](https://github.com/TriticeaeToolbox/BrAPI.R) (David Waring,
+Cornell) is a different kind of tool entirely, and complementary rather
+than competing: its own DESCRIPTION calls it “simple wrapper functions
+for httr that make it easier to make manual HTTP calls to a BrAPI
+server”, and its README is explicit that it “does not have any knowledge
+of the currently supported BrAPI endpoints”. It’s a transport layer -
+callers pass endpoint paths as strings (`GET`, `POST`, and `PUT` are all
+supported, plus a two-step search helper) and get back raw nested lists,
+with a version argument that switches between BrAPI v1 and v2. It also
+ships Breedbase-specific functions explicitly outside the BrAPI spec.
+brapiR2 takes the opposite approach - named per-endpoint functions
+returning tibbles - and covers less ground on writes: BrAPI.R’s
+`POST`/`PUT` support covers exactly the write operations brapiR2
+deliberately omits.
 
 ## Installation
 
@@ -88,21 +105,34 @@ brapi_observation_units(con, studyDbId = "study_42") |>
   select(germplasmDbId, germplasmName) |>
   distinct()
 
-# Get marker positions for a genotyping dataset
-brapi_get_marker_map(con, "my_variantset") |>
-  filter(referenceName == "chr1") |>
-  arrange(start)
+# Get marker positions for a genotyping dataset - from the Genome Maps
+# entity (a marker's position on a named map), not from Variant's own
+# assembly coordinates, which many servers leave unpopulated
+brapi_get_marker_map(con, variantSetDbId = "my_variantset") |>
+  filter(linkageGroupName == "chr1") |>
+  arrange(position)
 ```
 
 ## Supported BrAPI Modules
 
+brapiR2 wraps 32 of the 36 BrAPI v2.1 entities (56 of 138 retrieval
+endpoints) across all four modules:
+
 - **Core**: Programs, Trials, Studies, Locations, Seasons, Lists, People
-- **Germplasm**: Germplasm, Pedigrees, Progeny, Attributes, Crosses,
-  Seed Lots
+- **Germplasm**: Germplasm, Progeny, Attributes, Crosses, Seed Lots, and
+  Pedigree - both single-germplasm
+  ([`brapi_germplasm_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_germplasm_pedigree.md))
+  and batch/tree retrieval across many germplasm at once
+  ([`brapi_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_pedigree.md),
+  [`brapi_search_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_search_pedigree.md))
 - **Phenotyping**: Observation Units, Observations, Variables, Traits,
-  Scales, Methods, Images, Events
+  Scales, Methods, Ontologies, Images, Events
 - **Genotyping**: Samples, Variants, Variant Sets, Calls, Call Sets,
-  References, Allele Matrix
+  References, Allele Matrix, Genome Maps
+
+Not yet covered: Common Crop Names, Germplasm Attribute Values, Plates,
+and Vendor (lab/vendor order-tracking endpoints). brapiR2 is read-only
+by design - it does not implement BrAPI’s `POST`/`PUT` write endpoints.
 
 ## Authentication
 

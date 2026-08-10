@@ -39,11 +39,37 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="brapir2-development-version">brapiR2 (development version)<a class="anchor" aria-label="anchor" href="#brapir2-development-version"></a></h2>
+<div class="section level4">
+<h4 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h4>
+<ul><li>
+<code><a href="../reference/brapi_get_marker_map.html">brapi_get_marker_map()</a></code> no longer reads position data from <code><a href="../reference/brapi_variants.html">brapi_variants()</a></code> (<code>referenceName</code>/<code>start</code>, which many servers - including the public test server - leave <code>NA</code>, since the BrAPI spec makes those fields optional on <code>Variant</code>). It now queries the Genome Maps entity’s <code>/markerpositions</code> endpoint instead, which places a marker on a named map (genetic or physical) rather than a variant on a reference assembly. <strong>Signature change</strong>: <code>brapi_get_marker_map(con, variantSetDbId = NULL, mapDbId = NULL)</code>, requiring exactly one of the two identifiers. The returned tibble’s columns have changed to <code>variantDbId</code>, <code>variantName</code>, <code>mapDbId</code>, <code>mapName</code>, <code>type</code>, <code>unit</code>, <code>linkageGroupName</code>, <code>position</code> - <code>referenceName</code>/<code>start</code> are gone. Existing positional calls (<code>brapi_get_marker_map(con, variantSetDbId)</code>) still work, but code reading <code>referenceName</code> or <code>start</code> from the result will break.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h4>
+<ul><li>
+<code><a href="../reference/brapi_study_data.html">brapi_study_data()</a></code> no longer silently returns the wrong study’s observations on servers that don’t implement the <code>studyDbId</code> filter on <code>/observations</code> server-side (which triggers a client-side fallback that fetches all observations and filters locally). The filter used <code>dplyr::filter(.data$studyDbId == studyDbId)</code>, which - because the function’s own argument is also named <code>studyDbId</code> - resolved the right-hand side to the data column itself, making the comparison always <code>TRUE</code> and returning every study’s observations rather than just the requested one. Fixed to <code>.data$studyDbId == .env$studyDbId</code>, which correctly disambiguates the data column from the function argument.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h4>
+<ul><li>New Genome Maps entity support (<code>R/genome_maps.R</code>): <code><a href="../reference/brapi_maps.html">brapi_maps()</a></code>, <code><a href="../reference/brapi_map.html">brapi_map()</a></code>, <code><a href="../reference/brapi_map_linkage_groups.html">brapi_map_linkage_groups()</a></code>, <code><a href="../reference/brapi_marker_positions.html">brapi_marker_positions()</a></code>, <code><a href="../reference/brapi_search_marker_positions.html">brapi_search_marker_positions()</a></code>.</li>
+<li>New Pedigree entity support (<code>R/germplasm.R</code>): <code><a href="../reference/brapi_pedigree.html">brapi_pedigree()</a></code> and <code><a href="../reference/brapi_search_pedigree.html">brapi_search_pedigree()</a></code> retrieve pedigree records across many germplasm in one call (via <code>/pedigree</code> and <code>/search/pedigree</code>), complementing the existing single-germplasm <code><a href="../reference/brapi_germplasm_pedigree.html">brapi_germplasm_pedigree()</a></code>. Each row is one pedigree node; <code>parents</code>, <code>siblings</code>, and <code>progeny</code>, when requested, are list-columns of tidy per-node tibbles (not raw nested lists), so a marker on several maps or a node with several relatives is never silently collapsed to one row.</li>
+<li>New Ontologies entity support (<code>R/phenotyping.R</code>): <code><a href="../reference/brapi_ontologies.html">brapi_ontologies()</a></code> and <code><a href="../reference/brapi_ontology.html">brapi_ontology()</a></code>, cross-referenced from <code><a href="../reference/brapi_traits.html">brapi_traits()</a></code>, <code><a href="../reference/brapi_scales.html">brapi_scales()</a></code>, <code><a href="../reference/brapi_methods.html">brapi_methods()</a></code>, and <code><a href="../reference/brapi_observation_variables.html">brapi_observation_variables()</a></code>.</li>
+<li>brapiR2 now wraps 32 of the 36 BrAPI v2.1 entities across all four modules (56 of 138 retrieval endpoints); see <code>DESIGN.md</code> for the full coverage breakdown and which entities remain uncovered.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="deprecated-development-version">Deprecated<a class="anchor" aria-label="anchor" href="#deprecated-development-version"></a></h4>
+<ul><li>
+<code><a href="../reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code> no longer sets or restores a <code>future</code> plan itself. Per the future package’s best-practices vignette, the parallel backend is now the caller’s choice: call <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">future::plan()</a></code> before calling <code><a href="../reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code> to fetch in parallel. The <code>.workers</code> argument is deprecated - supplying it now emits a warning and has no effect.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="testing-development-version">Testing<a class="anchor" aria-label="anchor" href="#testing-development-version"></a></h4>
+<ul><li>Substantially expanded the mocked and live-server integration test suites alongside the features above: argument-capturing tests for every new thin wrapper, dedicated tests for the pedigree relative-list parsing (nodes with parents, with progeny, and with neither), and guarded integration tests against the public BrAPI test server for every new function.</li>
+</ul></div>
 <div class="section level3">
 <h3 id="brapir2-development-version-1">brapiR2 0.1.0<a class="anchor" aria-label="anchor" href="#brapir2-development-version-1"></a></h3>
 <div class="section level4">
-<h4 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h4>
-<ul><li>Initial release with full BrAPI v2.1 endpoint coverage.</li>
+<h4 id="new-features-development-version-1">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version-1"></a></h4>
+<ul><li>Initial release covering the BrAPI v2.1 specification’s Core, Germplasm, Phenotyping, and Genotyping modules.</li>
 <li>
 <strong>Core module</strong>: <code><a href="../reference/brapi_programs.html">brapi_programs()</a></code>, <code><a href="../reference/brapi_trials.html">brapi_trials()</a></code>, <code><a href="../reference/brapi_studies.html">brapi_studies()</a></code>, <code><a href="../reference/brapi_locations.html">brapi_locations()</a></code>, <code><a href="../reference/brapi_seasons.html">brapi_seasons()</a></code>, <code><a href="../reference/brapi_lists.html">brapi_lists()</a></code>, <code><a href="../reference/brapi_people.html">brapi_people()</a></code>, <code><a href="../reference/brapi_server_info.html">brapi_server_info()</a></code>.</li>
 <li>

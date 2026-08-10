@@ -68,6 +68,10 @@ Germplasm management, pedigrees, crosses, and seed lots.
   : List Seed Lots
 - [`brapi_search_germplasm()`](https://josh45-source.github.io/brapiR2/reference/brapi_search_germplasm.md)
   : Search Germplasm
+- [`brapi_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_pedigree.md)
+  : List Pedigree Nodes
+- [`brapi_search_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_search_pedigree.md)
+  : Search Pedigree Nodes
 
 ## Phenotyping Module
 
@@ -85,6 +89,10 @@ Observations, variables, traits, and analysis-ready data.
   : List Scales
 - [`brapi_methods()`](https://josh45-source.github.io/brapiR2/reference/brapi_methods.md)
   : List Methods
+- [`brapi_ontologies()`](https://josh45-source.github.io/brapiR2/reference/brapi_ontologies.md)
+  : List Ontologies
+- [`brapi_ontology()`](https://josh45-source.github.io/brapiR2/reference/brapi_ontology.md)
+  : Get a Single Ontology by ID
 - [`brapi_images()`](https://josh45-source.github.io/brapiR2/reference/brapi_images.md)
   : List Images
 - [`brapi_events()`](https://josh45-source.github.io/brapiR2/reference/brapi_events.md)
@@ -117,10 +125,20 @@ helpers.
   : List Reference Sets (Genome Assemblies)
 - [`brapi_allele_matrix()`](https://josh45-source.github.io/brapiR2/reference/brapi_allele_matrix.md)
   : Get Allele Matrix
+- [`brapi_maps()`](https://josh45-source.github.io/brapiR2/reference/brapi_maps.md)
+  : List Genome Maps
+- [`brapi_map()`](https://josh45-source.github.io/brapiR2/reference/brapi_map.md)
+  : Get a Single Genome Map by ID
+- [`brapi_map_linkage_groups()`](https://josh45-source.github.io/brapiR2/reference/brapi_map_linkage_groups.md)
+  : List the Linkage Groups of a Genome Map
+- [`brapi_marker_positions()`](https://josh45-source.github.io/brapiR2/reference/brapi_marker_positions.md)
+  : List Marker Positions
 - [`brapi_search_variants()`](https://josh45-source.github.io/brapiR2/reference/brapi_search_variants.md)
   : Search Variants
 - [`brapi_search_calls()`](https://josh45-source.github.io/brapiR2/reference/brapi_search_calls.md)
   : Search Genotype Calls
+- [`brapi_search_marker_positions()`](https://josh45-source.github.io/brapiR2/reference/brapi_search_marker_positions.md)
+  : Search Marker Positions
 - [`brapi_get_dosage_matrix()`](https://josh45-source.github.io/brapiR2/reference/brapi_get_dosage_matrix.md)
   : Get Dosage Matrix for Genomic Selection
 - [`brapi_get_marker_map()`](https://josh45-source.github.io/brapiR2/reference/brapi_get_marker_map.md)

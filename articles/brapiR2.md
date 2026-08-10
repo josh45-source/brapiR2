@@ -218,38 +218,71 @@ vsets
 #> #   metadataFields <list>
 
 vs_id <- vsets$variantSetDbId[1]
-
-# Get marker chromosome / position map
-markers <- brapi_get_marker_map(con, vs_id)
-markers
-#> # A tibble: 20 × 4
-#>    variantDbId variantName referenceName start
-#>    <chr>       <chr>       <lgl>         <lgl>
-#>  1 variant01   M1          NA            NA   
-#>  2 variant02   M2          NA            NA   
-#>  3 variant03   M3          NA            NA   
-#>  4 variant04   M4          NA            NA   
-#>  5 variant05   M5          NA            NA   
-#>  6 variant06   M6          NA            NA   
-#>  7 variant07   M7          NA            NA   
-#>  8 variant08   M8          NA            NA   
-#>  9 variant09   M9          NA            NA   
-#> 10 variant10   M10         NA            NA   
-#> 11 variant11   M11         NA            NA   
-#> 12 variant12   M12         NA            NA   
-#> 13 variant13   M13         NA            NA   
-#> 14 variant14   M14         NA            NA   
-#> 15 variant15   M15         NA            NA   
-#> 16 variant16   M16         NA            NA   
-#> 17 variant17   M17         NA            NA   
-#> 18 variant18   M18         NA            NA   
-#> 19 variant19   M19         NA            NA   
-#> 20 variant20   M20         NA            NA
 ```
 
-On this server `referenceName` and `start` are not populated for these
-markers (both come back `NA`) — the map’s identity and name columns are
-still real and usable.
+[`brapi_get_marker_map()`](https://josh45-source.github.io/brapiR2/reference/brapi_get_marker_map.md)
+used to read a marker’s chromosome and position off
+[`brapi_variants()`](https://josh45-source.github.io/brapiR2/reference/brapi_variants.md)’s
+`referenceName`/`start` columns. On this server those come back `NA` for
+every variant — and per the BrAPI spec, that is legal: `Variant.start`
+and `Variant.referenceName` place a variant on a reference *assembly*,
+and the spec explicitly allows a server to leave them unset if it has no
+such assembly configured for that variant, rather than treating `NA` as
+an error condition.
+
+This server has simply chosen not to populate assembly coordinates on
+its variants. Positions for the same markers do exist, just under a
+different resource: the **Genome Maps** entity (`/maps`,
+`/markerpositions`) places a marker on a named *map* instead of a
+reference assembly — genetic (measured in cM) or physical (measured in
+bp), per the map’s own `type` and `unit` fields — and the same marker
+can appear on more than one map.
+[`brapi_get_marker_map()`](https://josh45-source.github.io/brapiR2/reference/brapi_get_marker_map.md)
+now reads from there instead:
+
+``` r
+
+# Positions for every variant in the set, wherever they have been placed
+markers <- brapi_get_marker_map(con, variantSetDbId = vs_id)
+#> ℹ Async search started (ID: 73f31e06-243c-43a3-a0f0-96369e96d09d). Polling...
+#> Warning: 14 of 20 variants in "variantset1" have no marker position record; returning
+#> positions for the remaining 6.
+markers
+#> # A tibble: 6 × 8
+#>   variantDbId variantName mapDbId  mapName type  unit  linkageGroupName position
+#>   <chr>       <chr>       <chr>    <chr>   <chr> <chr> <chr>               <int>
+#> 1 variant01   M1          genome_… Primar… Phys… cM    Chromosome 1          200
+#> 2 variant02   M2          genome_… Primar… Phys… cM    Chromosome 1         4000
+#> 3 variant03   M3          genome_… Primar… Phys… cM    Chromosome 1        60000
+#> 4 variant04   M4          genome_… Primar… Phys… cM    Chromosome 2          200
+#> 5 variant05   M5          genome_… Primar… Phys… cM    Chromosome 2         4000
+#> 6 variant06   M6          genome_… Primar… Phys… cM    Chromosome 2        60000
+```
+
+Not every variant in a set is guaranteed to have a map placement. On
+this server, only some of the variant set’s variants have one — the
+warning above states the exact count rather than silently returning a
+shorter tibble. If you already know which map you care about, querying
+it directly skips the variant-set lookup and returns the same shape:
+
+``` r
+
+maps <- brapi_maps(con)
+maps[, c("mapDbId", "mapName", "type", "unit")]
+#> # A tibble: 2 × 4
+#>   mapDbId     mapName             type         unit 
+#>   <chr>       <chr>               <chr>        <chr>
+#> 1 genome_map1 Primary Paw Paw Map Physical Map cM   
+#> 2 genome_map2 Primary Paw Paw Map Physical Map cM
+
+brapi_get_marker_map(con, mapDbId = maps$mapDbId[1])
+#> # A tibble: 3 × 8
+#>   variantDbId variantName mapDbId  mapName type  unit  linkageGroupName position
+#>   <chr>       <chr>       <chr>    <chr>   <chr> <chr> <chr>               <int>
+#> 1 variant01   M1          genome_… Primar… Phys… cM    Chromosome 1          200
+#> 2 variant02   M2          genome_… Primar… Phys… cM    Chromosome 1         4000
+#> 3 variant03   M3          genome_… Primar… Phys… cM    Chromosome 1        60000
+```
 
 ``` r
 
@@ -360,7 +393,7 @@ fetching don’t need authentication).
 cache_dir <- tempfile("brapi_cache_")
 dir.create(cache_dir)
 perf_con <- brapi_cache_enable(con, ttl = 3600, dir = cache_dir)
-#> ✔ Caching enabled at /tmp/RtmpGuYt9Z/brapi_cache_1f2e498a3484 (TTL: 3600s)
+#> ✔ Caching enabled at /tmp/RtmpRcXwK1/brapi_cache_1fe236ecffbd (TTL: 3600s)
 
 # First call: hits the server
 invisible(brapi_programs(perf_con))
@@ -446,9 +479,15 @@ different workflows**.
 | Pipe-friendly | Partial | Yes, all functions follow `f(con, ...)` |
 | Caching | No | Yes, disk-based with TTL |
 | Parallel fetch | No | Via the caller’s own `future` backend |
-| Genotypics | Limited | Full (allele matrix, dosage matrix, marker map) |
-| BrAPI version | v1 + v2 | v2 only |
+| Genotypics | Limited | Allele matrix, dosage matrix, marker map (32/36 BrAPI entities covered overall, read-only) |
 | Authentication | Yes | Yes |
+
+brapiR2 targets BrAPI v2 only, by design - see the “Design History”
+section of
+[DESIGN.md](https://github.com/josh45-source/brapiR2/blob/main/DESIGN.md)
+for why. QBMS’s own BrAPI version support is a separate question from
+this comparison; check QBMS’s own documentation for its current v1/v2
+coverage rather than relying on a claim made here.
 
 ### Same workflow, different style
 

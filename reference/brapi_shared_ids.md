@@ -26,3 +26,11 @@ same names.
 - programDbId:
 
   Character. The unique program identifier.
+
+- mapDbId:
+
+  Character. The unique genome map identifier.
+
+- ontologyDbId:
+
+  Character. The unique ontology identifier.

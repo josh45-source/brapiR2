@@ -82,13 +82,16 @@
 <td>Programs, trials, studies, locations, seasons, lists, people, server info</td>
 </tr><tr><td>Germplasm module</td>
 <td><code>R/germplasm.R</code></td>
-<td>Germplasm records, pedigree, progeny, attributes, crosses, crossing projects, seed lots, germplasm search</td>
+<td>Germplasm records, progeny, attributes, crosses, crossing projects, seed lots, germplasm search; pedigree via both the single-germplasm sub-resource (<code><a href="reference/brapi_germplasm_pedigree.html">brapi_germplasm_pedigree()</a></code>) and the batch Pedigree entity (<code><a href="reference/brapi_pedigree.html">brapi_pedigree()</a></code>, <code><a href="reference/brapi_search_pedigree.html">brapi_search_pedigree()</a></code>)</td>
 </tr><tr><td>Phenotyping module</td>
 <td><code>R/phenotyping.R</code></td>
-<td>Observation units, observations, observation variables, traits, scales, methods, images, events, phenotyping search, and <code><a href="reference/brapi_study_data.html">brapi_study_data()</a></code> (wide-format pivot)</td>
+<td>Observation units, observations, observation variables, traits, scales, methods, ontologies, images, events, phenotyping search, and <code><a href="reference/brapi_study_data.html">brapi_study_data()</a></code> (wide-format pivot)</td>
 </tr><tr><td>Genotyping module</td>
 <td><code>R/genotyping.R</code></td>
 <td>Samples, variants, variant sets, calls, call sets, references, reference sets, the allele matrix, genotyping search, and the <code><a href="reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix()</a></code> / <code><a href="reference/brapi_get_marker_map.html">brapi_get_marker_map()</a></code> convenience functions</td>
+</tr><tr><td>Genome Maps</td>
+<td><code>R/genome_maps.R</code></td>
+<td>Genome maps, linkage groups, and marker positions (<code><a href="reference/brapi_maps.html">brapi_maps()</a></code>, <code><a href="reference/brapi_map.html">brapi_map()</a></code>, <code><a href="reference/brapi_map_linkage_groups.html">brapi_map_linkage_groups()</a></code>, <code><a href="reference/brapi_marker_positions.html">brapi_marker_positions()</a></code>, <code><a href="reference/brapi_search_marker_positions.html">brapi_search_marker_positions()</a></code>) - a distinct entity from Variants: a marker’s position on a named map (genetic or physical) rather than a variant’s position on a reference assembly</td>
 </tr><tr><td>Caching</td>
 <td><code>R/cache.R</code></td>
 <td>
@@ -136,7 +139,7 @@
 </div>
 <div class="section level3">
 <h3 id="genotyping-module-as-the-key-differentiator">Genotyping module as the key differentiator<a class="anchor" aria-label="anchor" href="#genotyping-module-as-the-key-differentiator"></a></h3>
-<p>Core, Germplasm, and Phenotyping coverage exist in other BrAPI clients. Full genotyping support - the allele matrix’s non-standard 2D pagination, and the <code><a href="reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix()</a></code> / <code><a href="reference/brapi_get_marker_map.html">brapi_get_marker_map()</a></code> conversion into genomic-selection-ready numeric matrices does not, and is the main reason <code>brapiR2</code> exists as a separate package rather than a QBMS contribution.</p>
+<p>Core, Germplasm, and Phenotyping coverage exist in other BrAPI clients. Handling the allele matrix’s non-standard 2D pagination, and converting it via <code><a href="reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix()</a></code> / <code><a href="reference/brapi_get_marker_map.html">brapi_get_marker_map()</a></code> into genomic-selection-ready numeric matrices, does not - and is the main reason <code>brapiR2</code> exists as a separate package rather than a QBMS contribution. This is a depth claim about the genotyping data path specifically, not a claim that <code>brapiR2</code> covers the Genotyping module (or any module) exhaustively; see the coverage figures in <a href="#boundaries">Boundaries</a>.</p>
 </div>
 <div class="section level3">
 <h3 id="disk-based-caching-keyed-with-rlanghash">Disk-based caching keyed with <code>rlang::hash()</code>
@@ -152,7 +155,9 @@
 <h2 id="boundaries">Boundaries<a class="anchor" aria-label="anchor" href="#boundaries"></a></h2>
 <p>The current design deliberately leaves several things out of scope:</p>
 <ul><li>
-<strong>Read-only.</strong> <code>brapiR2</code> retrieves BrAPI data; it does not implement the BrAPI <code>POST</code>/<code>PUT</code> endpoints for writing germplasm, observations, or other records back to a server.</li>
+<strong>Read-only.</strong> <code>brapiR2</code> retrieves BrAPI data; it does not implement the BrAPI <code>POST</code>/<code>PUT</code> endpoints for writing germplasm, observations, or other records back to a server. Of the BrAPI v2.1 specification’s 201 endpoints (114 <code>GET</code>, 57 <code>POST</code> - 24 of them search, 30 <code>PUT</code>), the 63 write and update endpoints are out of scope by design, not an oversight.</li>
+<li>
+<strong>Read coverage is intentionally partial, not exhaustive.</strong> <code>brapiR2</code> wraps 32 of the specification’s 36 top-level entities across all four modules, covering 56 of the 138 retrieval (<code>GET</code> + search <code>POST</code>) endpoints - 56 of 123 endpoints within the entities it does cover. Common Crop Names, Germplasm Attribute Values, Plates, and Vendor (lab/vendor order-tracking) currently have no coverage at all. New entities are added as real analysis needs surface, not to chase 100%.</li>
 <li>
 <strong>No analysis.</strong> Dosage matrices and wide phenotyping tibbles are produced in shapes that downstream genomic-selection and analysis packages expect, but <code>brapiR2</code> does not itself fit models, compute BLUPs, or perform GWAS.</li>
 <li>
@@ -162,6 +167,12 @@
 </ul></div>
 <div class="section level2">
 <h2 id="relationship-to-other-tools">Relationship to Other Tools<a class="anchor" aria-label="anchor" href="#relationship-to-other-tools"></a></h2>
+<div class="section level3">
+<h3 id="other-brapi-r-clients">Other BrAPI R clients<a class="anchor" aria-label="anchor" href="#other-brapi-r-clients"></a></h3>
+<p><a href="https://cran.r-project.org/package=QBMS" class="external-link">QBMS</a>, <a href="https://github.com/mverouden/brapir-v2" class="external-link">brapir-v2</a> (see <a href="#design-history">Design History</a>), and <a href="https://github.com/TriticeaeToolbox/BrAPI.R" class="external-link">BrAPI.R</a> (David Waring, Cornell) all target the same specification from different angles. BrAPI.R in particular is complementary rather than competing: its own DESCRIPTION calls it “simple wrapper functions for httr that make it easier to make manual HTTP calls to a BrAPI server”, and its README states plainly that it “does not have any knowledge of the currently supported BrAPI endpoints.” It is a transport layer - callers pass an endpoint path as a string and get back a raw nested list; it supports <code>GET</code>, <code>POST</code>, and <code>PUT</code> (with a <code>version</code> argument covering both BrAPI v1 and v2), plus a two-step search helper and Breedbase-specific functions explicitly outside the BrAPI spec. <code>brapiR2</code> takes the opposite position on the same trade-off: named, individually documented functions per endpoint that always return tibbles, at the cost of needing an explicit function for each entity. The two are usable together rather than as alternatives - and BrAPI.R’s <code>POST</code>/<code>PUT</code> support covers exactly the write operations <code>brapiR2</code> deliberately leaves out (see <a href="#boundaries">Boundaries</a>).</p>
+</div>
+<div class="section level3">
+<h3 id="downstream-analysis-tools">Downstream analysis tools<a class="anchor" aria-label="anchor" href="#downstream-analysis-tools"></a></h3>
 <p><code>brapiR2</code> is designed to sit at the start of a breeding-data analysis pipeline, not to replace the tools downstream of it:</p>
 <ul><li>
 <strong>phenoQC</strong> - phenotypic data cleaning and quality control, consuming the tibbles from <code><a href="reference/brapi_observations.html">brapi_observations()</a></code> / <code><a href="reference/brapi_study_data.html">brapi_study_data()</a></code>.</li>
@@ -172,6 +183,7 @@
 <li>
 <strong>gsbench</strong> - genomic selection model benchmarking, consuming the dosage matrix and phenotyping tibble directly as model inputs.</li>
 </ul><p>In each case, <code>brapiR2</code>’s job ends at “a tidy tibble or matrix retrieved from a BrAPI server”; cleaning, visualization, and modeling are left to packages built for those tasks specifically.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="maintenance-considerations">Maintenance Considerations<a class="anchor" aria-label="anchor" href="#maintenance-considerations"></a></h2>

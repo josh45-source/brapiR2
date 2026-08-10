@@ -270,38 +270,63 @@ allele count.</p>
 <span><span class="co">#&gt; <span style="color: #949494;">#   variantCount &lt;int&gt;, variantSetDbId &lt;chr&gt;, variantSetName &lt;chr&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   metadataFields &lt;list&gt;</span></span></span>
 <span></span>
-<span><span class="va">vs_id</span> <span class="op">&lt;-</span> <span class="va">vsets</span><span class="op">$</span><span class="va">variantSetDbId</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
-<span></span>
-<span><span class="co"># Get marker chromosome / position map</span></span>
-<span><span class="va">markers</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_get_marker_map.html">brapi_get_marker_map</a></span><span class="op">(</span><span class="va">con</span>, <span class="va">vs_id</span><span class="op">)</span></span>
-<span><span class="va">markers</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 20 × 4</span></span></span>
-<span><span class="co">#&gt;    variantDbId variantName referenceName start</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> variant01   M1          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> variant02   M2          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> variant03   M3          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> variant04   M4          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> variant05   M5          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> variant06   M6          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> variant07   M7          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> variant08   M8          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> variant09   M9          <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> variant10   M10         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> variant11   M11         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> variant12   M12         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> variant13   M13         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> variant14   M14         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> variant15   M15         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> variant16   M16         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> variant17   M17         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> variant18   M18         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">19</span> variant19   M19         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span>   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">20</span> variant20   M20         <span style="color: #BB0000;">NA</span>            <span style="color: #BB0000;">NA</span></span></span></code></pre></div>
-<p>On this server <code>referenceName</code> and <code>start</code> are
-not populated for these markers (both come back <code>NA</code>) — the
-map’s identity and name columns are still real and usable.</p>
+<span><span class="va">vs_id</span> <span class="op">&lt;-</span> <span class="va">vsets</span><span class="op">$</span><span class="va">variantSetDbId</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></code></pre></div>
+<p><code><a href="../reference/brapi_get_marker_map.html">brapi_get_marker_map()</a></code> used to read a marker’s
+chromosome and position off <code><a href="../reference/brapi_variants.html">brapi_variants()</a></code>’s
+<code>referenceName</code>/<code>start</code> columns. On this server
+those come back <code>NA</code> for every variant — and per the BrAPI
+spec, that is legal: <code>Variant.start</code> and
+<code>Variant.referenceName</code> place a variant on a reference
+<em>assembly</em>, and the spec explicitly allows a server to leave them
+unset if it has no such assembly configured for that variant, rather
+than treating <code>NA</code> as an error condition.</p>
+<p>This server has simply chosen not to populate assembly coordinates on
+its variants. Positions for the same markers do exist, just under a
+different resource: the <strong>Genome Maps</strong> entity
+(<code>/maps</code>, <code>/markerpositions</code>) places a marker on a
+named <em>map</em> instead of a reference assembly — genetic (measured
+in cM) or physical (measured in bp), per the map’s own <code>type</code>
+and <code>unit</code> fields — and the same marker can appear on more
+than one map. <code><a href="../reference/brapi_get_marker_map.html">brapi_get_marker_map()</a></code> now reads from there
+instead:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Positions for every variant in the set, wherever they have been placed</span></span>
+<span><span class="va">markers</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_get_marker_map.html">brapi_get_marker_map</a></span><span class="op">(</span><span class="va">con</span>, variantSetDbId <span class="op">=</span> <span class="va">vs_id</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Async search started (ID: 73f31e06-243c-43a3-a0f0-96369e96d09d). Polling...</span></span>
+<span><span class="co">#&gt; Warning: 14 of 20 variants in <span style="color: #0000BB;">"variantset1"</span> have no marker position record; returning</span></span>
+<span><span class="co">#&gt; positions for the remaining 6.</span></span>
+<span><span class="va">markers</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
+<span><span class="co">#&gt;   variantDbId variantName mapDbId  mapName type  unit  linkageGroupName position</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> variant01   M1          genome_… Primar… Phys… cM    Chromosome 1          200</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> variant02   M2          genome_… Primar… Phys… cM    Chromosome 1         <span style="text-decoration: underline;">4</span>000</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> variant03   M3          genome_… Primar… Phys… cM    Chromosome 1        <span style="text-decoration: underline;">60</span>000</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> variant04   M4          genome_… Primar… Phys… cM    Chromosome 2          200</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> variant05   M5          genome_… Primar… Phys… cM    Chromosome 2         <span style="text-decoration: underline;">4</span>000</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> variant06   M6          genome_… Primar… Phys… cM    Chromosome 2        <span style="text-decoration: underline;">60</span>000</span></span></code></pre></div>
+<p>Not every variant in a set is guaranteed to have a map placement. On
+this server, only some of the variant set’s variants have one — the
+warning above states the exact count rather than silently returning a
+shorter tibble. If you already know which map you care about, querying
+it directly skips the variant-set lookup and returns the same shape:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">maps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_maps.html">brapi_maps</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+<span><span class="va">maps</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mapDbId"</span>, <span class="st">"mapName"</span>, <span class="st">"type"</span>, <span class="st">"unit"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 4</span></span></span>
+<span><span class="co">#&gt;   mapDbId     mapName             type         unit </span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> genome_map1 Primary Paw Paw Map Physical Map cM   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> genome_map2 Primary Paw Paw Map Physical Map cM</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/brapi_get_marker_map.html">brapi_get_marker_map</a></span><span class="op">(</span><span class="va">con</span>, mapDbId <span class="op">=</span> <span class="va">maps</span><span class="op">$</span><span class="va">mapDbId</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 8</span></span></span>
+<span><span class="co">#&gt;   variantDbId variantName mapDbId  mapName type  unit  linkageGroupName position</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> variant01   M1          genome_… Primar… Phys… cM    Chromosome 1          200</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> variant02   M2          genome_… Primar… Phys… cM    Chromosome 1         <span style="text-decoration: underline;">4</span>000</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> variant03   M3          genome_… Primar… Phys… cM    Chromosome 1        <span style="text-decoration: underline;">60</span>000</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get dosage matrix for genomic selection (samples x markers, values 0/1/2)</span></span>
 <span><span class="va">dosage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix</a></span><span class="op">(</span><span class="va">con</span>, <span class="va">vs_id</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Fetching allele matrix for variant set <span style="color: #0000BB;">"variantset1"</span>...</span></span>
@@ -321,7 +346,7 @@ map’s identity and name columns are still real and usable.</p>
 <p>Most production BrAPI servers require authentication. These calls
 need your own server and credentials, so they are shown but not run
 here.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Username/password login - used by BreedBase, BMS, and Germinate</span></span>
 <span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_connection.html">brapi_connection</a></span><span class="op">(</span><span class="st">"https://my-breedbase.org"</span><span class="op">)</span></span>
 <span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_login.html">brapi_login</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"username"</span>, <span class="st">"password"</span><span class="op">)</span></span>
@@ -356,7 +381,7 @@ all projects, or in the project directory for that project only) as
 <p>R reads <code>.Renviron</code> automatically at startup, so after
 restarting your R session the values are available via
 <code><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv()</a></code>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_connection.html">brapi_connection</a></span><span class="op">(</span><span class="st">"https://my-breedbase.org"</span><span class="op">)</span></span>
 <span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_login.html">brapi_login</a></span><span class="op">(</span></span>
 <span>  <span class="va">con</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"BRAPI_USERNAME"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"BRAPI_PASSWORD"</span><span class="op">)</span></span>
@@ -372,7 +397,7 @@ plaintext file, use <a href="https://cran.r-project.org/package=keyring" class="
 <code>key_get()</code> retrieves it later, in this session or a future
 one, without the value ever appearing in your script or your R
 history:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run once, interactively - prompts for the password and stores it</span></span>
 <span><span class="fu">keyring</span><span class="fu">::</span><span class="fu"><a href="https://keyring.r-lib.org/reference/key_get.html" class="external-link">key_set</a></span><span class="op">(</span><span class="st">"brapiR2_my-breedbase"</span>, username <span class="op">=</span> <span class="st">"my_username"</span><span class="op">)</span></span>
 <span></span>
@@ -393,12 +418,12 @@ share.</p>
 </h2>
 <p>These run against the public test server again (caching and parallel
 fetching don’t need authentication).</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Enable caching — repeated calls within the TTL return instantly</span></span>
 <span><span class="va">cache_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"brapi_cache_"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">cache_dir</span><span class="op">)</span></span>
 <span><span class="va">perf_con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_cache_enable.html">brapi_cache_enable</a></span><span class="op">(</span><span class="va">con</span>, ttl <span class="op">=</span> <span class="fl">3600</span>, dir <span class="op">=</span> <span class="va">cache_dir</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Caching enabled at <span style="color: #0000BB;">/tmp/RtmpGuYt9Z/brapi_cache_1f2e498a3484</span> (TTL: 3600s)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Caching enabled at <span style="color: #0000BB;">/tmp/RtmpRcXwK1/brapi_cache_1fe236ecffbd</span> (TTL: 3600s)</span></span>
 <span></span>
 <span><span class="co"># First call: hits the server</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="fu"><a href="../reference/brapi_programs.html">brapi_programs</a></span><span class="op">(</span><span class="va">perf_con</span><span class="op">)</span><span class="op">)</span></span>
@@ -429,7 +454,7 @@ and can silently replace a plan you configured deliberately (a specific
 worker count, a cluster spanning several machines, callr workers for
 extra isolation). So it’s your call to make, before this function
 runs:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="va"><a href="https://future.futureverse.org/reference/multisession.html" class="external-link">multisession</a></span>, workers <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Fetch study data from multiple studies in parallel (all studies on the</span></span>
@@ -455,7 +480,7 @@ the parallel-fetch mechanics, are real.</p>
 <p>Since you set the plan, shutting the workers back down when you’re
 done with them is your responsibility too, not something the package
 does for you on exit:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="va"><a href="https://future.futureverse.org/reference/sequential.html" class="external-link">sequential</a></span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
@@ -507,27 +532,28 @@ tools designed for different workflows</strong>.</p>
 <tr class="even">
 <td>Genotypics</td>
 <td>Limited</td>
-<td>Full (allele matrix, dosage matrix, marker map)</td>
+<td>Allele matrix, dosage matrix, marker map (32/36 BrAPI entities
+covered overall, read-only)</td>
 </tr>
 <tr class="odd">
-<td>BrAPI version</td>
-<td>v1 + v2</td>
-<td>v2 only</td>
-</tr>
-<tr class="even">
 <td>Authentication</td>
 <td>Yes</td>
 <td>Yes</td>
 </tr>
 </tbody>
 </table>
+<p>brapiR2 targets BrAPI v2 only, by design - see the “Design History”
+section of <a href="https://github.com/josh45-source/brapiR2/blob/main/DESIGN.md" class="external-link">DESIGN.md</a>
+for why. QBMS’s own BrAPI version support is a separate question from
+this comparison; check QBMS’s own documentation for its current v1/v2
+coverage rather than relying on a claim made here.</p>
 <div class="section level3">
 <h3 id="same-workflow-different-style">Same workflow, different style<a class="anchor" aria-label="anchor" href="#same-workflow-different-style"></a>
 </h3>
 <p>The examples below use a private BreedBase-style server and
 credentials, so they are illustrative only.</p>
 <p><strong>QBMS</strong> — navigational, stateful:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://icarda.github.io/QBMS/" class="external-link">QBMS</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">set_crop</span><span class="op">(</span><span class="st">"Wheat"</span><span class="op">)</span></span>
@@ -544,7 +570,7 @@ credentials, so they are illustrative only.</p>
 <span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">get_study_data</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><strong>brapiR2</strong> — functional, pipe-friendly:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/josh45-source/brapiR2" class="external-link">brapiR2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>

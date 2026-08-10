@@ -24,6 +24,14 @@ brapi_scales(con, ...)
 
 A tibble with one row per scale definition.
 
+## See also
+
+[`brapi_ontologies()`](https://josh45-source.github.io/brapiR2/reference/brapi_ontologies.md)
+and
+[`brapi_ontology()`](https://josh45-source.github.io/brapiR2/reference/brapi_ontology.md)
+to resolve the ontology a scale's `ontologyDbId`/`ontologyReference`
+points to.
+
 ## Examples
 
 ``` r

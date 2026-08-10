@@ -16,8 +16,8 @@
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="A Tidyverse-Native Client for the BrAPI v2 (Breeding API) Specification">
-<meta name="description" content="Provides pipe-friendly, stateless access to every endpoint in the Breeding API (BrAPI) v2.1 specification, an open community standard for plant breeding data interchange maintained by the BrAPI project &lt;https://brapi.org&gt;. Covers all four BrAPI modules, Core, Germplasm, Phenotyping, and Genotyping, returning tidy tibbles ready for analysis. Features include automatic pagination, async search handling, response caching, parallel batch fetching, and convenience functions for genomic selection workflows (e.g. dosage matrix extraction). Designed for plant breeders and bioinformaticians who need programmatic access to BreedBase, BMS, EBS, GIGWA, Germinate, and any BrAPI-compliant server.">
-<meta property="og:description" content="Provides pipe-friendly, stateless access to every endpoint in the Breeding API (BrAPI) v2.1 specification, an open community standard for plant breeding data interchange maintained by the BrAPI project &lt;https://brapi.org&gt;. Covers all four BrAPI modules, Core, Germplasm, Phenotyping, and Genotyping, returning tidy tibbles ready for analysis. Features include automatic pagination, async search handling, response caching, parallel batch fetching, and convenience functions for genomic selection workflows (e.g. dosage matrix extraction). Designed for plant breeders and bioinformaticians who need programmatic access to BreedBase, BMS, EBS, GIGWA, Germinate, and any BrAPI-compliant server.">
+<meta name="description" content="Provides pipe-friendly, stateless read access to the Breeding API (BrAPI) v2.1 specification, an open community standard for plant breeding data interchange maintained by the BrAPI project &lt;https://brapi.org&gt;. Wraps 32 of the 36 BrAPI v2.1 entities across all four modules, Core, Germplasm, Phenotyping, and Genotyping, covering 56 of the specifications 138 retrieval (GET and search) endpoints and returning tidy tibbles ready for analysis. Write and update endpoints are out of scope by design. Features include automatic pagination, async search handling, response caching, parallel batch fetching, and convenience functions for genomic selection workflows (e.g. dosage matrix extraction). Designed for plant breeders and bioinformaticians who need programmatic access to BreedBase, BMS, EBS, GIGWA, Germinate, and any BrAPI'-compliant server.">
+<meta property="og:description" content="Provides pipe-friendly, stateless read access to the Breeding API (BrAPI) v2.1 specification, an open community standard for plant breeding data interchange maintained by the BrAPI project &lt;https://brapi.org&gt;. Wraps 32 of the 36 BrAPI v2.1 entities across all four modules, Core, Germplasm, Phenotyping, and Genotyping, covering 56 of the specifications 138 retrieval (GET and search) endpoints and returning tidy tibbles ready for analysis. Write and update endpoints are out of scope by design. Features include automatic pagination, async search handling, response caching, parallel batch fetching, and convenience functions for genomic selection workflows (e.g. dosage matrix extraction). Designed for plant breeders and bioinformaticians who need programmatic access to BreedBase, BMS, EBS, GIGWA, Germinate, and any BrAPI'-compliant server.">
 <meta property="og:image" content="https://josh45-source.github.io/brapiR2/logo.png">
 </head>
 <body>
@@ -67,7 +67,7 @@
 </div>
 <!-- badges: start -->
 
-<p><strong>brapiR2</strong> is a tidyverse-native, stateless R client for the <a href="https://brapi.org/" class="external-link">BrAPI v2</a> (Breeding API) specification. It provides pipe-friendly access to <strong>all four BrAPI modules</strong> - Core, Germplasm, Phenotyping, and Genotyping - returning tidy tibbles ready for analysis.</p>
+<p><strong>brapiR2</strong> is a tidyverse-native, stateless R client for the <a href="https://brapi.org/" class="external-link">BrAPI v2</a> (Breeding API) specification. It provides pipe-friendly, read-only access across all four BrAPI modules - Core, Germplasm, Phenotyping, and Genotyping - wrapping 32 of the specification’s 36 entities (56 of 138 retrieval endpoints) and returning tidy tibbles ready for analysis.</p>
 <p>Developed by <strong>Joash Joshua Ayo</strong> (<a href="mailto:joashjoshua789@gmail.com" class="email">joashjoshua789@gmail.com</a>).</p>
 <div class="section level2">
 <h2 id="why-brapir2">Why brapiR2?<a class="anchor" aria-label="anchor" href="#why-brapir2"></a>
@@ -91,7 +91,7 @@
 </tr>
 <tr>
 <td>BrAPI v2 coverage</td>
-<td>Full spec (all 4 modules)</td>
+<td>32/36 entities, all 4 modules, read-only</td>
 <td>Partial (phenotyping focus)</td>
 </tr>
 <tr>
@@ -118,6 +118,7 @@
 </table>
 <p><strong>brapiR2 complements <a href="https://cran.r-project.org/package=QBMS" class="external-link">QBMS</a></strong> - use QBMS for interactive exploration, use brapiR2 for programmatic pipelines and custom tooling.</p>
 <p><a href="https://github.com/mverouden/brapir-v2" class="external-link">brapir-v2</a> is another R client that, like brapiR2, targets the BrAPI v2 specification directly rather than v1. Its own README describes it as still under development, and the repository has had no commits in roughly four years (last pushed April 2022) - it does not appear to be actively maintained.</p>
+<p><a href="https://github.com/TriticeaeToolbox/BrAPI.R" class="external-link">BrAPI.R</a> (David Waring, Cornell) is a different kind of tool entirely, and complementary rather than competing: its own DESCRIPTION calls it “simple wrapper functions for httr that make it easier to make manual HTTP calls to a BrAPI server”, and its README is explicit that it “does not have any knowledge of the currently supported BrAPI endpoints”. It’s a transport layer - callers pass endpoint paths as strings (<code>GET</code>, <code>POST</code>, and <code>PUT</code> are all supported, plus a two-step search helper) and get back raw nested lists, with a version argument that switches between BrAPI v1 and v2. It also ships Breedbase-specific functions explicitly outside the BrAPI spec. brapiR2 takes the opposite approach - named per-endpoint functions returning tibbles - and covers less ground on writes: BrAPI.R’s <code>POST</code>/<code>PUT</code> support covers exactly the write operations brapiR2 deliberately omits.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -173,24 +174,28 @@
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">germplasmDbId</span>, <span class="va">germplasmName</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Get marker positions for a genotyping dataset</span></span>
-<span><span class="fu"><a href="reference/brapi_get_marker_map.html">brapi_get_marker_map</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"my_variantset"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">referenceName</span> <span class="op">==</span> <span class="st">"chr1"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">start</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Get marker positions for a genotyping dataset - from the Genome Maps</span></span>
+<span><span class="co"># entity (a marker's position on a named map), not from Variant's own</span></span>
+<span><span class="co"># assembly coordinates, which many servers leave unpopulated</span></span>
+<span><span class="fu"><a href="reference/brapi_get_marker_map.html">brapi_get_marker_map</a></span><span class="op">(</span><span class="va">con</span>, variantSetDbId <span class="op">=</span> <span class="st">"my_variantset"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">linkageGroupName</span> <span class="op">==</span> <span class="st">"chr1"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">position</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="supported-brapi-modules">Supported BrAPI Modules<a class="anchor" aria-label="anchor" href="#supported-brapi-modules"></a>
 </h2>
+<p>brapiR2 wraps 32 of the 36 BrAPI v2.1 entities (56 of 138 retrieval endpoints) across all four modules:</p>
 <ul>
 <li>
 <strong>Core</strong>: Programs, Trials, Studies, Locations, Seasons, Lists, People</li>
 <li>
-<strong>Germplasm</strong>: Germplasm, Pedigrees, Progeny, Attributes, Crosses, Seed Lots</li>
+<strong>Germplasm</strong>: Germplasm, Progeny, Attributes, Crosses, Seed Lots, and Pedigree - both single-germplasm (<code><a href="reference/brapi_germplasm_pedigree.html">brapi_germplasm_pedigree()</a></code>) and batch/tree retrieval across many germplasm at once (<code><a href="reference/brapi_pedigree.html">brapi_pedigree()</a></code>, <code><a href="reference/brapi_search_pedigree.html">brapi_search_pedigree()</a></code>)</li>
 <li>
-<strong>Phenotyping</strong>: Observation Units, Observations, Variables, Traits, Scales, Methods, Images, Events</li>
+<strong>Phenotyping</strong>: Observation Units, Observations, Variables, Traits, Scales, Methods, Ontologies, Images, Events</li>
 <li>
-<strong>Genotyping</strong>: Samples, Variants, Variant Sets, Calls, Call Sets, References, Allele Matrix</li>
+<strong>Genotyping</strong>: Samples, Variants, Variant Sets, Calls, Call Sets, References, Allele Matrix, Genome Maps</li>
 </ul>
+<p>Not yet covered: Common Crop Names, Germplasm Attribute Values, Plates, and Vendor (lab/vendor order-tracking endpoints). brapiR2 is read-only by design - it does not implement BrAPI’s <code>POST</code>/<code>PUT</code> write endpoints.</p>
 </div>
 <div class="section level2">
 <h2 id="authentication">Authentication<a class="anchor" aria-label="anchor" href="#authentication"></a>

@@ -34,10 +34,17 @@
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_locations.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_login.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_login_oauth2.html</loc></url>
+<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_map.html</loc></url>
+<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_map_linkage_groups.html</loc></url>
+<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_maps.html</loc></url>
+<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_marker_positions.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_methods.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_observation_units.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_observation_variables.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_observations.html</loc></url>
+<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_ontologies.html</loc></url>
+<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_ontology.html</loc></url>
+<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_pedigree.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_people.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_ping.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_program.html</loc></url>
@@ -48,7 +55,9 @@
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_scales.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_search_calls.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_search_germplasm.html</loc></url>
+<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_search_marker_positions.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_search_observations.html</loc></url>
+<url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_search_pedigree.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_search_variables.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_search_variants.html</loc></url>
 <url><loc>https://josh45-source.github.io/brapiR2/reference/brapi_seasons.html</loc></url>

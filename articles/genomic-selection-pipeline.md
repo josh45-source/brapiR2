@@ -92,31 +92,26 @@ vsets
 
 vs_id <- vsets$variantSetDbId[1]
 
-markers <- brapi_get_marker_map(con, vs_id)
-markers # referenceName/start are NA on this server; identity columns are real
-#> # A tibble: 20 × 4
-#>    variantDbId variantName referenceName start
-#>    <chr>       <chr>       <lgl>         <lgl>
-#>  1 variant01   M1          NA            NA   
-#>  2 variant02   M2          NA            NA   
-#>  3 variant03   M3          NA            NA   
-#>  4 variant04   M4          NA            NA   
-#>  5 variant05   M5          NA            NA   
-#>  6 variant06   M6          NA            NA   
-#>  7 variant07   M7          NA            NA   
-#>  8 variant08   M8          NA            NA   
-#>  9 variant09   M9          NA            NA   
-#> 10 variant10   M10         NA            NA   
-#> 11 variant11   M11         NA            NA   
-#> 12 variant12   M12         NA            NA   
-#> 13 variant13   M13         NA            NA   
-#> 14 variant14   M14         NA            NA   
-#> 15 variant15   M15         NA            NA   
-#> 16 variant16   M16         NA            NA   
-#> 17 variant17   M17         NA            NA   
-#> 18 variant18   M18         NA            NA   
-#> 19 variant19   M19         NA            NA   
-#> 20 variant20   M20         NA            NA
+## brapi_variants()'s referenceName/start are NA on this server (the BrAPI
+## spec makes them optional - they place a variant on a reference
+## assembly, and this server has none configured). brapi_get_marker_map()
+## instead reads the Genome Maps entity (/markerpositions), which places
+## each marker on a named map (genetic, cM, or physical, bp) and is
+## populated here.
+markers <- brapi_get_marker_map(con, variantSetDbId = vs_id)
+#> ℹ Async search started (ID: e28c1d0c-ff05-451e-bbf6-a0293b6b5f13). Polling...
+#> Warning: 14 of 20 variants in "variantset1" have no marker position record; returning
+#> positions for the remaining 6.
+markers
+#> # A tibble: 6 × 8
+#>   variantDbId variantName mapDbId  mapName type  unit  linkageGroupName position
+#>   <chr>       <chr>       <chr>    <chr>   <chr> <chr> <chr>               <int>
+#> 1 variant01   M1          genome_… Primar… Phys… cM    Chromosome 1          200
+#> 2 variant02   M2          genome_… Primar… Phys… cM    Chromosome 1         4000
+#> 3 variant03   M3          genome_… Primar… Phys… cM    Chromosome 1        60000
+#> 4 variant04   M4          genome_… Primar… Phys… cM    Chromosome 2          200
+#> 5 variant05   M5          genome_… Primar… Phys… cM    Chromosome 2         4000
+#> 6 variant06   M6          genome_… Primar… Phys… cM    Chromosome 2        60000
 
 dosage <- brapi_get_dosage_matrix(con, vs_id)
 #> ℹ Fetching allele matrix for variant set "variantset1"...
@@ -217,7 +212,7 @@ dosage_priv <- brapi_get_dosage_matrix(con_priv, "vs001")
 dim(dosage_priv)
 
 # Get marker map for downstream QTL / Manhattan plots
-markers_priv <- brapi_get_marker_map(con_priv, "vs001")
+markers_priv <- brapi_get_marker_map(con_priv, variantSetDbId = "vs001")
 markers_priv
 ```
 

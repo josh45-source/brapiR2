@@ -24,6 +24,14 @@ brapi_traits(con, ...)
 
 A tibble with one row per trait.
 
+## See also
+
+[`brapi_ontologies()`](https://josh45-source.github.io/brapiR2/reference/brapi_ontologies.md)
+and
+[`brapi_ontology()`](https://josh45-source.github.io/brapiR2/reference/brapi_ontology.md)
+to resolve the ontology a trait's `ontologyDbId`/`ontologyReference`
+points to.
+
 ## Examples
 
 ``` r
