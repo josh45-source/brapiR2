@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/josh45-source/brapiR2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/josh45-source/brapiR2/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Status at rOpenSci Software Peer Review](https://badges.ropensci.org/792_status.svg)](https://github.com/ropensci/software-review/issues/792)
 <!-- badges: end -->
 
 **brapiR2** is a tidyverse-native, stateless R client for the [BrAPI v2](https://brapi.org/) (Breeding API) specification. It provides pipe-friendly, read-only access across all four BrAPI modules - Core, Germplasm, Phenotyping, and Genotyping - wrapping 32 of the specification's 36 entities (56 of 138 retrieval endpoints) and returning tidy tibbles ready for analysis.

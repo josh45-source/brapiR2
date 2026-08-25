@@ -8,6 +8,8 @@
 [![R-CMD-check](https://github.com/josh45-source/brapiR2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/josh45-source/brapiR2/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Status at rOpenSci Software Peer
+Review](https://badges.ropensci.org/792_status.svg)](https://github.com/ropensci/software-review/issues/792)
 <!-- badges: end -->
 
 **brapiR2** is a tidyverse-native, stateless R client for the [BrAPI
