@@ -34,9 +34,9 @@ brapi_germplasm(con)
 #> # A tibble: 3 × 32
 #>   additionalInfo   externalReferences accessionNumber acquisitionDate
 #>   <list>           <list>             <chr>           <chr>          
-#> 1 <named list [1]> <list [1]>         A0000002        2000-04-09     
-#> 2 <named list [1]> <list [1]>         A0000003        2000-04-09     
-#> 3 <named list [1]> <list [1]>         A0000001        2000-04-09     
+#> 1 <named list [1]> <list [1]>         A0000001        2000-04-09     
+#> 2 <named list [1]> <list [1]>         A0000002        2000-04-09     
+#> 3 <named list [1]> <list [1]>         A0000003        2000-04-09     
 #> # ℹ 28 more variables: biologicalStatusOfAccessionCode <chr>,
 #> #   biologicalStatusOfAccessionDescription <chr>, breedingMethodDbId <chr>,
 #> #   breedingMethodName <chr>, collection <chr>, commonCropName <chr>,
