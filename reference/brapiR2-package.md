@@ -26,5 +26,19 @@ Useful links:
 
 ## Author
 
-**Maintainer**: Joash Joshua Ayo <joashjoshua789@gmail.com>
-([ORCID](https://orcid.org/0009-0007-1642-0172))
+**Maintainer**: Joash Joshua Ayo <joashjoshua789@gmail.com> \[copyright
+holder\]
+
+Authors:
+
+- Joash Joshua Ayo <joashjoshua789@gmail.com> \[copyright holder\]
+
+Other contributors:
+
+- David Waring (David reviewed the package (v. 0.1.0) for rOpenSci, see
+  \<https://github.com/ropensci/software-review/issues/792\>)
+  \[reviewer\]
+
+- Jenna Hershberger (Jenna reviewed the package (v. 0.1.0) for rOpenSci,
+  see \<https://github.com/ropensci/software-review/issues/792\>)
+  \[reviewer\]

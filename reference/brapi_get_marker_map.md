@@ -73,7 +73,7 @@ brapi_get_marker_map(con, mapDbId = "genome_map1")
 #> 2 variant02   M2          genome_… Primar… Phys… cM    Chromosome 1         4000
 #> 3 variant03   M3          genome_… Primar… Phys… cM    Chromosome 1        60000
 brapi_get_marker_map(con, variantSetDbId = "variantset1")
-#> ℹ Async search started (ID: 274d6d70-1cc7-4a66-a197-c68f1109b9c0). Polling...
+#> ℹ Async search started (ID: d039a961-b8a0-4919-91a5-21dd04c0cfee). Polling...
 #> Warning: 14 of 20 variants in "variantset1" have no marker position record; returning
 #> positions for the remaining 6.
 #> # A tibble: 6 × 8

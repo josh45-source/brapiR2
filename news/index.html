@@ -59,7 +59,11 @@
 <div class="section level4">
 <h4 id="deprecated-development-version">Deprecated<a class="anchor" aria-label="anchor" href="#deprecated-development-version"></a></h4>
 <ul><li>
-<code><a href="../reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code> no longer sets or restores a <code>future</code> plan itself. Per the future package’s best-practices vignette, the parallel backend is now the caller’s choice: call <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">future::plan()</a></code> before calling <code><a href="../reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code> to fetch in parallel. The <code>.workers</code> argument is deprecated - supplying it now emits a warning and has no effect.</li>
+<p><code><a href="../reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code> no longer sets or restores a <code>future</code> plan itself. Per the future package’s best-practices vignette, the parallel backend is now the caller’s choice: call <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">future::plan()</a></code> before calling <code><a href="../reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code> to fetch in parallel. The <code>.workers</code> argument is deprecated - supplying it now emits a warning and has no effect.</p>
+<h4 id="documentation">Documentation</h4>
+</li>
+<li><p>Added <code>LICENSE.md</code> with the full MIT licence text, which was missing from the repository, so GitHub had no licence to detect and anyone opening <code>LICENSE</code> found no grant of rights. The copyright holder is now named explicitly rather than “brapiR2 authors” (<a href="https://github.com/dwaring87" class="external-link">@dwaring87</a>, ropensci/software-review#792).</p></li>
+<li><p><a href="https://github.com/dwaring87" class="external-link">@dwaring87</a> and <a href="https://github.com/jmh579" class="external-link">@jmh579</a> are recorded in <code>DESCRIPTION</code> with the <code>rev</code> role for their rOpenSci reviews (ropensci/software-review#792).</p></li>
 </ul></div>
 <div class="section level4">
 <h4 id="testing-development-version">Testing<a class="anchor" aria-label="anchor" href="#testing-development-version"></a></h4>

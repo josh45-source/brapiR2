@@ -2,8 +2,15 @@
 
 ## Authors
 
-- **Joash Joshua Ayo**. Author, maintainer.
-  [](https://orcid.org/0009-0007-1642-0172)
+- **Joash Joshua Ayo**. Author, maintainer, copyright holder.
+
+- **David Waring**. Reviewer.  
+  David reviewed the package (v. 0.1.0) for rOpenSci, see
+  \<<https://github.com/ropensci/software-review/issues/792>\>
+
+- **Jenna Hershberger**. Reviewer.  
+  Jenna reviewed the package (v. 0.1.0) for rOpenSci, see
+  \<<https://github.com/ropensci/software-review/issues/792>\>
 
 ## Citation
 

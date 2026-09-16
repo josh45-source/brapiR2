@@ -1,4 +1,4 @@
 # License
 
     YEAR: 2026
-    COPYRIGHT HOLDER: brapiR2 authors
+    COPYRIGHT HOLDER: Joash Joshua Ayo

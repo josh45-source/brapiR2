@@ -82,6 +82,20 @@
   to fetch in parallel. The `.workers` argument is deprecated -
   supplying it now emits a warning and has no effect.
 
+  #### Documentation
+
+- Added `LICENSE.md` with the full MIT licence text, which was missing
+  from the repository, so GitHub had no licence to detect and anyone
+  opening `LICENSE` found no grant of rights. The copyright holder is
+  now named explicitly rather than “brapiR2 authors”
+  ([@dwaring87](https://github.com/dwaring87),
+  ropensci/software-review#792).
+
+- [@dwaring87](https://github.com/dwaring87) and
+  [@jmh579](https://github.com/jmh579) are recorded in `DESCRIPTION`
+  with the `rev` role for their rOpenSci reviews
+  (ropensci/software-review#792).
+
 #### Testing
 
 - Substantially expanded the mocked and live-server integration test
