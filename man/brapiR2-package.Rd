@@ -20,7 +20,18 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Joash Joshua Ayo \email{joashjoshua789@gmail.com} (\href{https://orcid.org/0009-0007-1642-0172}{ORCID})
+\strong{Maintainer}: Joash Joshua Ayo \email{joashjoshua789@gmail.com} [copyright holder]
+
+Authors:
+\itemize{
+  \item Joash Joshua Ayo \email{joashjoshua789@gmail.com} [copyright holder]
+}
+
+Other contributors:
+\itemize{
+  \item David Waring (David reviewed the package (v. 0.1.0) for rOpenSci, see <https://github.com/ropensci/software-review/issues/792>) [reviewer]
+  \item Jenna Hershberger (Jenna reviewed the package (v. 0.1.0) for rOpenSci, see <https://github.com/ropensci/software-review/issues/792>) [reviewer]
+}
 
 }
 \keyword{internal}

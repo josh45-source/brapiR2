@@ -1,9 +1,14 @@
 Package: brapiR2
 Title: A Tidyverse-Native Client for the 'BrAPI' v2 (Breeding API) Specification
 Version: 0.1.0
-Authors@R: 
-    person("Joash Joshua", "Ayo", , "joashjoshua789@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0009-0007-1642-0172"))
+Authors@R: c(
+    person("Joash Joshua", "Ayo", , "joashjoshua789@gmail.com",
+           role = c("aut", "cre", "cph")),
+    person("David", "Waring", role = "rev",
+           comment = "David reviewed the package (v. 0.1.0) for rOpenSci, see <https://github.com/ropensci/software-review/issues/792>"),
+    person("Jenna", "Hershberger", role = "rev",
+           comment = "Jenna reviewed the package (v. 0.1.0) for rOpenSci, see <https://github.com/ropensci/software-review/issues/792>")
+    )
 Description: Provides pipe-friendly, stateless read access to the Breeding
     API ('BrAPI') v2.1 specification, an open community standard for plant
     breeding data interchange maintained by the BrAPI project
@@ -26,7 +31,6 @@ Language: en-US
 Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 4.1.0)
-RoxygenNote: 7.3.3
 Imports:
     cli (>= 3.6.0),
     dplyr (>= 1.1.0),
@@ -51,3 +55,4 @@ Suggests:
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Config/Needs/website: rmarkdown, AlphaSimR, AGHmatrix, BGLR, rrBLUP, sommer, metan, lme4
+Config/roxygen2/version: 8.1.0
