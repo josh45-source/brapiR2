@@ -8,6 +8,7 @@ brapi_connection(
   url,
   token = NULL,
   version = "v2",
+  path = "brapi",
   page_size = 1000L,
   timeout = 120
 )
@@ -21,6 +22,10 @@ If NULL, you can authenticate later with \code{\link[=brapi_login]{brapi_login()
 \code{\link[=brapi_login_oauth2]{brapi_login_oauth2()}}.}
 
 \item{version}{Character. BrAPI version path segment. Default \code{"v2"}.}
+
+\item{path}{Character. URL path segment before the version, for servers
+that do not serve BrAPI at \verb{/brapi/}. Default \code{"brapi"}. GRIN-Global
+instances, for example, use \code{"gringlobal/brapi"}.}
 
 \item{page_size}{Integer. Number of records per page for paginated requests.
 Default 1000.}
@@ -42,5 +47,9 @@ con
 
 # Connect with an existing token
 con <- brapi_connection("https://my-breedbase.org", token = "my_token_here")
+
+# Connect to a server that serves BrAPI under a different path
+con <- brapi_connection("https://npgsweb.ars-grin.gov",
+                        path = "gringlobal/brapi")
 
 }

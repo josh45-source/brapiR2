@@ -70,3 +70,34 @@ test_that("print.brapi_con shows authenticated and cache-enabled status", {
   expect_true(grepl("authenticated", full_output, fixed = TRUE))
   expect_true(grepl("enabled", full_output, fixed = TRUE))
 })
+
+test_that("brapi_connection defaults path to brapi and stores a custom one", {
+  con <- brapi_connection("https://test-server.brapi.org")
+  expect_identical(con$path, "brapi")
+
+  grin <- brapi_connection("https://npgsweb.ars-grin.gov",
+                           path = "gringlobal/brapi")
+  expect_identical(grin$path, "gringlobal/brapi")
+})
+
+test_that("brapi_connection strips leading and trailing slashes from path", {
+  con <- brapi_connection("https://example.org", path = "/gringlobal/brapi/")
+  expect_identical(con$path, "gringlobal/brapi")
+})
+
+test_that("brapi_connection rejects an invalid path", {
+  expect_error(brapi_connection("https://example.org", path = ""), "non-empty")
+  expect_error(brapi_connection("https://example.org", path = 123), "character")
+})
+
+test_that("print.brapi_con shows the path only when it is not the default", {
+  con <- brapi_connection("https://example.org")
+  out <- testthat::evaluate_promise(print(con))
+  full <- paste(c(out$output, out$messages), collapse = "\n")
+  expect_false(grepl("Path:", full, fixed = TRUE))
+
+  grin <- brapi_connection("https://example.org", path = "gringlobal/brapi")
+  out2 <- testthat::evaluate_promise(print(grin))
+  full2 <- paste(c(out2$output, out2$messages), collapse = "\n")
+  expect_true(grepl("gringlobal/brapi", full2, fixed = TRUE))
+})

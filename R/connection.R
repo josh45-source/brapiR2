@@ -10,6 +10,9 @@
 #'   If NULL, you can authenticate later with [brapi_login()] or
 #'   [brapi_login_oauth2()].
 #' @param version Character. BrAPI version path segment. Default `"v2"`.
+#' @param path Character. URL path segment before the version, for servers
+#'   that do not serve BrAPI at `/brapi/`. Default `"brapi"`. GRIN-Global
+#'   instances, for example, use `"gringlobal/brapi"`.
 #' @param page_size Integer. Number of records per page for paginated requests.
 #'   Default 1000.
 #' @param timeout Numeric. Request timeout in seconds. Default 120.
@@ -24,16 +27,26 @@
 #' # Connect with an existing token
 #' con <- brapi_connection("https://my-breedbase.org", token = "my_token_here")
 #'
+#' # Connect to a server that serves BrAPI under a different path
+#' con <- brapi_connection("https://npgsweb.ars-grin.gov",
+#'                         path = "gringlobal/brapi")
+#'
 #' @export
 brapi_connection <- function(url,
                              token = NULL,
                              version = "v2",
+                             path = "brapi",
                              page_size = 1000L,
                              timeout = 120) {
   # Validate inputs
   if (!is.character(url) || length(url) != 1 || nchar(url) == 0) {
     cli_abort("{.arg url} must be a single non-empty character string.")
   }
+
+  if (!is.character(path) || length(path) != 1 || nchar(path) == 0) {
+    cli_abort("{.arg path} must be a single non-empty character string.")
+  }
+  path <- gsub("^/+|/+$", "", path)
 
   # Clean URL: remove trailing slashes
 
@@ -44,6 +57,7 @@ brapi_connection <- function(url,
       base_url   = url,
       token      = token,
       version    = version,
+      path       = path,
       page_size  = as.integer(page_size),
       timeout    = timeout,
       cache      = NULL # populated by brapi_cache_enable()
@@ -80,14 +94,21 @@ print.brapi_con <- function(x, ...) {
   }
 
   cli::cli_h3("BrAPI Connection")
-  cli::cli_ul(c(
+  bullets <- c(
     "Server:    {.url {x$base_url}}",
-    "Version:   {x$version}",
+    "Version:   {x$version}"
+  )
+  if ((x$path %||% "brapi") != "brapi") {
+    bullets <- c(bullets, "Path:      {x$path}")
+  }
+  bullets <- c(
+    bullets,
     "Auth:      {auth_status}",
     "Page size: {x$page_size}",
     "Timeout:   {x$timeout}s",
     "Cache:     {cache_status}"
-  ))
+  )
+  cli::cli_ul(bullets)
   invisible(x)
 }
 

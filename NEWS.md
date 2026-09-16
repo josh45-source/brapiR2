@@ -50,6 +50,12 @@
 * brapiR2 now wraps 32 of the 36 BrAPI v2.1 entities across all four
   modules (56 of 138 retrieval endpoints); see `DESIGN.md` for the full
   coverage breakdown and which entities remain uncovered.
+  serve BrAPI under `/brapi/`. GRIN-Global instances use
+  `gringlobal/brapi` and were previously unreachable; Germinate and
+  GIGWA deployments commonly sit under their own prefixes too. Defaults
+  to `"brapi"`, so existing code is unaffected. `print()` shows the path
+  only when it differs from the default, and the cache key now includes
+  it, so two servers sharing a hostname no longer collide.
 
 ### Deprecated
 
@@ -59,8 +65,8 @@
   calling `brapi_fetch_parallel()` to fetch in parallel. The `.workers`
   argument is deprecated - supplying it now emits a warning and has no
   effect.
-  
-  ### Documentation
+
+### Documentation
 
 * Added `LICENSE.md` with the full MIT licence text, which was missing
   from the repository, so GitHub had no licence to detect and anyone

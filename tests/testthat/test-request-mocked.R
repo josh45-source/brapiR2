@@ -257,3 +257,57 @@ test_that("parse_brapi_result falls back to jsonlite flatten on bad records", {
   expect_identical(result$id, "1")
   expect_identical(result$nested[[1]]$x, 1:2)
 })
+
+test_that("brapi_req builds the default /brapi/ path", {
+  captured <- new.env()
+  local_mocked_bindings(
+    req_perform = function(req) {
+      captured$url <- req$url
+      structure(list(), class = "httr2_response")
+    },
+    resp_body_json = function(resp, ...) {
+      list(metadata = list(pagination = list(totalPages = 1L)),
+           result = list(data = list()))
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  brapi_get(con, "/serverinfo")
+  expect_match(captured$url, "/brapi/v2/serverinfo?pageSize", fixed = TRUE)
+})
+
+test_that("brapi_req honours a custom path", {
+  captured <- new.env()
+  local_mocked_bindings(
+    req_perform = function(req) {
+      captured$url <- req$url
+      structure(list(), class = "httr2_response")
+    },
+    resp_body_json = function(resp, ...) {
+      list(metadata = list(pagination = list(totalPages = 1L)),
+           result = list(data = list()))
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org", path = "gringlobal/brapi")
+  brapi_get(con, "/serverinfo")
+  expect_match(captured$url, "/gringlobal/brapi/v2/serverinfo?pageSize",
+               fixed = TRUE)
+})
+
+test_that("brapi_cache_path keys differ for the same host on different paths", {
+  dir <- file.path(tempdir(), paste0("path_key_", Sys.getpid()))
+  on.exit(unlink(dir, recursive = TRUE), add = TRUE)
+
+  a <- brapi_connection("https://example.org") |>
+    brapi_cache_enable(dir = dir)
+  b <- brapi_connection("https://example.org", path = "gringlobal/brapi") |>
+    brapi_cache_enable(dir = dir)
+
+  expect_false(identical(
+    brapi_cache_path(a, "/programs", list()),
+    brapi_cache_path(b, "/programs", list())
+  ))
+})

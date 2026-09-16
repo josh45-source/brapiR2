@@ -14,7 +14,7 @@ brapi_req <- function(con, endpoint) {
   endpoint <- sub("^/", "", endpoint)
 
   req <- request(con$base_url) |>
-    req_url_path_append("brapi", con$version, endpoint) |>
+    req_url_path_append(con$path %||% "brapi", con$version, endpoint) |>
     req_headers("Accept" = "application/json") |>
     req_retry(max_tries = 3, backoff = ~2)
 
@@ -99,7 +99,7 @@ brapi_cache_path <- function(con, endpoint, query) {
 
   key_query <- query[setdiff(names(query), "page")]
   key_str <- paste0(
-    con$base_url, "/brapi/", con$version, "/",
+    con$base_url, "/", con$path %||% "brapi", "/", con$version, "/",
     sub("^/", "", endpoint)
   )
   if (length(key_query) > 0L) {
