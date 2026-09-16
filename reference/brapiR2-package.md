@@ -11,7 +11,7 @@ are out of scope by design. Features include automatic pagination, async
 search handling, response caching, parallel batch fetching, and
 convenience functions for genomic selection workflows (e.g. dosage
 matrix extraction). Designed for plant breeders and bioinformaticians
-who need programmatic access to 'BreedBase', 'BMS', 'EBS', 'GIGWA',
+who need programmatic access to 'Breedbase', 'BMS', 'EBS', 'GIGWA',
 'Germinate', and any 'BrAPI'-compliant server.
 
 ## See also
@@ -26,12 +26,13 @@ Useful links:
 
 ## Author
 
-**Maintainer**: Joash Joshua Ayo <joashjoshua789@gmail.com> \[copyright
-holder\]
+**Maintainer**: Joash Joshua Ayo <joashjoshua789@gmail.com>
+([ORCID](https://orcid.org/0009-0007-1642-0172)) \[copyright holder\]
 
 Authors:
 
-- Joash Joshua Ayo <joashjoshua789@gmail.com> \[copyright holder\]
+- Joash Joshua Ayo <joashjoshua789@gmail.com>
+  ([ORCID](https://orcid.org/0009-0007-1642-0172)) \[copyright holder\]
 
 Other contributors:
 

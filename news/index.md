@@ -96,6 +96,10 @@
   with the `rev` role for their rOpenSci reviews
   (ropensci/software-review#792).
 
+- Corrected a misspelling in the QBMS comparison table in the
+  getting-started vignette ([@jmh579](https://github.com/jmh579),
+  ropensci/software-review#792).
+
 #### Testing
 
 - Substantially expanded the mocked and live-server integration test

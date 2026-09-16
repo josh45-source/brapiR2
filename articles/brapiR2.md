@@ -156,7 +156,7 @@ The public test server’s studies currently have no recorded
 observations, so
 [`brapi_study_data()`](https://josh45-source.github.io/brapiR2/reference/brapi_study_data.md)
 returns an empty tibble and a warning rather than fabricated numbers —
-this is the function’s real, documented behavior when a study has no
+this is the function’s real, documented behaviour when a study has no
 data, not a bug in the example. Downstream code should check for this:
 
 ``` r
@@ -244,7 +244,7 @@ now reads from there instead:
 
 # Positions for every variant in the set, wherever they have been placed
 markers <- brapi_get_marker_map(con, variantSetDbId = vs_id)
-#> ℹ Async search started (ID: 5713fa80-ad73-4664-989d-ab48018c65e0). Polling...
+#> ℹ Async search started (ID: c4266f64-f116-4127-8257-df0ee8fc0dff). Polling...
 #> Warning: 14 of 20 variants in "variantset1" have no marker position record; returning
 #> positions for the remaining 6.
 markers
@@ -315,7 +315,7 @@ your own server and credentials, so they are shown but not run here.
 
 ``` r
 
-# Username/password login - used by BreedBase, BMS, and Germinate
+# Username/password login - used by Breedbase, BMS, and Germinate
 con <- brapi_connection("https://my-breedbase.org")
 con <- brapi_login(con, "username", "password")
 
@@ -401,7 +401,7 @@ fetching don’t need authentication).
 cache_dir <- tempfile("brapi_cache_")
 dir.create(cache_dir)
 perf_con <- brapi_cache_enable(con, ttl = 3600, dir = cache_dir)
-#> ✔ Caching enabled at /tmp/RtmpjEtclS/brapi_cache_1fc92df5e66c (TTL: 3600s)
+#> ✔ Caching enabled at /tmp/RtmppacEdT/brapi_cache_1f115a1fdf31 (TTL: 3600s)
 
 # First call: hits the server
 invisible(brapi_programs(perf_con))
@@ -487,7 +487,7 @@ different workflows**.
 | Pipe-friendly | Partial | Yes, all functions follow `f(con, ...)` |
 | Caching | No | Yes, disk-based with TTL |
 | Parallel fetch | No | Via the caller’s own `future` backend |
-| Genotypics | Limited | Allele matrix, dosage matrix, marker map (32/36 BrAPI entities covered overall, read-only) |
+| Genotyping | Limited | Allele matrix, dosage matrix, marker map (32/36 BrAPI entities covered overall, read-only) |
 | Authentication | Yes | Yes |
 
 brapiR2 targets BrAPI v2 only, by design - see the “Design History”
@@ -499,7 +499,7 @@ coverage rather than relying on a claim made here.
 
 ### Same workflow, different style
 
-The examples below use a private BreedBase-style server and credentials,
+The examples below use a private Breedbase-style server and credentials,
 so they are illustrative only.
 
 **QBMS** — navigational, stateful:

@@ -52,8 +52,17 @@ Install the development version from GitHub:
 
 ``` r
 
-# install.packages("remotes")
-remotes::install_github("josh45-source/brapiR2")
+# install.packages("pak")
+pak::pak("josh45-source/brapiR2")
+```
+
+`pak` builds the vignette as part of the install. If you prefer
+`remotes` or `devtools`, pass `build_vignettes = TRUE`, or the vignette
+will not be installed:
+
+``` r
+
+remotes::install_github("josh45-source/brapiR2", build_vignettes = TRUE)
 ```
 
 ## Quick Start

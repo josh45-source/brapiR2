@@ -202,7 +202,7 @@ The current design deliberately leaves several things out of scope:
   BLUPs, or perform GWAS.
 - **No server-specific workarounds.** `brapiR2` targets the BrAPI v2
   specification as written. It does not carry bespoke branches for
-  particular server implementations (BMS, BreedBase, EBS, GIGWA,
+  particular server implementations (BMS, Breedbase, EBS, GIGWA,
   Germinate); servers that deviate from spec are expected to be fixed
   upstream rather than special-cased here.
 - **No visualization.** Plotting genotype, pedigree, or phenotype data

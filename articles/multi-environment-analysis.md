@@ -533,7 +533,7 @@ cat(sprintf("Broad-sense H^2 (across environments): %.3f\n", H2))
 
 With `sd_g = 0.35`, `sd_ge = 0.55`, `sd_e = 1.00` the true (simulated)
 H2 is about 0.48; the model fitted above typically recovers something in
-the same neighborhood, comfortably inside the ~0.3-0.6 range real yield
+the same neighbourhood, comfortably inside the ~0.3-0.6 range real yield
 heritabilities fall in — not the unrealistically high value (0.9) that
 an earlier, less careful choice of variance components produced.
 

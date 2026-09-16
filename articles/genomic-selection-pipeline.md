@@ -22,7 +22,7 @@ directly compatible with the major GS packages:
 It has three parts: **Part 1** fetches real data from the public BrAPI
 test server and shows exactly what brapiR2 returns. **Part 2** shows the
 authenticated pattern you’d use against your own server, without running
-it. **Part 3** runs the actual GS modeling on a simulated dataset,
+it. **Part 3** runs the actual GS modelling on a simulated dataset,
 because (as Part 1 demonstrates directly) the public server doesn’t have
 enough real individuals with both phenotype and genotype data to fit and
 validate a model.
@@ -99,7 +99,7 @@ vs_id <- vsets$variantSetDbId[1]
 ## each marker on a named map (genetic, cM, or physical, bp) and is
 ## populated here.
 markers <- brapi_get_marker_map(con, variantSetDbId = vs_id)
-#> ℹ Async search started (ID: d50b6635-ed30-4ebe-8538-70f3c4bc56a4). Polling...
+#> ℹ Async search started (ID: 27086ed2-6da5-4fdb-906b-be5c0f0970e0). Polling...
 #> Warning: 14 of 20 variants in "variantset1" have no marker position record; returning
 #> positions for the remaining 6.
 markers
@@ -172,11 +172,11 @@ the dozens of individuals a real genomic prediction exercise needs to
 fit a model and hold out a validation set. See
 [`dev/explore-test-server.R`](https://github.com/josh45-source/brapiR2/blob/main/dev/explore-test-server.R)
 for the full survey this is drawn from. Part 3 below uses simulated data
-so the modeling section can actually run.
+so the modelling section can actually run.
 
 ## Part 2: Authenticated Access to Your Own Server (illustrative)
 
-Production BrAPI servers (BreedBase, BMS, Germinate, …) require
+Production BrAPI servers (Breedbase, BMS, Germinate, …) require
 credentials the public test server doesn’t need. This shows the pattern
 — it is not run here, since it needs a real server and login of your
 own.
@@ -227,7 +227,7 @@ paired records genomic prediction actually needs. The rest of this
 article uses a **simulated** dataset built with
 [AlphaSimR](https://cran.r-project.org/package=AlphaSimR), generated
 with a fixed seed so it is fully reproducible without server access.
-Simulated values are labeled as such throughout.
+Simulated values are labelled as such throughout.
 
 ``` r
 
