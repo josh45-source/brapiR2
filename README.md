@@ -16,7 +16,7 @@ Review](https://badges.ropensci.org/792_status.svg)](https://github.com/ropensci
 v2](https://brapi.org/) (Breeding API) specification. It provides
 pipe-friendly, read-only access across all four BrAPI modules - Core,
 Germplasm, Phenotyping, and Genotyping - wrapping 32 of the
-specification’s 36 entities (56 of 138 retrieval endpoints) and
+specification's 36 entities (56 of 138 retrieval endpoints) and
 returning tidy tibbles ready for analysis.
 
 Developed by **Joash Joshua Ayo** (<joashjoshua789@gmail.com>).
@@ -26,7 +26,7 @@ Developed by **Joash Joshua Ayo** (<joashjoshua789@gmail.com>).
 | Feature | brapiR2 | QBMS |
 |----|----|----|
 | Design | Stateless, functional, pipeable | Stateful, menu-driven |
-| BrAPI v2 coverage | 32/36 entities, all 4 modules, read-only | See QBMS’s own documentation |
+| BrAPI v2 coverage | 32/36 entities, all 4 modules, read-only | See QBMS's own documentation |
 | Genotyping support | Native variants, callsets, dosage matrix | Via GIGWA wrapper |
 | Return type | Always tibbles | Mixed lists/dataframes |
 | Auth | Unified token/OAuth2 | Engine-specific functions |
@@ -45,16 +45,16 @@ repository has had no commits in roughly four years (last pushed April
 
 [BrAPI.R](https://github.com/TriticeaeToolbox/BrAPI.R) (David Waring,
 Cornell) is a different kind of tool entirely, and complementary rather
-than competing: its own DESCRIPTION calls it “simple wrapper functions
+than competing: its own DESCRIPTION calls it "simple wrapper functions
 for httr that make it easier to make manual HTTP calls to a BrAPI
-server”, and its README is explicit that it “does not have any knowledge
-of the currently supported BrAPI endpoints”. It’s a transport layer -
+server", and its README is explicit that it "does not have any knowledge
+of the currently supported BrAPI endpoints". It's a transport layer -
 callers pass endpoint paths as strings (`GET`, `POST`, and `PUT` are all
 supported, plus a two-step search helper) and get back raw nested lists,
 with a version argument that switches between BrAPI v1 and v2. It also
 ships Breedbase-specific functions explicitly outside the BrAPI spec.
 brapiR2 takes the opposite approach - named per-endpoint functions
-returning tibbles - and covers less ground on writes: BrAPI.R’s
+returning tibbles - and covers less ground on writes: BrAPI.R's
 `POST`/`PUT` support covers exactly the write operations brapiR2
 deliberately omits.
 
@@ -63,8 +63,16 @@ deliberately omits.
 Install the development version from GitHub:
 
 ``` r
-# install.packages("remotes")
-remotes::install_github("josh45-source/brapiR2")
+# install.packages("pak")
+pak::pak("josh45-source/brapiR2")
+```
+
+`pak` builds the vignette as part of the install. If you prefer
+`remotes` or `devtools`, pass `build_vignettes = TRUE`, or the vignette
+will not be installed:
+
+``` r
+remotes::install_github("josh45-source/brapiR2", build_vignettes = TRUE)
 ```
 
 ## Quick Start
@@ -139,7 +147,7 @@ endpoints) across all four modules:
 
 Not yet covered: Common Crop Names, Germplasm Attribute Values, Plates,
 and Vendor (lab/vendor order-tracking endpoints). brapiR2 is read-only
-by design - it does not implement BrAPI’s `POST`/`PUT` write endpoints.
+by design - it does not implement BrAPI's `POST`/`PUT` write endpoints.
 
 ## Authentication
 
@@ -166,7 +174,7 @@ con <- brapi_set_token(con, "my_existing_token")
 - [QBMS](https://cran.r-project.org/package=QBMS) — High-level, stateful
   BrAPI client for interactive use
 - [BrAPI.R](https://github.com/TriticeaeToolbox/BrAPI.R) — HTTP
-  transport layer for manual BrAPI calls, complementary to brapiR2’s
+  transport layer for manual BrAPI calls, complementary to brapiR2's
   named per-endpoint functions
 - [rrBLUP](https://cran.r-project.org/package=rrBLUP) — Genomic
   selection (use brapiR2 to fetch the dosage matrix)

@@ -39,7 +39,7 @@ The `brapi_get_dosage_matrix()` function returns a standard numeric matrix
 It has three parts: **Part 1** fetches real data from the public BrAPI test
 server and shows exactly what brapiR2 returns. **Part 2** shows the
 authenticated pattern you'd use against your own server, without running it.
-**Part 3** runs the actual GS modeling on a simulated dataset, because (as
+**Part 3** runs the actual GS modelling on a simulated dataset, because (as
 Part 1 demonstrates directly) the public server doesn't have enough real
 individuals with both phenotype and genotype data to fit and validate a
 model.
@@ -123,11 +123,11 @@ a real genomic prediction exercise needs to fit a model and hold out a
 validation set. See
 [`dev/explore-test-server.R`](https://github.com/josh45-source/brapiR2/blob/main/dev/explore-test-server.R)
 for the full survey this is drawn from. Part 3 below uses simulated data so
-the modeling section can actually run.
+the modelling section can actually run.
 
 ## Part 2: Authenticated Access to Your Own Server (illustrative)
 
-Production BrAPI servers (BreedBase, BMS, Germinate, ...) require
+Production BrAPI servers (Breedbase, BMS, Germinate, ...) require
 credentials the public test server doesn't need. This shows the pattern —
 it is not run here, since it needs a real server and login of your own.
 
@@ -175,7 +175,7 @@ provides the dozens-to-hundreds of paired records genomic prediction
 actually needs. The rest of this article uses a **simulated** dataset built
 with [AlphaSimR](https://cran.r-project.org/package=AlphaSimR), generated
 with a fixed seed so it is fully reproducible without server access.
-Simulated values are labeled as such throughout.
+Simulated values are labelled as such throughout.
 
 ```{r simulate-founders, eval = FALSE}
 # SIMULATED founder haplotypes. runMacs() runs a coalescent simulation

@@ -3,7 +3,8 @@ Title: A Tidyverse-Native Client for the 'BrAPI' v2 (Breeding API) Specification
 Version: 0.1.0
 Authors@R: c(
     person("Joash Joshua", "Ayo", , "joashjoshua789@gmail.com",
-           role = c("aut", "cre", "cph")),
+           role = c("aut", "cre", "cph"),
+           comment = c(ORCID = "0009-0007-1642-0172")),
     person("David", "Waring", role = "rev",
            comment = "David reviewed the package (v. 0.1.0) for rOpenSci, see <https://github.com/ropensci/software-review/issues/792>"),
     person("Jenna", "Hershberger", role = "rev",
@@ -20,14 +21,14 @@ Description: Provides pipe-friendly, stateless read access to the Breeding
     search handling, response caching, parallel batch fetching, and
     convenience functions for genomic selection workflows (e.g. dosage
     matrix extraction). Designed for plant breeders and bioinformaticians
-    who need programmatic access to 'BreedBase', 'BMS', 'EBS', 'GIGWA',
+    who need programmatic access to 'Breedbase', 'BMS', 'EBS', 'GIGWA',
     'Germinate', and any 'BrAPI'-compliant server.
 License: MIT + file LICENSE
 URL: https://github.com/josh45-source/brapiR2,
     https://josh45-source.github.io/brapiR2/
 BugReports: https://github.com/josh45-source/brapiR2/issues
 Encoding: UTF-8
-Language: en-US
+Language: en-GB
 Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 4.1.0)

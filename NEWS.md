@@ -69,6 +69,8 @@
   (@dwaring87, ropensci/software-review#792).
 * @dwaring87 and @jmh579 are recorded in `DESCRIPTION` with the `rev`
   role for their rOpenSci reviews (ropensci/software-review#792).
+* Corrected a misspelling in the QBMS comparison table in
+  the getting-started vignette (@jmh579, ropensci/software-review#792).
 
 ### Testing
 

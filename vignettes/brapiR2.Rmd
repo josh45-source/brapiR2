@@ -121,7 +121,7 @@ data
 
 The public test server's studies currently have no recorded observations, so
 `brapi_study_data()` returns an empty tibble and a warning rather than
-fabricated numbers — this is the function's real, documented behavior when
+fabricated numbers — this is the function's real, documented behaviour when
 a study has no data, not a bug in the example. Downstream code should check
 for this:
 
@@ -228,7 +228,7 @@ Most production BrAPI servers require authentication. These calls need your
 own server and credentials, so they are shown but not run here.
 
 ```{r auth, eval = FALSE}
-# Username/password login - used by BreedBase, BMS, and Germinate
+# Username/password login - used by Breedbase, BMS, and Germinate
 con <- brapi_connection("https://my-breedbase.org")
 con <- brapi_login(con, "username", "password")
 
@@ -369,7 +369,7 @@ different workflows**.
 | Pipe-friendly | Partial | Yes, all functions follow `f(con, ...)` |
 | Caching | No | Yes, disk-based with TTL |
 | Parallel fetch | No | Via the caller's own `future` backend |
-| Genotypics | Limited | Allele matrix, dosage matrix, marker map (32/36 BrAPI entities covered overall, read-only) |
+| Genotyping | Limited | Allele matrix, dosage matrix, marker map (32/36 BrAPI entities covered overall, read-only) |
 | Authentication | Yes | Yes |
 
 brapiR2 targets BrAPI v2 only, by design - see the "Design History" section
@@ -380,7 +380,7 @@ rather than relying on a claim made here.
 
 ### Same workflow, different style
 
-The examples below use a private BreedBase-style server and credentials, so
+The examples below use a private Breedbase-style server and credentials, so
 they are illustrative only.
 
 **QBMS** — navigational, stateful:
