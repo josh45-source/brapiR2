@@ -54,6 +54,7 @@ and configuration. This object is passed as the first argument to all
 <span>  <span class="va">url</span>,</span>
 <span>  token <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  version <span class="op">=</span> <span class="st">"v2"</span>,</span>
+<span>  path <span class="op">=</span> <span class="st">"brapi"</span>,</span>
 <span>  page_size <span class="op">=</span> <span class="fl">1000L</span>,</span>
 <span>  timeout <span class="op">=</span> <span class="fl">120</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -76,6 +77,12 @@ If NULL, you can authenticate later with <code><a href="brapi_login.html">brapi_
 
 <dt id="arg-version">version<a class="anchor" aria-label="anchor" href="#arg-version"></a></dt>
 <dd><p>Character. BrAPI version path segment. Default <code>"v2"</code>.</p></dd>
+
+
+<dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
+<dd><p>Character. URL path segment before the version, for servers
+that do not serve BrAPI at <code>/brapi/</code>. Default <code>"brapi"</code>. GRIN-Global
+instances, for example, use <code>"gringlobal/brapi"</code>.</p></dd>
 
 
 <dt id="arg-page-size">page_size<a class="anchor" aria-label="anchor" href="#arg-page-size"></a></dt>
@@ -108,6 +115,10 @@ Default 1000.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Connect with an existing token</span></span></span>
 <span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">brapi_connection</span><span class="op">(</span><span class="st">"https://my-breedbase.org"</span>, token <span class="op">=</span> <span class="st">"my_token_here"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Connect to a server that serves BrAPI under a different path</span></span></span>
+<span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">brapi_connection</span><span class="op">(</span><span class="st">"https://npgsweb.ars-grin.gov"</span>,</span></span>
+<span class="r-in"><span>                        path <span class="op">=</span> <span class="st">"gringlobal/brapi"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
