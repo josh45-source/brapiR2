@@ -68,8 +68,10 @@
   [`brapi_observation_variables()`](https://josh45-source.github.io/brapiR2/reference/brapi_observation_variables.md).
 - brapiR2 now wraps 32 of the 36 BrAPI v2.1 entities across all four
   modules (56 of 138 retrieval endpoints); see `DESIGN.md` for the full
-  coverage breakdown and which entities remain uncovered. serve BrAPI
-  under `/brapi/`. GRIN-Global instances use `gringlobal/brapi` and were
+  coverage breakdown and which entities remain uncovered.
+- [`brapi_connection()`](https://josh45-source.github.io/brapiR2/reference/brapi_connection.md)
+  gains a `path` argument for servers that do not serve BrAPI under
+  `/brapi/`. GRIN-Global instances use `gringlobal/brapi` and were
   previously unreachable; Germinate and GIGWA deployments commonly sit
   under their own prefixes too. Defaults to `"brapi"`, so existing code
   is unaffected. [`print()`](https://rdrr.io/r/base/print.html) shows
