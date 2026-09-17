@@ -311,3 +311,15 @@ test_that("brapi_cache_path keys differ for the same host on different paths", {
     brapi_cache_path(b, "/programs", list())
   ))
 })
+
+test_that("parse_brapi_result normalises key order in nested objects", {
+  a <- list(list(id = "1", season = list(seasonDbId = "2026", year = "2026")))
+  b <- list(list(id = "1", season = list(year = "2026", seasonDbId = "2026")))
+
+  ra <- brapiR2:::parse_brapi_result(a)
+  rb <- brapiR2:::parse_brapi_result(b)
+
+  # Same record, different JSON key order: the rows must compare as identical.
+  expect_identical(ra$season, rb$season)
+  expect_identical(nrow(unique(rbind(ra, rb))), 1L)
+})

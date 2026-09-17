@@ -29,6 +29,21 @@
   `TRUE` and returning every study's observations rather than just the
   requested one. Fixed to `.data$studyDbId == .env$studyDbId`, which
   correctly disambiguates the data column from the function argument.
+* `brapi_study_data()` no longer errors on studies where a trait is
+  measured on only some observation units. `pivot_wider()` fills the
+  absent combinations with zero-length elements, and the simplification
+  step's `unlist()` silently dropped them, returning a column shorter
+  than the table and failing inside `dplyr::across()`. Unmeasured cells
+  are now `NA`, and simplified columns are character throughout, which is
+  how BrAPI returns observation values (@dwaring87,
+  ropensci/software-review#792).
+* Records that differ only in JSON object key order are no longer treated
+  as distinct. Key order is not significant in JSON, and at least one
+  server varies it between records in the same response; nested objects
+  are now normalised as they are parsed. On the study used to reproduce
+  this, 75 of 4,613 observations were affected, and `brapi_study_data()`
+  additionally drops exact duplicate records before pivoting, reporting
+  how many it removed (@dwaring87, ropensci/software-review#792).
 
 ### New features
 

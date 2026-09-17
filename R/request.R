@@ -317,7 +317,13 @@ parse_brapi_result <- function(data) {
           }
           # Wrap lists and multi-element vectors as list-columns so
           # as_tibble_row (which requires size-1 elements) doesn't error.
+          # Named lists have their keys sorted first: JSON object key order
+          # is not significant, and some servers vary it between records,
+          # which would otherwise make identical records compare as distinct.
           if (is.list(val) || length(val) > 1L) {
+            if (is.list(val) && !is.null(names(val))) {
+              val <- val[order(names(val))]
+            }
             return(list(val))
           }
           val

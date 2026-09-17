@@ -112,3 +112,28 @@ test_that("brapi_study_data uses observationValue/DbId fallback column names", {
   expect_identical(wide$var1, "10")
   expect_identical(wide$var2, "150")
 })
+
+test_that("brapi_study_data fills unmeasured traits with NA, not a short column", {
+  local_mocked_bindings(
+    brapi_observations = function(con, ...) {
+      tibble::tibble(
+        observationUnitDbId = c("u1", "u2", "u1"),
+        observationUnitName = c("p1", "p2", "p1"),
+        germplasmDbId = c("g1", "g1", "g1"),
+        germplasmName = c("G", "G", "G"),
+        studyDbId = c("s1", "s1", "s1"),
+        observationVariableName = c("height", "height", "yield"),
+        value = c("10", "20", "5")
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  out <- brapi_study_data(con, "s1")
+
+  expect_identical(nrow(out), 2L)
+  expect_false(any(vapply(out, is.list, logical(1))))
+  # u2 has no yield observation, so that cell must be NA rather than dropped.
+  expect_true(is.na(out$yield[out$observationUnitDbId == "u2"]))
+})

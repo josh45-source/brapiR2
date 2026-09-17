@@ -332,6 +332,17 @@ brapi_study_data <- function(con, studyDbId) {
 
   obs_slim <- obs[, c(id_cols, var_col, value_col), drop = FALSE]
 
+  # Some servers return the same observation more than once. After key-order
+  # normalisation in the parser these are exact duplicates, and they would
+  # otherwise pivot into cells holding several copies of one value.
+  n_before <- nrow(obs_slim)
+  obs_slim <- obs_slim[!duplicated(obs_slim), , drop = FALSE]
+  if (nrow(obs_slim) < n_before) {
+    cli_alert_info(
+      "Dropped {n_before - nrow(obs_slim)} duplicate observation record{?s}."
+    )
+  }
+
   wide <- pivot_wider(
     obs_slim,
     names_from  = !!rlang::sym(var_col),
@@ -343,7 +354,10 @@ brapi_study_data <- function(con, studyDbId) {
   mutate(wide, dplyr::across(
     where(is.list),
     function(col) {
-      if (all(lengths(col) <= 1L)) unlist(col, use.names = FALSE) else col
+      if (!all(lengths(col) <= 1L)) return(col)
+      vapply(col, function(x) {
+        if (length(x) == 0L) NA_character_ else as.character(x[[1]])
+      }, character(1))
     }
   ))
 }
