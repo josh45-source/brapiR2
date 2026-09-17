@@ -15,3 +15,5 @@
 ^DESIGN\.md$
 ^vignettes/articles$
 ^dev$
+^doc$
+^Meta$

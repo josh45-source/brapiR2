@@ -37,7 +37,7 @@ alongside the existing live-server integration tests.
 
 ## Architecture Overview
 
-`brapiR2` is organized in layers, from the caller's perspective inward:
+`brapiR2` is organised in layers, from the caller's perspective inward:
 
 1. **Connection and auth** - build and hold connection state explicitly
    (`brapi_connection()`, `brapi_login()`, `brapi_login_oauth2()`,
@@ -54,7 +54,7 @@ alongside the existing live-server integration tests.
    (`brapi_study_data()`, `brapi_get_dosage_matrix()`,
    `brapi_get_marker_map()`) that compose module functions into
    analysis-ready shapes (a wide phenotyping tibble, a numeric dosage
-   matrix) without introducing any new HTTP behavior of their own.
+   matrix) without introducing any new HTTP behaviour of their own.
 5. **Caching and parallel fetching** - an optional, opt-in disk cache
    (`brapi_cache_enable()`, `brapi_cache_clear()`) and a parallel batch
    fetch helper (`brapi_fetch_parallel()`) layered on top of the request
@@ -145,11 +145,23 @@ any module) exhaustively; see the coverage figures in
 ### Disk-based caching keyed with `rlang::hash()`
 
 Caching is opt-in (`brapi_cache_enable()`), not automatic, so default
-behavior always reflects the live server. When enabled, each cache entry is
+behaviour always reflects the live server. When enabled, each cache entry is
 keyed by a hash of the fully-qualified URL plus sorted, page-excluded query
 parameters, so identical requests (including identical filter arguments in
 a different order) reliably hit the cache and different requests never
 collide.
+
+### The caller owns the `future` plan
+
+`brapi_fetch_parallel()` runs against whatever `future` plan is already
+active and never sets one itself. The future package's best-practices
+guidance is explicit that the choice of backend belongs to the caller, not
+to a package: a function that quietly sets and restores a plan on every
+call still mutates session-wide state the caller did not ask it to touch,
+and can silently replace a plan configured deliberately - a specific worker
+count, a cluster spanning several machines, `callr` workers for extra
+isolation. The `.workers` argument in 0.1.0 did exactly this, and is
+deprecated; supplying it now warns and has no effect.
 
 ### Mocked tests alongside integration tests
 
@@ -187,7 +199,7 @@ The current design deliberately leaves several things out of scope:
   particular server implementations (BMS, Breedbase, EBS, GIGWA,
   Germinate); servers that deviate from spec are expected to be fixed
   upstream rather than special-cased here.
-- **No visualization.** Plotting genotype, pedigree, or phenotype data is
+- **No visualisation.** Plotting genotype, pedigree, or phenotype data is
   left to downstream packages that consume `brapiR2`'s tibbles.
 
 ## Relationship to Other Tools
@@ -224,13 +236,13 @@ pipeline, not to replace the tools downstream of it:
 - **vcf2dosage** - genotype format conversion, complementary to
   `brapi_get_dosage_matrix()` for data that originates as VCF rather than
   from a BrAPI server.
-- **ggvariant** - variant and genotype visualization, consuming
+- **ggvariant** - variant and genotype visualisation, consuming
   `brapi_variants()` / `brapi_allele_matrix()` output.
 - **gsbench** - genomic selection model benchmarking, consuming the
   dosage matrix and phenotyping tibble directly as model inputs.
 
 In each case, `brapiR2`'s job ends at "a tidy tibble or matrix retrieved
-from a BrAPI server"; cleaning, visualization, and modeling are left to
+from a BrAPI server"; cleaning, visualisation, and modelling are left to
 packages built for those tasks specifically.
 
 ## Maintenance Considerations

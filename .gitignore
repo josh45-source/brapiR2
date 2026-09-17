@@ -11,3 +11,5 @@ docs/
 *.dll
 .DS_Store
 Thumbs.db
+/doc/
+/Meta/
