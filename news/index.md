@@ -35,6 +35,28 @@
   just the requested one. Fixed to `.data$studyDbId == .env$studyDbId`,
   which correctly disambiguates the data column from the function
   argument.
+- [`brapi_study_data()`](https://josh45-source.github.io/brapiR2/reference/brapi_study_data.md)
+  no longer errors on studies where a trait is measured on only some
+  observation units.
+  [`pivot_wider()`](https://tidyr.tidyverse.org/reference/pivot_wider.html)
+  fills the absent combinations with zero-length elements, and the
+  simplification step’s [`unlist()`](https://rdrr.io/r/base/unlist.html)
+  silently dropped them, returning a column shorter than the table and
+  failing inside
+  [`dplyr::across()`](https://dplyr.tidyverse.org/reference/across.html).
+  Unmeasured cells are now `NA`, and simplified columns are character
+  throughout, which is how BrAPI returns observation values
+  ([@dwaring87](https://github.com/dwaring87),
+  ropensci/software-review#792).
+- Records that differ only in JSON object key order are no longer
+  treated as distinct. Key order is not significant in JSON, and at
+  least one server varies it between records in the same response;
+  nested objects are now normalised as they are parsed. On the study
+  used to reproduce this, 75 of 4,613 observations were affected, and
+  [`brapi_study_data()`](https://josh45-source.github.io/brapiR2/reference/brapi_study_data.md)
+  additionally drops exact duplicate records before pivoting, reporting
+  how many it removed ([@dwaring87](https://github.com/dwaring87),
+  ropensci/software-review#792).
 
 #### New features
 
