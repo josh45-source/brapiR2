@@ -72,6 +72,11 @@
   to `"brapi"`, so existing code is unaffected. `print()` shows the path
   only when it differs from the default, and the cache key now includes
   it, so two servers sharing a hostname no longer collide.
+* Requests now send a user agent identifying brapiR2, its version, and the
+  httr2 and R versions in use, so server operators can see what is calling
+  them. Requests made on continuous integration are marked as such.
+  `brapi_connection()` gains a `user_agent` argument to override it
+  (@dwaring87, ropensci/software-review#792).
 
 ### Deprecated
 

@@ -15,7 +15,10 @@ brapi_req <- function(con, endpoint) {
 
   req <- request(con$base_url) |>
     req_url_path_append(con$path %||% "brapi", con$version, endpoint) |>
-    req_headers("Accept" = "application/json") |>
+    req_headers(
+      "Accept" = "application/json",
+      "User-Agent" = con$user_agent %||% brapi_user_agent()
+    ) |>
     req_retry(max_tries = 3, backoff = ~2)
 
   if (!is.null(con$token)) {

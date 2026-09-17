@@ -13,6 +13,9 @@
 #' @param path Character. URL path segment before the version, for servers
 #'   that do not serve BrAPI at `/brapi/`. Default `"brapi"`. GRIN-Global
 #'   instances, for example, use `"gringlobal/brapi"`.
+#' @param user_agent Character or NULL. Overrides the user agent brapiR2
+#'   sends with each request. The default identifies the package, its
+#'   version, and the httr2 and R versions in use.
 #' @param page_size Integer. Number of records per page for paginated requests.
 #'   Default 1000.
 #' @param timeout Numeric. Request timeout in seconds. Default 120.
@@ -36,6 +39,7 @@ brapi_connection <- function(url,
                              token = NULL,
                              version = "v2",
                              path = "brapi",
+                             user_agent = NULL,
                              page_size = 1000L,
                              timeout = 120) {
   # Validate inputs
@@ -48,6 +52,14 @@ brapi_connection <- function(url,
   }
   path <- gsub("^/+|/+$", "", path)
 
+  if (!is.null(user_agent) &&
+      (!is.character(user_agent) || length(user_agent) != 1 ||
+       nchar(user_agent) == 0)) {
+    cli_abort(
+      "{.arg user_agent} must be NULL or a single non-empty character string."
+    )
+  }
+
   # Clean URL: remove trailing slashes
 
   url <- sub("/+$", "", url)
@@ -58,6 +70,7 @@ brapi_connection <- function(url,
       token      = token,
       version    = version,
       path       = path,
+      user_agent = user_agent,
       page_size  = as.integer(page_size),
       timeout    = timeout,
       cache      = NULL # populated by brapi_cache_enable()

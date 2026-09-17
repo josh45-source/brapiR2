@@ -323,3 +323,36 @@ test_that("parse_brapi_result normalises key order in nested objects", {
   expect_identical(ra$season, rb$season)
   expect_identical(nrow(unique(rbind(ra, rb))), 1L)
 })
+
+test_that("brapi_req sends a user agent, and a custom one when given", {
+  captured <- new.env()
+  local_mocked_bindings(
+    req_perform = function(req) {
+      captured$ua <- req$headers[["User-Agent"]]
+      structure(list(), class = "httr2_response")
+    },
+    resp_body_json = function(resp, ...) {
+      list(metadata = list(pagination = list(totalPages = 1L)),
+           result = list(data = list()))
+    },
+    .package = "brapiR2"
+  )
+
+  brapi_get(brapi_connection("https://example.org"), "/serverinfo")
+  expect_match(captured$ua, "^brapiR2/")
+
+  con <- brapi_connection("https://example.org", user_agent = "mine/1.0")
+  brapi_get(con, "/serverinfo")
+  expect_identical(captured$ua, "mine/1.0")
+})
+
+test_that("brapi_connection rejects an invalid user agent", {
+  expect_error(
+    brapi_connection("https://example.org", user_agent = ""),
+    "non-empty"
+  )
+  expect_error(
+    brapi_connection("https://example.org", user_agent = 123),
+    "character"
+  )
+})

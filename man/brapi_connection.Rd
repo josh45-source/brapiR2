@@ -9,6 +9,7 @@ brapi_connection(
   token = NULL,
   version = "v2",
   path = "brapi",
+  user_agent = NULL,
   page_size = 1000L,
   timeout = 120
 )
@@ -26,6 +27,10 @@ If NULL, you can authenticate later with \code{\link[=brapi_login]{brapi_login()
 \item{path}{Character. URL path segment before the version, for servers
 that do not serve BrAPI at \verb{/brapi/}. Default \code{"brapi"}. GRIN-Global
 instances, for example, use \code{"gringlobal/brapi"}.}
+
+\item{user_agent}{Character or NULL. Overrides the user agent brapiR2
+sends with each request. The default identifies the package, its
+version, and the httr2 and R versions in use.}
 
 \item{page_size}{Integer. Number of records per page for paginated requests.
 Default 1000.}

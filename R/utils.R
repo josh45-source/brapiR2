@@ -58,3 +58,27 @@ brapi_ping <- function(con) {
 brapi_endpoints <- function(con) {
   brapi_server_info(con)
 }
+
+
+#' Internal: Default User Agent String
+#'
+#' Identifies brapiR2 to the server, as recommended by the rOpenSci
+#' packaging guidelines. The package version and URL are read from
+#' DESCRIPTION so they cannot drift, and requests made on continuous
+#' integration are marked as such.
+#'
+#' @return A single string.
+#' @keywords internal
+#' @noRd
+brapi_user_agent <- function() {
+  ua <- sprintf(
+    "brapiR2/%s (https://github.com/josh45-source/brapiR2) httr2/%s R/%s",
+    utils::packageVersion("brapiR2"),
+    utils::packageVersion("httr2"),
+    getRversion()
+  )
+  if (nzchar(Sys.getenv("CI"))) {
+    ua <- paste0(ua, " (CI)")
+  }
+  ua
+}
