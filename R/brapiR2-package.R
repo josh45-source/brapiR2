@@ -12,7 +12,7 @@
 #' @importFrom jsonlite fromJSON toJSON
 #' @importFrom httr2 request req_headers req_url_path_append req_url_query
 #' @importFrom httr2 req_perform req_body_json resp_body_json resp_status
-#' @importFrom httr2 req_retry req_auth_bearer_token req_method
+#' @importFrom httr2 req_retry req_auth_bearer_token req_method req_timeout
 #' @importFrom tidyr pivot_wider unnest
 NULL
 

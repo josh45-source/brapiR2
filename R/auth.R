@@ -30,11 +30,9 @@ brapi_login <- function(con, username, password) {
     grant_type = "password"
   )
 
-  resp <- request(con$base_url) |>
-    req_url_path_append("brapi", con$version, "token") |>
+  resp <- brapi_req(con, "token") |>
     req_body_json(body) |>
     req_method("POST") |>
-    req_retry(max_tries = 3) |>
     req_perform()
 
   result <- resp_body_json(resp)
@@ -92,6 +90,8 @@ brapi_login_oauth2 <- function(con, client_id, client_secret,
   )
 
   resp <- request(access_url) |>
+    req_headers("User-Agent" = con$user_agent %||% brapi_user_agent()) |>
+    req_timeout(con$timeout %||% 120) |>
     req_body_json(body) |>
     req_method("POST") |>
     req_retry(max_tries = 3) |>

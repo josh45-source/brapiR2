@@ -44,6 +44,13 @@
   this, 75 of 4,613 observations were affected, and `brapi_study_data()`
   additionally drops exact duplicate records before pivoting, reporting
   how many it removed (@dwaring87, ropensci/software-review#792).
+* `brapi_login()` now builds its request the same way every other function
+  does. It previously hardcoded `/brapi/`, so authentication was impossible
+  on servers using a different path, and it sent neither the user agent nor
+  the `Accept` header.
+* `con$timeout` is now applied to requests. The argument has been accepted
+  and documented since 0.1.0 but never took effect, leaving every request on
+  curl's own default.
 
 ### New features
 

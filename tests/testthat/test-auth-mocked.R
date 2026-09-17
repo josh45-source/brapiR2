@@ -88,3 +88,23 @@ test_that("brapi_login_oauth2 errors when no access token is returned", {
     "OAuth2 login failed"
   )
 })
+
+test_that("brapi_login honours the connection path and sends a user agent", {
+  captured <- new.env()
+  local_mocked_bindings(
+    req_perform = function(req) {
+      captured$url <- req$url
+      captured$ua <- req$headers[["User-Agent"]]
+      structure(list(), class = "httr2_response")
+    },
+    resp_body_json = function(resp, ...) list(access_token = "tok"),
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org", path = "gringlobal/brapi")
+  out <- brapi_login(con, "u", "p")
+
+  expect_identical(out$token, "tok")
+  expect_match(captured$url, "/gringlobal/brapi/v2/token", fixed = TRUE)
+  expect_match(captured$ua, "^brapiR2/")
+})

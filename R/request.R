@@ -19,7 +19,8 @@ brapi_req <- function(con, endpoint) {
       "Accept" = "application/json",
       "User-Agent" = con$user_agent %||% brapi_user_agent()
     ) |>
-    req_retry(max_tries = 3, backoff = ~2)
+    req_retry(max_tries = 3, backoff = ~2) |>
+    req_timeout(con$timeout %||% 120)
 
   if (!is.null(con$token)) {
     req <- req |> req_auth_bearer_token(con$token)
