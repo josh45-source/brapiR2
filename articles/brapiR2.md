@@ -42,6 +42,11 @@ con
 Every function takes `con` as its first argument. No global state is
 modified.
 
+Most real servers require credentials. See
+[Authentication](#authentication) below for username/password login,
+OAuth 2.0, and bearer tokens, and [Handling Credentials
+Safely](#credential-handling) for keeping them out of your scripts.
+
 ## Exploring Programs and Trials
 
 BrAPI organises breeding data as a nesting of four levels, and the calls
@@ -244,7 +249,7 @@ now reads from there instead:
 
 # Positions for every variant in the set, wherever they have been placed
 markers <- brapi_get_marker_map(con, variantSetDbId = vs_id)
-#> ℹ Async search started (ID: 92422319-2fa3-4d4e-b57a-8d5a4e604719). Polling...
+#> ℹ Async search started (ID: e294fe59-88c4-41c9-9e45-934f6b115379). Polling...
 #> Warning: 14 of 20 variants in "variantset1" have no marker position record; returning
 #> positions for the remaining 6.
 markers
@@ -392,8 +397,16 @@ history, and out of anything you might `git commit` or share.
 
 ## Caching and Parallel Fetching
 
-These run against the public test server again (caching and parallel
-fetching don’t need authentication).
+Two features for when you are fetching the same data repeatedly, or a
+lot of it at once. Both run against the public test server here; neither
+needs authentication.
+
+**Caching** stores each response on disk under a key built from the URL
+and query parameters, and returns it without a network call for as long
+as the TTL lasts. Reach for it when you are developing a script against
+a slow or distant server and re-running the same calls, or when a
+knitted report would otherwise hit the server once per render. It is off
+by default, per connection, and never shared between connections.
 
 ``` r
 
@@ -401,7 +414,7 @@ fetching don’t need authentication).
 cache_dir <- tempfile("brapi_cache_")
 dir.create(cache_dir)
 perf_con <- brapi_cache_enable(con, ttl = 3600, dir = cache_dir)
-#> ✔ Caching enabled at /tmp/RtmpCMyVcv/brapi_cache_1ee45179323e (TTL: 3600s)
+#> ✔ Caching enabled at /tmp/RtmpTG7GOg/brapi_cache_1ee75336f7b9 (TTL: 3600s)
 
 # First call: hits the server
 invisible(brapi_programs(perf_con))
@@ -424,16 +437,15 @@ brapi_cache_clear(perf_con)
 #> ✔ Cleared 1 cached response(s).
 ```
 
+**Parallel fetching** runs one call across many identifiers at once,
+which helps when you are pulling data for dozens of studies or germplasm
+and each request is slow.
 [`brapi_fetch_parallel()`](https://josh45-source.github.io/brapiR2/reference/brapi_fetch_parallel.md)
-does not set a parallel backend itself - it runs against whatever
-`future` plan is already active, sequential by default. The future
-package’s best-practices vignette is explicit that the choice of backend
-belongs to the caller, not to a package: a function that quietly sets
-and restores a plan on every call still mutates session-wide state you
-didn’t ask it to touch, and can silently replace a plan you configured
-deliberately (a specific worker count, a cluster spanning several
-machines, callr workers for extra isolation). So it’s your call to make,
-before this function runs:
+uses whatever `future` plan is already active — sequential unless you
+say otherwise — so choosing the backend, and shutting it down
+afterwards, is yours to do. See [`future`’s own
+documentation](https://future.futureverse.org/) for the available
+backends, and DESIGN.md for why the package does not set one for you:
 
 ``` r
 
@@ -545,13 +557,13 @@ data <- brapi_programs(con) |>
   brapi_study_data(con = con)
 ```
 
+Choose QBMS for interactive exploration in the console. Choose brapiR2
+for reproducible scripts, pipelines, or when you need genotypic data and
+caching. Many users use both.
+
 ## References
 
 - Selby, P., Abbeloos, R., Backlund, J.E., et al., & The BrAPI
   Consortium (2019). BrAPI — an application programming interface for
   plant breeding applications. *Bioinformatics*, 35(20), 4147–4155.
   <https://doi.org/10.1093/bioinformatics/btz190>
-
-Choose QBMS for interactive exploration in the console. Choose brapiR2
-for reproducible scripts, pipelines, or when you need genotypic data and
-caching. Many users use both.

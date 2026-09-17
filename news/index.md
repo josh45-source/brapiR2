@@ -104,6 +104,29 @@
 - Corrected a misspelling in the QBMS comparison table in the
   getting-started vignette ([@jmh579](https://github.com/jmh579),
   ropensci/software-review#792).
+- The getting-started vignette’s “Caching and Parallel Fetching” section
+  now explains what each feature does and when to reach for it, rather
+  than describing the `future` package at length. The design rationale
+  for why
+  [`brapi_fetch_parallel()`](https://josh45-source.github.io/brapiR2/reference/brapi_fetch_parallel.md)
+  does not set a plan has moved to `DESIGN.md`
+  ([@jmh579](https://github.com/jmh579), ropensci/software-review#792).
+- The “Connecting to a Server” section now links to Authentication and
+  to Handling Credentials Safely, which most users need before anything
+  else on the page ([@jmh579](https://github.com/jmh579),
+  ropensci/software-review#792).
+- The recommendation on when to choose QBMS and when to choose brapiR2
+  now sits with the comparison it belongs to, rather than after the
+  references ([@jmh579](https://github.com/jmh579),
+  ropensci/software-review#792).
+- The vignette’s parallel-fetching chunks are guarded on `furrr` and
+  `future` being installed, so the vignette builds where suggested
+  packages are absent.
+- `DESCRIPTION` now declares `Language: en-GB`, and the package’s prose
+  has been made consistent with it. Six American spellings were
+  corrected, and `inst/WORDLIST` has been extended with the domain
+  vocabulary and package names the spellchecker cannot know
+  ([@jmh579](https://github.com/jmh579), ropensci/software-review#792).
 
 #### Testing
 

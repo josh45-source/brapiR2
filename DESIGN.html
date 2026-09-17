@@ -48,7 +48,7 @@
 </div>
 <div class="section level2">
 <h2 id="architecture-overview">Architecture Overview<a class="anchor" aria-label="anchor" href="#architecture-overview"></a></h2>
-<p><code>brapiR2</code> is organized in layers, from the caller’s perspective inward:</p>
+<p><code>brapiR2</code> is organised in layers, from the caller’s perspective inward:</p>
 <ol style="list-style-type: decimal"><li>
 <strong>Connection and auth</strong> - build and hold connection state explicitly (<code><a href="reference/brapi_connection.html">brapi_connection()</a></code>, <code><a href="reference/brapi_login.html">brapi_login()</a></code>, <code><a href="reference/brapi_login_oauth2.html">brapi_login_oauth2()</a></code>, <code><a href="reference/brapi_set_token.html">brapi_set_token()</a></code>). Nothing is stored globally.</li>
 <li>
@@ -56,7 +56,7 @@
 <li>
 <strong>Four BrAPI modules</strong> - Core, Germplasm, Phenotyping, and Genotyping. Each module is a thin, one-function-per-endpoint wrapper around the request engine, matching the four modules defined by the BrAPI v2 specification itself.</li>
 <li>
-<strong>Convenience functions</strong> - a small number of higher-level functions (<code><a href="reference/brapi_study_data.html">brapi_study_data()</a></code>, <code><a href="reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix()</a></code>, <code><a href="reference/brapi_get_marker_map.html">brapi_get_marker_map()</a></code>) that compose module functions into analysis-ready shapes (a wide phenotyping tibble, a numeric dosage matrix) without introducing any new HTTP behavior of their own.</li>
+<strong>Convenience functions</strong> - a small number of higher-level functions (<code><a href="reference/brapi_study_data.html">brapi_study_data()</a></code>, <code><a href="reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix()</a></code>, <code><a href="reference/brapi_get_marker_map.html">brapi_get_marker_map()</a></code>) that compose module functions into analysis-ready shapes (a wide phenotyping tibble, a numeric dosage matrix) without introducing any new HTTP behaviour of their own.</li>
 <li>
 <strong>Caching and parallel fetching</strong> - an optional, opt-in disk cache (<code><a href="reference/brapi_cache_enable.html">brapi_cache_enable()</a></code>, <code><a href="reference/brapi_cache_clear.html">brapi_cache_clear()</a></code>) and a parallel batch fetch helper (<code><a href="reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code>) layered on top of the request engine, both off by default.</li>
 </ol></div>
@@ -144,7 +144,11 @@
 <div class="section level3">
 <h3 id="disk-based-caching-keyed-with-rlanghash">Disk-based caching keyed with <code>rlang::hash()</code>
 <a class="anchor" aria-label="anchor" href="#disk-based-caching-keyed-with-rlanghash"></a></h3>
-<p>Caching is opt-in (<code><a href="reference/brapi_cache_enable.html">brapi_cache_enable()</a></code>), not automatic, so default behavior always reflects the live server. When enabled, each cache entry is keyed by a hash of the fully-qualified URL plus sorted, page-excluded query parameters, so identical requests (including identical filter arguments in a different order) reliably hit the cache and different requests never collide.</p>
+<p>Caching is opt-in (<code><a href="reference/brapi_cache_enable.html">brapi_cache_enable()</a></code>), not automatic, so default behaviour always reflects the live server. When enabled, each cache entry is keyed by a hash of the fully-qualified URL plus sorted, page-excluded query parameters, so identical requests (including identical filter arguments in a different order) reliably hit the cache and different requests never collide.</p>
+</div>
+<div class="section level3">
+<h3 id="the-caller-owns-the-future-plan">The caller owns the <code>future</code> plan<a class="anchor" aria-label="anchor" href="#the-caller-owns-the-future-plan"></a></h3>
+<p><code><a href="reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code> runs against whatever <code>future</code> plan is already active and never sets one itself. The future package’s best-practices guidance is explicit that the choice of backend belongs to the caller, not to a package: a function that quietly sets and restores a plan on every call still mutates session-wide state the caller did not ask it to touch, and can silently replace a plan configured deliberately - a specific worker count, a cluster spanning several machines, <code>callr</code> workers for extra isolation. The <code>.workers</code> argument in 0.1.0 did exactly this, and is deprecated; supplying it now warns and has no effect.</p>
 </div>
 <div class="section level3">
 <h3 id="mocked-tests-alongside-integration-tests">Mocked tests alongside integration tests<a class="anchor" aria-label="anchor" href="#mocked-tests-alongside-integration-tests"></a></h3>
@@ -163,7 +167,7 @@
 <li>
 <strong>No server-specific workarounds.</strong> <code>brapiR2</code> targets the BrAPI v2 specification as written. It does not carry bespoke branches for particular server implementations (BMS, Breedbase, EBS, GIGWA, Germinate); servers that deviate from spec are expected to be fixed upstream rather than special-cased here.</li>
 <li>
-<strong>No visualization.</strong> Plotting genotype, pedigree, or phenotype data is left to downstream packages that consume <code>brapiR2</code>’s tibbles.</li>
+<strong>No visualisation.</strong> Plotting genotype, pedigree, or phenotype data is left to downstream packages that consume <code>brapiR2</code>’s tibbles.</li>
 </ul></div>
 <div class="section level2">
 <h2 id="relationship-to-other-tools">Relationship to Other Tools<a class="anchor" aria-label="anchor" href="#relationship-to-other-tools"></a></h2>
@@ -179,10 +183,10 @@
 <li>
 <strong>vcf2dosage</strong> - genotype format conversion, complementary to <code><a href="reference/brapi_get_dosage_matrix.html">brapi_get_dosage_matrix()</a></code> for data that originates as VCF rather than from a BrAPI server.</li>
 <li>
-<strong>ggvariant</strong> - variant and genotype visualization, consuming <code><a href="reference/brapi_variants.html">brapi_variants()</a></code> / <code><a href="reference/brapi_allele_matrix.html">brapi_allele_matrix()</a></code> output.</li>
+<strong>ggvariant</strong> - variant and genotype visualisation, consuming <code><a href="reference/brapi_variants.html">brapi_variants()</a></code> / <code><a href="reference/brapi_allele_matrix.html">brapi_allele_matrix()</a></code> output.</li>
 <li>
 <strong>gsbench</strong> - genomic selection model benchmarking, consuming the dosage matrix and phenotyping tibble directly as model inputs.</li>
-</ul><p>In each case, <code>brapiR2</code>’s job ends at “a tidy tibble or matrix retrieved from a BrAPI server”; cleaning, visualization, and modeling are left to packages built for those tasks specifically.</p>
+</ul><p>In each case, <code>brapiR2</code>’s job ends at “a tidy tibble or matrix retrieved from a BrAPI server”; cleaning, visualisation, and modelling are left to packages built for those tasks specifically.</p>
 </div>
 </div>
 <div class="section level2">

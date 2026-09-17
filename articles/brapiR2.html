@@ -106,6 +106,9 @@ which requires no authentication.</p>
 <span><span class="co">#&gt; • Cache: disabled</span></span></code></pre></div>
 <p>Every function takes <code>con</code> as its first argument. No
 global state is modified.</p>
+<p>Most real servers require credentials. See <a href="#authentication">Authentication</a> below for username/password
+login, OAuth 2.0, and bearer tokens, and <a href="#credential-handling">Handling Credentials Safely</a> for keeping
+them out of your scripts.</p>
 </div>
 <div class="section level2">
 <h2 id="exploring-programs-and-trials">Exploring Programs and Trials<a class="anchor" aria-label="anchor" href="#exploring-programs-and-trials"></a>
@@ -292,7 +295,7 @@ instead:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Positions for every variant in the set, wherever they have been placed</span></span>
 <span><span class="va">markers</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_get_marker_map.html">brapi_get_marker_map</a></span><span class="op">(</span><span class="va">con</span>, variantSetDbId <span class="op">=</span> <span class="va">vs_id</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Async search started (ID: 92422319-2fa3-4d4e-b57a-8d5a4e604719). Polling...</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Async search started (ID: e294fe59-88c4-41c9-9e45-934f6b115379). Polling...</span></span>
 <span><span class="co">#&gt; Warning: 14 of 20 variants in <span style="color: #0000BB;">"variantset1"</span> have no marker position record; returning</span></span>
 <span><span class="co">#&gt; positions for the remaining 6.</span></span>
 <span><span class="va">markers</span></span>
@@ -420,14 +423,22 @@ share.</p>
 <div class="section level2">
 <h2 id="caching-and-parallel-fetching">Caching and Parallel Fetching<a class="anchor" aria-label="anchor" href="#caching-and-parallel-fetching"></a>
 </h2>
-<p>These run against the public test server again (caching and parallel
-fetching don’t need authentication).</p>
+<p>Two features for when you are fetching the same data repeatedly, or a
+lot of it at once. Both run against the public test server here; neither
+needs authentication.</p>
+<p><strong>Caching</strong> stores each response on disk under a key
+built from the URL and query parameters, and returns it without a
+network call for as long as the TTL lasts. Reach for it when you are
+developing a script against a slow or distant server and re-running the
+same calls, or when a knitted report would otherwise hit the server once
+per render. It is off by default, per connection, and never shared
+between connections.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Enable caching — repeated calls within the TTL return instantly</span></span>
 <span><span class="va">cache_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"brapi_cache_"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">cache_dir</span><span class="op">)</span></span>
 <span><span class="va">perf_con</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/brapi_cache_enable.html">brapi_cache_enable</a></span><span class="op">(</span><span class="va">con</span>, ttl <span class="op">=</span> <span class="fl">3600</span>, dir <span class="op">=</span> <span class="va">cache_dir</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Caching enabled at <span style="color: #0000BB;">/tmp/RtmpCMyVcv/brapi_cache_1ee45179323e</span> (TTL: 3600s)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Caching enabled at <span style="color: #0000BB;">/tmp/RtmpTG7GOg/brapi_cache_1ee75336f7b9</span> (TTL: 3600s)</span></span>
 <span></span>
 <span><span class="co"># First call: hits the server</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="fu"><a href="../reference/brapi_programs.html">brapi_programs</a></span><span class="op">(</span><span class="va">perf_con</span><span class="op">)</span><span class="op">)</span></span>
@@ -448,16 +459,15 @@ fetching don’t need authentication).</p>
 <span><span class="co"># Clear all cached files</span></span>
 <span><span class="fu"><a href="../reference/brapi_cache_clear.html">brapi_cache_clear</a></span><span class="op">(</span><span class="va">perf_con</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Cleared 1 cached response(s).</span></span></code></pre></div>
-<p><code><a href="../reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code> does not set a parallel backend
-itself - it runs against whatever <code>future</code> plan is already
-active, sequential by default. The future package’s best-practices
-vignette is explicit that the choice of backend belongs to the caller,
-not to a package: a function that quietly sets and restores a plan on
-every call still mutates session-wide state you didn’t ask it to touch,
-and can silently replace a plan you configured deliberately (a specific
-worker count, a cluster spanning several machines, callr workers for
-extra isolation). So it’s your call to make, before this function
-runs:</p>
+<p><strong>Parallel fetching</strong> runs one call across many
+identifiers at once, which helps when you are pulling data for dozens of
+studies or germplasm and each request is slow.
+<code><a href="../reference/brapi_fetch_parallel.html">brapi_fetch_parallel()</a></code> uses whatever <code>future</code>
+plan is already active — sequential unless you say otherwise — so
+choosing the backend, and shutting it down afterwards, is yours to do.
+See <a href="https://future.futureverse.org/" class="external-link"><code>future</code>’s own
+documentation</a> for the available backends, and DESIGN.md for why the
+package does not set one for you:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="va"><a href="https://future.futureverse.org/reference/multisession.html" class="external-link">multisession</a></span>, workers <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span></span>
@@ -591,6 +601,9 @@ credentials, so they are illustrative only.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">studyName</span> <span class="op">==</span> <span class="st">"Ithaca 2022"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">studyDbId</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/brapi_study_data.html">brapi_study_data</a></span><span class="op">(</span>con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span></code></pre></div>
+<p>Choose QBMS for interactive exploration in the console. Choose
+brapiR2 for reproducible scripts, pipelines, or when you need genotypic
+data and caching. Many users use both.</p>
 </div>
 </div>
 <div class="section level2">
@@ -603,9 +616,6 @@ plant breeding applications. <em>Bioinformatics</em>, 35(20), 4147–4155.
 <a href="https://doi.org/10.1093/bioinformatics/btz190" class="external-link uri">https://doi.org/10.1093/bioinformatics/btz190</a>
 </li>
 </ul>
-<p>Choose QBMS for interactive exploration in the console. Choose
-brapiR2 for reproducible scripts, pipelines, or when you need genotypic
-data and caching. Many users use both.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

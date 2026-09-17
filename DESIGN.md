@@ -39,7 +39,7 @@ integration tests.
 
 ## Architecture Overview
 
-`brapiR2` is organized in layers, from the caller’s perspective inward:
+`brapiR2` is organised in layers, from the caller’s perspective inward:
 
 1.  **Connection and auth** - build and hold connection state explicitly
     ([`brapi_connection()`](https://josh45-source.github.io/brapiR2/reference/brapi_connection.md),
@@ -61,7 +61,7 @@ integration tests.
     [`brapi_get_marker_map()`](https://josh45-source.github.io/brapiR2/reference/brapi_get_marker_map.md))
     that compose module functions into analysis-ready shapes (a wide
     phenotyping tibble, a numeric dosage matrix) without introducing any
-    new HTTP behavior of their own.
+    new HTTP behaviour of their own.
 5.  **Caching and parallel fetching** - an optional, opt-in disk cache
     ([`brapi_cache_enable()`](https://josh45-source.github.io/brapiR2/reference/brapi_cache_enable.md),
     [`brapi_cache_clear()`](https://josh45-source.github.io/brapiR2/reference/brapi_cache_clear.md))
@@ -162,11 +162,24 @@ specifically, not a claim that `brapiR2` covers the Genotyping module
 
 Caching is opt-in
 ([`brapi_cache_enable()`](https://josh45-source.github.io/brapiR2/reference/brapi_cache_enable.md)),
-not automatic, so default behavior always reflects the live server. When
-enabled, each cache entry is keyed by a hash of the fully-qualified URL
-plus sorted, page-excluded query parameters, so identical requests
+not automatic, so default behaviour always reflects the live server.
+When enabled, each cache entry is keyed by a hash of the fully-qualified
+URL plus sorted, page-excluded query parameters, so identical requests
 (including identical filter arguments in a different order) reliably hit
 the cache and different requests never collide.
+
+### The caller owns the `future` plan
+
+[`brapi_fetch_parallel()`](https://josh45-source.github.io/brapiR2/reference/brapi_fetch_parallel.md)
+runs against whatever `future` plan is already active and never sets one
+itself. The future package’s best-practices guidance is explicit that
+the choice of backend belongs to the caller, not to a package: a
+function that quietly sets and restores a plan on every call still
+mutates session-wide state the caller did not ask it to touch, and can
+silently replace a plan configured deliberately - a specific worker
+count, a cluster spanning several machines, `callr` workers for extra
+isolation. The `.workers` argument in 0.1.0 did exactly this, and is
+deprecated; supplying it now warns and has no effect.
 
 ### Mocked tests alongside integration tests
 
@@ -205,7 +218,7 @@ The current design deliberately leaves several things out of scope:
   particular server implementations (BMS, Breedbase, EBS, GIGWA,
   Germinate); servers that deviate from spec are expected to be fixed
   upstream rather than special-cased here.
-- **No visualization.** Plotting genotype, pedigree, or phenotype data
+- **No visualisation.** Plotting genotype, pedigree, or phenotype data
   is left to downstream packages that consume `brapiR2`’s tibbles.
 
 ## Relationship to Other Tools
@@ -246,7 +259,7 @@ pipeline, not to replace the tools downstream of it:
 - **vcf2dosage** - genotype format conversion, complementary to
   [`brapi_get_dosage_matrix()`](https://josh45-source.github.io/brapiR2/reference/brapi_get_dosage_matrix.md)
   for data that originates as VCF rather than from a BrAPI server.
-- **ggvariant** - variant and genotype visualization, consuming
+- **ggvariant** - variant and genotype visualisation, consuming
   [`brapi_variants()`](https://josh45-source.github.io/brapiR2/reference/brapi_variants.md)
   /
   [`brapi_allele_matrix()`](https://josh45-source.github.io/brapiR2/reference/brapi_allele_matrix.md)
@@ -255,7 +268,7 @@ pipeline, not to replace the tools downstream of it:
   dosage matrix and phenotyping tibble directly as model inputs.
 
 In each case, `brapiR2`’s job ends at “a tidy tibble or matrix retrieved
-from a BrAPI server”; cleaning, visualization, and modeling are left to
+from a BrAPI server”; cleaning, visualisation, and modelling are left to
 packages built for those tasks specifically.
 
 ## Maintenance Considerations
