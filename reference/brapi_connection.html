@@ -55,6 +55,7 @@ and configuration. This object is passed as the first argument to all
 <span>  token <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  version <span class="op">=</span> <span class="st">"v2"</span>,</span>
 <span>  path <span class="op">=</span> <span class="st">"brapi"</span>,</span>
+<span>  user_agent <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  page_size <span class="op">=</span> <span class="fl">1000L</span>,</span>
 <span>  timeout <span class="op">=</span> <span class="fl">120</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -83,6 +84,12 @@ If NULL, you can authenticate later with <code><a href="brapi_login.html">brapi_
 <dd><p>Character. URL path segment before the version, for servers
 that do not serve BrAPI at <code>/brapi/</code>. Default <code>"brapi"</code>. GRIN-Global
 instances, for example, use <code>"gringlobal/brapi"</code>.</p></dd>
+
+
+<dt id="arg-user-agent">user_agent<a class="anchor" aria-label="anchor" href="#arg-user-agent"></a></dt>
+<dd><p>Character or NULL. Overrides the user agent brapiR2
+sends with each request. The default identifies the package, its
+version, and the httr2 and R versions in use.</p></dd>
 
 
 <dt id="arg-page-size">page_size<a class="anchor" aria-label="anchor" href="#arg-page-size"></a></dt>

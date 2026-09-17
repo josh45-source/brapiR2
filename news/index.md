@@ -99,6 +99,14 @@
   is unaffected. [`print()`](https://rdrr.io/r/base/print.html) shows
   the path only when it differs from the default, and the cache key now
   includes it, so two servers sharing a hostname no longer collide.
+- Requests now send a user agent identifying brapiR2, its version, and
+  the httr2 and R versions in use, so server operators can see what is
+  calling them. Requests made on continuous integration are marked as
+  such.
+  [`brapi_connection()`](https://josh45-source.github.io/brapiR2/reference/brapi_connection.md)
+  gains a `user_agent` argument to override it
+  ([@dwaring87](https://github.com/dwaring87),
+  ropensci/software-review#792).
 
 #### Deprecated
 

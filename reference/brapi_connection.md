@@ -12,6 +12,7 @@ brapi_connection(
   token = NULL,
   version = "v2",
   path = "brapi",
+  user_agent = NULL,
   page_size = 1000L,
   timeout = 120
 )
@@ -41,6 +42,12 @@ brapi_connection(
   Character. URL path segment before the version, for servers that do
   not serve BrAPI at `/brapi/`. Default `"brapi"`. GRIN-Global
   instances, for example, use `"gringlobal/brapi"`.
+
+- user_agent:
+
+  Character or NULL. Overrides the user agent brapiR2 sends with each
+  request. The default identifies the package, its version, and the
+  httr2 and R versions in use.
 
 - page_size:
 
