@@ -356,7 +356,7 @@ brapi_study_data <- function(con, studyDbId) {
     function(col) {
       if (!all(lengths(col) <= 1L)) return(col)
       vapply(col, function(x) {
-        if (length(x) == 0L) NA_character_ else as.character(x[[1]])
+        if (length(x) == 0L) NA_character_ else trimws(as.character(x[[1]]))
       }, character(1))
     }
   ))

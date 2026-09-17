@@ -51,6 +51,12 @@
 * `con$timeout` is now applied to requests. The argument has been accepted
   and documented since 0.1.0 but never took effect, leaving every request on
   curl's own default.
+* Observation values are trimmed of surrounding whitespace before being
+  returned by `brapi_study_data()`, so values such as `"80 "` do not become
+  `NA` on conversion to numeric. Reported by @dwaring87 from a development
+  server; not reproducible across 21 studies on T3/Oat Sandbox,
+  T3/Wheat Sandbox and Cassavabase, so the trim is defensive
+  (ropensci/software-review#792).
 
 ### New features
 
