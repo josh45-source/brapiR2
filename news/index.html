@@ -55,6 +55,7 @@
 <code><a href="../reference/brapi_login.html">brapi_login()</a></code> now builds its request the same way every other function does. It previously hardcoded <code>/brapi/</code>, so authentication was impossible on servers using a different path, and it sent neither the user agent nor the <code>Accept</code> header.</li>
 <li>
 <code>con$timeout</code> is now applied to requests. The argument has been accepted and documented since 0.1.0 but never took effect, leaving every request on curl’s own default.</li>
+<li>Observation values are trimmed of surrounding whitespace before being returned by <code><a href="../reference/brapi_study_data.html">brapi_study_data()</a></code>, so values such as <code>"80 "</code> do not become <code>NA</code> on conversion to numeric. Reported by <a href="https://github.com/dwaring87" class="external-link">@dwaring87</a> from a development server; not reproducible across 21 studies on T3/Oat Sandbox, T3/Wheat Sandbox and Cassavabase, so the trim is defensive (ropensci/software-review#792).</li>
 </ul></div>
 <div class="section level4">
 <h4 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h4>
