@@ -127,6 +127,11 @@
   corrected, and `inst/WORDLIST` has been extended with the domain
   vocabulary and package names the spellchecker cannot know
   ([@jmh579](https://github.com/jmh579), ropensci/software-review#792).
+- The README leads with what brapiR2 does and which BrAPI modules it
+  covers. The QBMS comparison table and the notes on other BrAPI clients
+  have moved into Related Packages, and Authentication now comes before
+  the extended examples ([@jmh579](https://github.com/jmh579),
+  ropensci/software-review#792).
 
 #### Testing
 
