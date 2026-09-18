@@ -119,3 +119,19 @@ test_that("brapi_pedigree returns zero rows unchanged", {
 
   expect_identical(nrow(result), 0L)
 })
+
+test_that("brapi_germplasm_pedigree filters client-side when the server does not", {
+  local_mocked_bindings(
+    brapi_pedigree = function(con, germplasmDbId = NULL, ...) {
+      tibble::tibble(
+        germplasmDbId = c("g1", "g3"),
+        germplasmName = c("One", "Three")
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  out <- brapi_germplasm_pedigree(brapi_connection("https://example.org"), "g1")
+  expect_identical(nrow(out), 1L)
+  expect_identical(out$germplasmDbId, "g1")
+})

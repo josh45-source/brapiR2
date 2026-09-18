@@ -44,10 +44,16 @@ brapi_germplasm_detail <- function(con, germplasmDbId) {
 
 #' Get Germplasm Pedigree
 #'
+#'
+#' The `/germplasm/{germplasmDbId}/pedigree` endpoint this function
+#' originally called was deprecated in BrAPI v2.1. It now queries
+#' `/pedigree?germplasmDbId=` instead, which returns a richer record.
 #' @inheritParams brapi_shared_params
 #' @inheritParams brapi_shared_ids
 #'
-#' @return A tibble with pedigree information (parents, crosses).
+#' @return A single-row tibble of the germplasm's pedigree node, with
+#'   `parents`, `siblings` and `progeny` as list-columns of tidy tibbles.
+#'   See [brapi_pedigree()], which this function calls.
 #'
 #' @examples
 #' \donttest{
@@ -57,7 +63,14 @@ brapi_germplasm_detail <- function(con, germplasmDbId) {
 #'
 #' @export
 brapi_germplasm_pedigree <- function(con, germplasmDbId) {
-  brapi_get(con, glue("/germplasm/{germplasmDbId}/pedigree"))
+  res <- brapi_pedigree(con, germplasmDbId = germplasmDbId)
+  # Some servers do not apply the germplasmDbId filter, returning other
+  # nodes alongside the requested one. This function promises a single
+  # germplasm, so filter client-side as well.
+  if ("germplasmDbId" %in% names(res)) {
+    res <- res[res$germplasmDbId == germplasmDbId, , drop = FALSE]
+  }
+  res
 }
 
 
@@ -66,7 +79,9 @@ brapi_germplasm_pedigree <- function(con, germplasmDbId) {
 #' @inheritParams brapi_shared_params
 #' @inheritParams brapi_shared_ids
 #'
-#' @return A tibble with progeny information.
+#' @return A single-row tibble of the germplasm's pedigree node, with
+#'   `progeny` as a list-column of a tidy tibble of descendants. See
+#'   [brapi_pedigree()], which this function calls.
 #'
 #' @examples
 #' \donttest{
@@ -76,7 +91,15 @@ brapi_germplasm_pedigree <- function(con, germplasmDbId) {
 #'
 #' @export
 brapi_germplasm_progeny <- function(con, germplasmDbId) {
-  brapi_get(con, glue("/germplasm/{germplasmDbId}/progeny"))
+  res <- brapi_pedigree(
+    con,
+    germplasmDbId = germplasmDbId,
+    includeProgeny = TRUE
+  )
+  if ("germplasmDbId" %in% names(res)) {
+    res <- res[res$germplasmDbId == germplasmDbId, , drop = FALSE]
+  }
+  res
 }
 
 

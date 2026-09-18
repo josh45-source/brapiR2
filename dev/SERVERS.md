@@ -38,6 +38,16 @@ bug @dwaring87 and @jmh579 hit on Cassavabase is not present there.
   and it does not advertise serverinfo in its own list. brapi_studies()
   returns 404 there, correctly.
 - Both T3 sandboxes advertise 118 services, the same count as Cassavabase.
+- The public test server ignores the `germplasmDbId` filter on `/pedigree`:
+  a request for germplasm1 returns germplasm1 and germplasm3. Both
+  by-germplasm pedigree functions now filter client-side as well.
+- `/germplasm/{id}/pedigree` (8 columns) and `/pedigree?germplasmDbId=`
+  (15 columns) return different shapes on both T3 sandboxes; `pedigree`
+  becomes `pedigreeString`, and relatives come back as tidy tibbles
+  rather than raw nested lists.
+- An unfiltered brapi_germplasm() does not complete on Cassavabase
+  (120s timeout at page sizes 10 and 1000) or wheat-sandbox (85+ min).
+  Worth documenting, and possibly warning on large totalCount.
 
 ## Reproducers
 

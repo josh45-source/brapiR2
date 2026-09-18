@@ -12,7 +12,9 @@ brapi_germplasm_progeny(con, germplasmDbId)
 \item{germplasmDbId}{Character. The unique germplasm identifier.}
 }
 \value{
-A tibble with progeny information.
+A single-row tibble of the germplasm's pedigree node, with
+\code{progeny} as a list-column of a tidy tibble of descendants. See
+\code{\link[=brapi_pedigree]{brapi_pedigree()}}, which this function calls.
 }
 \description{
 Get Germplasm Progeny

@@ -85,10 +85,13 @@ test_that("germplasm wrappers hit the right endpoint and pass filters", {
   expect_identical(captured$endpoint, "/germplasm/g1")
 
   expect_identical(brapi_germplasm_pedigree(con, "g1"), canned)
-  expect_identical(captured$endpoint, "/germplasm/g1/pedigree")
+  expect_identical(captured$endpoint, "/pedigree")
+  expect_identical(captured$query$germplasmDbId, "g1")
 
   expect_identical(brapi_germplasm_progeny(con, "g1"), canned)
-  expect_identical(captured$endpoint, "/germplasm/g1/progeny")
+  expect_identical(captured$endpoint, "/pedigree")
+  expect_identical(captured$query$germplasmDbId, "g1")
+  expect_true(captured$query$includeProgeny)
 
   expect_identical(brapi_germplasm_attributes(con), canned)
   expect_identical(captured$endpoint, "/attributes")

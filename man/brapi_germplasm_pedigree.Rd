@@ -12,10 +12,14 @@ brapi_germplasm_pedigree(con, germplasmDbId)
 \item{germplasmDbId}{Character. The unique germplasm identifier.}
 }
 \value{
-A tibble with pedigree information (parents, crosses).
+A single-row tibble of the germplasm's pedigree node, with
+\code{parents}, \code{siblings} and \code{progeny} as list-columns of tidy tibbles.
+See \code{\link[=brapi_pedigree]{brapi_pedigree()}}, which this function calls.
 }
 \description{
-Get Germplasm Pedigree
+The \verb{/germplasm/\{germplasmDbId\}/pedigree} endpoint this function
+originally called was deprecated in BrAPI v2.1. It now queries
+\verb{/pedigree?germplasmDbId=} instead, which returns a richer record.
 }
 \examples{
 \donttest{
