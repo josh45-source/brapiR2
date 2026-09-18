@@ -15,6 +15,8 @@
 \item{mapDbId}{Character. The unique genome map identifier.}
 
 \item{ontologyDbId}{Character. The unique ontology identifier.}
+
+\item{locationDbId}{Character. The unique location identifier.}
 }
 \description{
 Not a real function - like \link{brapi_shared_params}, this exists only as an

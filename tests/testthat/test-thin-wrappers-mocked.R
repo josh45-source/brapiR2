@@ -448,3 +448,19 @@ test_that("brapi_ping returns FALSE when the request errors", {
   con <- brapi_connection("https://example.org")
   expect_false(isTRUE(brapi_ping(con)))
 })
+
+test_that("brapi_location hits the by-ID endpoint", {
+  captured <- new.env()
+  canned <- tibble::tibble(id = "x")
+  local_mocked_bindings(
+    brapi_get = function(con, endpoint, query = list()) {
+      captured$endpoint <- endpoint
+      canned
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  expect_identical(brapi_location(con, "loc1"), canned)
+  expect_identical(captured$endpoint, "/locations/loc1")
+})

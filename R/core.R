@@ -148,6 +148,26 @@ brapi_locations <- function(con, ...) {
   brapi_get(con, "/locations", query = list(...))
 }
 
+#' Get a Single Location by ID
+#'
+#' @inheritParams brapi_shared_params
+#' @inheritParams brapi_shared_ids
+#'
+#' @return A single-row tibble with location metadata, including
+#'   coordinates where the server provides them.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_location(con, "location_01")
+#' }
+#'
+#' @export
+brapi_location <- function(con, locationDbId) {
+  brapi_get(con, glue("/locations/{locationDbId}"))
+}
+
+
 
 #' List Seasons
 #'

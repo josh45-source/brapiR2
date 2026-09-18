@@ -48,6 +48,9 @@ bug @dwaring87 and @jmh579 hit on Cassavabase is not present there.
 - An unfiltered brapi_germplasm() does not complete on Cassavabase
   (120s timeout at page sizes 10 and 1000) or wheat-sandbox (85+ min).
   Worth documenting, and possibly warning on large totalCount.
+- /locations/{locationDbId} works on all four reachable servers. Column
+  counts differ (21 on the test server, 19 on Cassavabase, oat-sandbox
+  and GRIN), since servers return different optional fields.
 
 ## Reproducers
 

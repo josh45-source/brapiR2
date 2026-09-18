@@ -103,6 +103,11 @@
   them. Requests made on continuous integration are marked as such.
   `brapi_connection()` gains a `user_agent` argument to override it
   (@dwaring87, ropensci/software-review#792).
+* New `brapi_location()` retrieves a single location by ID, so a user who
+  knows a study's `locationDbId` can fetch its coordinates without listing
+  every location and filtering. Verified against the public test server,
+  Cassavabase, T3/Oat Sandbox and USDA-GRIN (@dwaring87,
+  ropensci/software-review#792).
 
 ### Deprecated
 
