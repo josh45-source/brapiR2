@@ -20,6 +20,20 @@
   `referenceName`/`start` are gone. Existing positional calls
   (`brapi_get_marker_map(con, variantSetDbId)`) still work, but code
   reading `referenceName` or `start` from the result will break.
+- [`brapi_germplasm_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_germplasm_pedigree.md)
+  and
+  [`brapi_germplasm_progeny()`](https://josh45-source.github.io/brapiR2/reference/brapi_germplasm_progeny.md)
+  now query `/pedigree?germplasmDbId=` instead of the
+  `/germplasm/{germplasmDbId}/pedigree` and
+  `/germplasm/{germplasmDbId}/progeny` sub-resources, which BrAPI
+  deprecated in v2.1. **The returned columns have changed**: 15 rather
+  than 8, `pedigree` is now `pedigreeString`, and `parents`, `siblings`
+  and `progeny` are list-columns of tidy tibbles rather than raw nested
+  lists. The added fields are `progeny`, `germplasmPUI`,
+  `defaultDisplayName`, `breedingMethodName`, `breedingMethodDbId`,
+  `additionalInfo` and `externalReferences`
+  ([@dwaring87](https://github.com/dwaring87),
+  ropensci/software-review#792).
 
 #### Bug fixes
 
@@ -73,6 +87,14 @@
   development server; not reproducible across 21 studies on T3/Oat
   Sandbox, T3/Wheat Sandbox and Cassavabase, so the trim is defensive
   (ropensci/software-review#792).
+- [`brapi_germplasm_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_germplasm_pedigree.md)
+  and
+  [`brapi_germplasm_progeny()`](https://josh45-source.github.io/brapiR2/reference/brapi_germplasm_progeny.md)
+  filter the response on `germplasmDbId` client-side. The public test
+  server ignores that parameter on `/pedigree`, so a request for one
+  germplasm returned another alongside it
+  ([@dwaring87](https://github.com/dwaring87),
+  ropensci/software-review#792).
 
 #### New features
 

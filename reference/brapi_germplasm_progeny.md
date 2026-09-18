@@ -22,7 +22,10 @@ brapi_germplasm_progeny(con, germplasmDbId)
 
 ## Value
 
-A tibble with progeny information.
+A single-row tibble of the germplasm's pedigree node, with `progeny` as
+a list-column of a tidy tibble of descendants. See
+[`brapi_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_pedigree.md),
+which this function calls.
 
 ## Examples
 
@@ -30,9 +33,13 @@ A tibble with progeny information.
 # \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 brapi_germplasm_progeny(con, "germplasm1")
-#> # A tibble: 1 × 3
-#>   germplasmDbId germplasmName        progeny   
-#>   <chr>         <chr>                <list>    
-#> 1 germplasm1    Tomatillo Fantastico <list [1]>
+#> # A tibble: 1 × 15
+#>   additionalInfo externalReferences breedingMethodDbId breedingMethodName
+#>   <lgl>          <lgl>              <chr>              <chr>             
+#> 1 NA             NA                 breeding_method1   Male Backcross    
+#> # ℹ 11 more variables: crossingProjectDbId <chr>, crossingYear <int>,
+#> #   defaultDisplayName <chr>, familyCode <chr>, germplasmDbId <chr>,
+#> #   germplasmName <chr>, germplasmPUI <chr>, parents <list>,
+#> #   pedigreeString <chr>, progeny <list>, siblings <list>
 # }
 ```

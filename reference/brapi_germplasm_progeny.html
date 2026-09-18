@@ -61,7 +61,9 @@
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble with progeny information.</p>
+    <p>A single-row tibble of the germplasm's pedigree node, with
+<code>progeny</code> as a list-column of a tidy tibble of descendants. See
+<code><a href="brapi_pedigree.html">brapi_pedigree()</a></code>, which this function calls.</p>
     </div>
 
     <div class="section level2">
@@ -69,10 +71,14 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="brapi_connection.html">brapi_connection</a></span><span class="op">(</span><span class="st">"https://test-server.brapi.org"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">brapi_germplasm_progeny</span><span class="op">(</span><span class="va">con</span>, <span class="st">"germplasm1"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   germplasmDbId germplasmName        progeny   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> germplasm1    Tomatillo Fantastico <span style="color: #949494;">&lt;list [1]&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 15</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   additionalInfo externalReferences breedingMethodDbId breedingMethodName</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> <span style="color: #BB0000;">NA</span>             <span style="color: #BB0000;">NA</span>                 breeding_method1   Male Backcross    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 11 more variables: crossingProjectDbId &lt;chr&gt;, crossingYear &lt;int&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   defaultDisplayName &lt;chr&gt;, familyCode &lt;chr&gt;, germplasmDbId &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   germplasmName &lt;chr&gt;, germplasmPUI &lt;chr&gt;, parents &lt;list&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   pedigreeString &lt;chr&gt;, progeny &lt;list&gt;, siblings &lt;list&gt;</span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
