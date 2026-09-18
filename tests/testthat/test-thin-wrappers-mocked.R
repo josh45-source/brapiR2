@@ -464,3 +464,22 @@ test_that("brapi_location hits the by-ID endpoint", {
   expect_identical(brapi_location(con, "loc1"), canned)
   expect_identical(captured$endpoint, "/locations/loc1")
 })
+
+test_that("brapi_list returns list metadata with members as a character vector", {
+  local_mocked_bindings(
+    brapi_get = function(con, endpoint, query = list()) {
+      tibble::tibble(
+        listDbId = "list1",
+        listType = "germplasm",
+        listSize = 3L,
+        data = list(list(list("germ1"), list("germ2"), list("germ3")))
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  out <- brapi_list(brapi_connection("https://example.org"), "list1")
+  expect_identical(nrow(out), 1L)
+  expect_identical(out$listType, "germplasm")
+  expect_identical(out$data[[1]], c("germ1", "germ2", "germ3"))
+})

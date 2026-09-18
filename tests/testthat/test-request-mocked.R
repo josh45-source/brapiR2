@@ -356,3 +356,24 @@ test_that("brapi_connection rejects an invalid user agent", {
     "character"
   )
 })
+
+test_that("a result field named data is not mistaken for the record envelope", {
+  local_mocked_bindings(
+    req_perform = function(req) structure(list(), class = "httr2_response"),
+    resp_body_json = function(resp, ...) {
+      list(
+        metadata = list(pagination = list(totalPages = 1L)),
+        result = list(
+          listDbId = "list1",
+          listName = "Example",
+          data = list("germ1", "germ2")
+        )
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  out <- brapi_get(brapi_connection("https://example.org"), "/lists/list1")
+  expect_identical(nrow(out), 1L)
+  expect_true(all(c("listDbId", "listName", "data") %in% names(out)))
+})

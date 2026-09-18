@@ -52,6 +52,7 @@ NULL
 #' @param mapDbId Character. The unique genome map identifier.
 #' @param ontologyDbId Character. The unique ontology identifier.
 #' @param locationDbId Character. The unique location identifier.
+#' @param listDbId Character. The unique list identifier.
 #'
 #' @keywords internal
 #' @name brapi_shared_ids

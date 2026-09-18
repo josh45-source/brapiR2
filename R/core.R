@@ -206,6 +206,43 @@ brapi_lists <- function(con, ...) {
   brapi_get(con, "/lists", query = list(...))
 }
 
+#' Get a Single List by ID, With Its Contents
+#'
+#' Unlike [brapi_lists()], which returns only list metadata, this returns
+#' a single list together with its members in the `data` list-column.
+#' `listType` says what the members are (for example `"germplasm"`).
+#'
+#' @inheritParams brapi_shared_params
+#' @inheritParams brapi_shared_ids
+#'
+#' @return A single-row tibble of list metadata, with the list's members
+#'   as a character vector in the `data` list-column.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' lst <- brapi_list(con, "list1")
+#' lst$data[[1]]
+#' }
+#'
+#' @export
+brapi_list <- function(con, listDbId) {
+  res <- brapi_get(con, glue("/lists/{listDbId}"))
+  # The members arrive as a list of one-element lists; a character vector
+  # is what a caller actually wants to pass to another function.
+  if ("data" %in% names(res) && is.list(res$data)) {
+    res$data <- lapply(res$data, function(x) {
+      if (is.list(x) && all(lengths(x) == 1L)) {
+        unlist(x, use.names = FALSE)
+      } else {
+        x
+      }
+    })
+  }
+  res
+}
+
+
 
 #' List People
 #'

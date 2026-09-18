@@ -179,7 +179,14 @@ brapi_get_pages <- function(con, endpoint, query) {
 
     # Single-object endpoint (no `data` envelope) — return immediately,
     # no caching because there is nothing to paginate.
-    if (!is.null(body$result) && is.null(body$result$data)) {
+    # A collection endpoint's `data` is a list of record objects. A
+    # single-object endpoint may itself carry a field called `data`
+    # (`/lists/{listDbId}` holds its members there, as bare strings), so
+    # treat `data` as the record envelope only when it holds objects.
+    is_envelope <- !is.null(body$result$data) &&
+      (length(data) == 0L ||
+        all(vapply(data, is.list, logical(1))))
+    if (!is.null(body$result) && !is_envelope) {
       return(list(data = list(body$result), single = TRUE))
     }
 

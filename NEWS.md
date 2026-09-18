@@ -70,6 +70,11 @@
   response on `germplasmDbId` client-side. The public test server ignores
   that parameter on `/pedigree`, so a request for one germplasm returned
   another alongside it (@dwaring87, ropensci/software-review#792).
+* A single-object response whose `result` carries a field named `data` is no
+  longer mistaken for a collection. The parser treated any `result$data` as
+  the record envelope, so `/lists/{listDbId}` returned only its members and
+  discarded every other field. `data` is now treated as the envelope only
+  when it is absent of scalars — that is, empty or holding objects.
 
 ### New features
 
@@ -108,6 +113,11 @@
   every location and filtering. Verified against the public test server,
   Cassavabase, T3/Oat Sandbox and USDA-GRIN (@dwaring87,
   ropensci/software-review#792).
+* New `brapi_list()` retrieves a single list by ID together with its
+  contents. `brapi_lists()` returns only metadata, so there was previously
+  no way to reach a list's members at all. The members come back as a
+  character vector in the `data` list-column, ready to pass to another
+  function (@dwaring87, ropensci/software-review#792).
 
 ### Deprecated
 
