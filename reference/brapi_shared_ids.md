@@ -34,3 +34,11 @@ same names.
 - ontologyDbId:
 
   Character. The unique ontology identifier.
+
+- locationDbId:
+
+  Character. The unique location identifier.
+
+- listDbId:
+
+  Character. The unique list identifier.

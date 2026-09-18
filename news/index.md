@@ -95,6 +95,12 @@
   germplasm returned another alongside it
   ([@dwaring87](https://github.com/dwaring87),
   ropensci/software-review#792).
+- A single-object response whose `result` carries a field named `data`
+  is no longer mistaken for a collection. The parser treated any
+  `result$data` as the record envelope, so `/lists/{listDbId}` returned
+  only its members and discarded every other field. `data` is now
+  treated as the envelope only when it is absent of scalars — that is,
+  empty or holding objects.
 
 #### New features
 
@@ -143,6 +149,23 @@
   such.
   [`brapi_connection()`](https://josh45-source.github.io/brapiR2/reference/brapi_connection.md)
   gains a `user_agent` argument to override it
+  ([@dwaring87](https://github.com/dwaring87),
+  ropensci/software-review#792).
+- New
+  [`brapi_location()`](https://josh45-source.github.io/brapiR2/reference/brapi_location.md)
+  retrieves a single location by ID, so a user who knows a study’s
+  `locationDbId` can fetch its coordinates without listing every
+  location and filtering. Verified against the public test server,
+  Cassavabase, T3/Oat Sandbox and USDA-GRIN
+  ([@dwaring87](https://github.com/dwaring87),
+  ropensci/software-review#792).
+- New
+  [`brapi_list()`](https://josh45-source.github.io/brapiR2/reference/brapi_list.md)
+  retrieves a single list by ID together with its contents.
+  [`brapi_lists()`](https://josh45-source.github.io/brapiR2/reference/brapi_lists.md)
+  returns only metadata, so there was previously no way to reach a
+  list’s members at all. The members come back as a character vector in
+  the `data` list-column, ready to pass to another function
   ([@dwaring87](https://github.com/dwaring87),
   ropensci/software-review#792).
 

@@ -37,10 +37,14 @@ Programs, trials, studies, locations, and other organizational entities.
   : Get a Single Study by ID
 - [`brapi_locations()`](https://josh45-source.github.io/brapiR2/reference/brapi_locations.md)
   : List Locations
+- [`brapi_location()`](https://josh45-source.github.io/brapiR2/reference/brapi_location.md)
+  : Get a Single Location by ID
 - [`brapi_seasons()`](https://josh45-source.github.io/brapiR2/reference/brapi_seasons.md)
   : List Seasons
 - [`brapi_lists()`](https://josh45-source.github.io/brapiR2/reference/brapi_lists.md)
   : List Generic Lists
+- [`brapi_list()`](https://josh45-source.github.io/brapiR2/reference/brapi_list.md)
+  : Get a Single List by ID, With Its Contents
 - [`brapi_people()`](https://josh45-source.github.io/brapiR2/reference/brapi_people.md)
   : List People
 - [`brapi_server_info()`](https://josh45-source.github.io/brapiR2/reference/brapi_server_info.md)
