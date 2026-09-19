@@ -276,6 +276,22 @@
   since neither result was used and both added a heavy dependency to the
   build ([@jmh579](https://github.com/jmh579),
   ropensci/software-review#792).
+- Every wrapper’s help page now has a “BrAPI endpoint” section naming
+  the endpoint it calls, linking to that endpoint’s definition in the
+  v2.1 specification, and listing the query parameters the specification
+  defines for it.
+  [`brapi_studies()`](https://josh45-source.github.io/brapiR2/reference/brapi_studies.md)
+  documented only `trialDbId` while the specification defines nine; the
+  same gap existed across the package
+  ([@dwaring87](https://github.com/dwaring87),
+  [@jmh579](https://github.com/jmh579), ropensci/software-review#792).
+- The coverage figures are now derived from the specification rather
+  than stated from memory. `dev/brapi-spec.R` reads the pinned `V2.1`
+  tag of the BrAPI specification repository and writes the endpoint
+  inventory that the documentation is generated from. Correcting against
+  it: the specification defines 37 top-level entities rather than 36,
+  brapiR2 wraps 49 retrieval endpoints rather than 56, and Planned
+  Crosses was missing from the list of uncovered entities.
 
 #### Testing
 
