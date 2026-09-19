@@ -3,7 +3,8 @@
 Retrieves genotype calls from the `/allelematrix` endpoint and returns a
 tidy tibble with one row per (variant, callSet) combination. The
 `/allelematrix` response has a unique structure (2-D pagination, no
-`result$data` envelope) so it cannot use the generic `brapi_get()`.
+`result$data` envelope) so it cannot use the generic
+[`brapi_get()`](https://josh45-source.github.io/brapiR2/reference/brapi_get.md).
 
 ## Usage
 

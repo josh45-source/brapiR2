@@ -67,7 +67,7 @@
 <h2 id="adding-a-new-brapi-endpoint">Adding a New BrAPI Endpoint<a class="anchor" aria-label="anchor" href="#adding-a-new-brapi-endpoint"></a></h2>
 <ol style="list-style-type: decimal"><li>Add the function in the appropriate module file (<code>R/core.R</code>, <code>R/germplasm.R</code>, etc.)</li>
 <li>Follow the existing pattern: <code>con</code> as first argument, <code>...</code> for query params</li>
-<li>Use <code>brapi_get()</code> or <code>brapi_post_search()</code> internally</li>
+<li>Use <code><a href="reference/brapi_get.html">brapi_get()</a></code> or <code><a href="reference/brapi_post_search.html">brapi_post_search()</a></code> internally</li>
 <li>Add <code>#' @export</code> to the function’s roxygen block and run <code>devtools::document()</code> to regenerate <code>NAMESPACE</code> (it carries a roxygen2 “do not edit by hand” header, so never edit it directly)</li>
 <li>Write tests in <code>tests/testthat/</code>
 </li>

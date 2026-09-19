@@ -148,6 +148,15 @@ helpers.
 - [`brapi_get_marker_map()`](https://josh45-source.github.io/brapiR2/reference/brapi_get_marker_map.md)
   : Get Marker Map
 
+## Low-Level Requests
+
+Call any BrAPI endpoint directly, including those brapiR2 does not wrap.
+
+- [`brapi_get()`](https://josh45-source.github.io/brapiR2/reference/brapi_get.md)
+  : Call Any BrAPI GET Endpoint
+- [`brapi_post_search()`](https://josh45-source.github.io/brapiR2/reference/brapi_post_search.md)
+  : Call Any BrAPI Search Endpoint
+
 ## Caching & Performance
 
 Response caching and parallel data fetching.

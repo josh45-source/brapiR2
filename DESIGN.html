@@ -76,7 +76,7 @@
 </tr><tr><td>Request engine</td>
 <td><code>R/request.R</code></td>
 <td>
-<code>brapi_req()</code>, <code>brapi_get()</code>, <code>brapi_get_pages()</code>, <code>brapi_cache_path()</code>, <code>brapi_cache_read()</code>, <code>brapi_post_search()</code>, <code>brapi_poll_search()</code>, <code>parse_brapi_result()</code> - shared HTTP plumbing: headers/auth/retry, GET pagination, cache key/lookup, the POST-search 200/202-poll protocol, and list-to-tibble parsing</td>
+<code>brapi_req()</code>, <code><a href="reference/brapi_get.html">brapi_get()</a></code>, <code>brapi_get_pages()</code>, <code>brapi_cache_path()</code>, <code>brapi_cache_read()</code>, <code><a href="reference/brapi_post_search.html">brapi_post_search()</a></code>, <code>brapi_poll_search()</code>, <code>parse_brapi_result()</code> - shared HTTP plumbing: headers/auth/retry, GET pagination, cache key/lookup, the POST-search 200/202-poll protocol, and list-to-tibble parsing</td>
 </tr><tr><td>Core module</td>
 <td><code>R/core.R</code></td>
 <td>Programs, trials, studies, locations, seasons, lists, people, server info</td>
@@ -125,11 +125,11 @@
 </div>
 <div class="section level3">
 <h3 id="transparent-pagination">Transparent pagination<a class="anchor" aria-label="anchor" href="#transparent-pagination"></a></h3>
-<p>BrAPI list endpoints are always paginated server-side. <code>brapi_get()</code> / <code>brapi_get_pages()</code> walk every page automatically and return the fully concatenated result, so callers never have to reason about <code>page</code> or <code>pageSize</code> unless they want to override the default page size.</p>
+<p>BrAPI list endpoints are always paginated server-side. <code><a href="reference/brapi_get.html">brapi_get()</a></code> / <code>brapi_get_pages()</code> walk every page automatically and return the fully concatenated result, so callers never have to reason about <code>page</code> or <code>pageSize</code> unless they want to override the default page size.</p>
 </div>
 <div class="section level3">
 <h3 id="async-search-handled-internally">Async search handled internally<a class="anchor" aria-label="anchor" href="#async-search-handled-internally"></a></h3>
-<p>BrAPI’s <code>/search/*</code> endpoints can respond either immediately (200, with data) or asynchronously (202, with a <code>searchResultsDbId</code> to poll). Both paths are collapsed into a single synchronous return value by <code>brapi_post_search()</code> / <code>brapi_poll_search()</code>, so <code><a href="reference/brapi_search_germplasm.html">brapi_search_germplasm()</a></code> and friends behave identically to the immediate-result endpoints from the caller’s point of view.</p>
+<p>BrAPI’s <code>/search/*</code> endpoints can respond either immediately (200, with data) or asynchronously (202, with a <code>searchResultsDbId</code> to poll). Both paths are collapsed into a single synchronous return value by <code><a href="reference/brapi_post_search.html">brapi_post_search()</a></code> / <code>brapi_poll_search()</code>, so <code><a href="reference/brapi_search_germplasm.html">brapi_search_germplasm()</a></code> and friends behave identically to the immediate-result endpoints from the caller’s point of view.</p>
 </div>
 <div class="section level3">
 <h3 id="httr2-not-httr">

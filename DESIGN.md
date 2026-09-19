@@ -75,7 +75,7 @@ integration tests.
 |----|----|----|
 | Connection & validation | `R/connection.R` | [`brapi_connection()`](https://josh45-source.github.io/brapiR2/reference/brapi_connection.md), [`print.brapi_con()`](https://josh45-source.github.io/brapiR2/reference/print.brapi_con.md), [`is_brapi_con()`](https://josh45-source.github.io/brapiR2/reference/is_brapi_con.md), `validate_con()` — build, print, and validate the stateless connection object every other function takes as its first argument |
 | Authentication | `R/auth.R` | [`brapi_login()`](https://josh45-source.github.io/brapiR2/reference/brapi_login.md), [`brapi_login_oauth2()`](https://josh45-source.github.io/brapiR2/reference/brapi_login_oauth2.md), [`brapi_set_token()`](https://josh45-source.github.io/brapiR2/reference/brapi_set_token.md) - populate the connection’s Bearer token via password grant, OAuth2 client-credentials grant, or direct assignment |
-| Request engine | `R/request.R` | `brapi_req()`, `brapi_get()`, `brapi_get_pages()`, `brapi_cache_path()`, `brapi_cache_read()`, `brapi_post_search()`, `brapi_poll_search()`, `parse_brapi_result()` - shared HTTP plumbing: headers/auth/retry, GET pagination, cache key/lookup, the POST-search 200/202-poll protocol, and list-to-tibble parsing |
+| Request engine | `R/request.R` | `brapi_req()`, [`brapi_get()`](https://josh45-source.github.io/brapiR2/reference/brapi_get.md), `brapi_get_pages()`, `brapi_cache_path()`, `brapi_cache_read()`, [`brapi_post_search()`](https://josh45-source.github.io/brapiR2/reference/brapi_post_search.md), `brapi_poll_search()`, `parse_brapi_result()` - shared HTTP plumbing: headers/auth/retry, GET pagination, cache key/lookup, the POST-search 200/202-poll protocol, and list-to-tibble parsing |
 | Core module | `R/core.R` | Programs, trials, studies, locations, seasons, lists, people, server info |
 | Germplasm module | `R/germplasm.R` | Germplasm records, progeny, attributes, crosses, crossing projects, seed lots, germplasm search; pedigree via both the single-germplasm sub-resource ([`brapi_germplasm_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_germplasm_pedigree.md)) and the batch Pedigree entity ([`brapi_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_pedigree.md), [`brapi_search_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_search_pedigree.md)) |
 | Phenotyping module | `R/phenotyping.R` | Observation units, observations, observation variables, traits, scales, methods, ontologies, images, events, phenotyping search, and [`brapi_study_data()`](https://josh45-source.github.io/brapiR2/reference/brapi_study_data.md) (wide-format pivot) |
@@ -121,8 +121,9 @@ parameter saving would.
 
 ### Transparent pagination
 
-BrAPI list endpoints are always paginated server-side. `brapi_get()` /
-`brapi_get_pages()` walk every page automatically and return the fully
+BrAPI list endpoints are always paginated server-side.
+[`brapi_get()`](https://josh45-source.github.io/brapiR2/reference/brapi_get.md)
+/ `brapi_get_pages()` walk every page automatically and return the fully
 concatenated result, so callers never have to reason about `page` or
 `pageSize` unless they want to override the default page size.
 
@@ -131,7 +132,8 @@ concatenated result, so callers never have to reason about `page` or
 BrAPI’s `/search/*` endpoints can respond either immediately (200, with
 data) or asynchronously (202, with a `searchResultsDbId` to poll). Both
 paths are collapsed into a single synchronous return value by
-`brapi_post_search()` / `brapi_poll_search()`, so
+[`brapi_post_search()`](https://josh45-source.github.io/brapiR2/reference/brapi_post_search.md)
+/ `brapi_poll_search()`, so
 [`brapi_search_germplasm()`](https://josh45-source.github.io/brapiR2/reference/brapi_search_germplasm.md)
 and friends behave identically to the immediate-result endpoints from
 the caller’s point of view.

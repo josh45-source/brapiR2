@@ -26,7 +26,11 @@ Thank you for your interest in contributing to brapiR2!
     `R/germplasm.R`, etc.)
 2.  Follow the existing pattern: `con` as first argument, `...` for
     query params
-3.  Use `brapi_get()` or `brapi_post_search()` internally
+3.  Use
+    [`brapi_get()`](https://josh45-source.github.io/brapiR2/reference/brapi_get.md)
+    or
+    [`brapi_post_search()`](https://josh45-source.github.io/brapiR2/reference/brapi_post_search.md)
+    internally
 4.  Add `#' @export` to the function’s roxygen block and run
     `devtools::document()` to regenerate `NAMESPACE` (it carries a
     roxygen2 “do not edit by hand” header, so never edit it directly)
