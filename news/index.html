@@ -66,6 +66,8 @@
 <div class="section level4">
 <h4 id="minor-improvements-development-version">Minor improvements<a class="anchor" aria-label="anchor" href="#minor-improvements-development-version"></a></h4>
 <ul><li>Failed requests now report what the server said, not just the HTTP status. A 401 from a Breedbase server reads “You must login and have permission to access this BrAPI call” rather than a bare <code>HTTP 401 Unauthorized</code>, and a failed login reports the server’s reason — “Incorrect Password”, or “JSON array body required” — instead of “no access token returned”. Servers report errors in several different ways, and all of the forms seen across the test server, Breedbase, T3 and GRIN-Global are handled; an HTML error page is not shown, since it is never useful to a user (<a href="https://github.com/dwaring87" class="external-link">@dwaring87</a>, ropensci/software-review#792).</li>
+<li>
+<code><a href="../reference/brapi_study_data.html">brapi_study_data()</a></code> checks that the observations it received are really from the study asked for. A server may accept the <code>studyDbId</code> filter and ignore it — the public test server does exactly this on <code>/pedigree</code> — in which case every study’s observations would have been pivoted together. Extra studies are now filtered out, and the function says how many it found (<a href="https://github.com/dwaring87" class="external-link">@dwaring87</a>, ropensci/software-review#792).</li>
 </ul></div>
 <div class="section level4">
 <h4 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h4>

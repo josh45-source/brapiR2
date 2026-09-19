@@ -49,7 +49,7 @@ for the records that reference these ontologies.
 # \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 brapi_ontologies(con)
-#> # A tibble: 147 × 10
+#> # A tibble: 151 × 10
 #>    additionalInfo   externalReferences authors copyright      description       
 #>    <list>           <lgl>              <chr>   <chr>          <chr>             
 #>  1 <NULL>           NA                 NA      NA             NA                
@@ -62,7 +62,7 @@ brapi_ontologies(con)
 #>  8 <named list [1]> NA                 Bob     2017 brapi.org Custom Maize Onto…
 #>  9 <named list [1]> NA                 Bob     2017 brapi.org Custom Pawpaw Ont…
 #> 10 <NULL>           NA                 NA      NA             NA                
-#> # ℹ 137 more rows
+#> # ℹ 141 more rows
 #> # ℹ 5 more variables: documentationURL <chr>, licence <chr>,
 #> #   ontologyName <chr>, version <chr>, ontologyDbId <chr>
 # }

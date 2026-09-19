@@ -118,6 +118,14 @@
   shown, since it is never useful to a user
   ([@dwaring87](https://github.com/dwaring87),
   ropensci/software-review#792).
+- [`brapi_study_data()`](https://josh45-source.github.io/brapiR2/reference/brapi_study_data.md)
+  checks that the observations it received are really from the study
+  asked for. A server may accept the `studyDbId` filter and ignore it —
+  the public test server does exactly this on `/pedigree` — in which
+  case every study’s observations would have been pivoted together.
+  Extra studies are now filtered out, and the function says how many it
+  found ([@dwaring87](https://github.com/dwaring87),
+  ropensci/software-review#792).
 
 #### New features
 
