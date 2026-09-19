@@ -422,7 +422,10 @@ something else. Its polyploid-aware methods matter for crops such as potato
 and sugarcane where the diploid assumptions elsewhere in this article do not
 hold.
 
-```{r gs-other}
+The code below is shown rather than run: it fits the same trait three
+ways, and the comparison above is the useful part.
+
+```{r gs-other, eval = FALSE}
 # ---- BGLR (Bayesian regression) ----
 library(BGLR)
 

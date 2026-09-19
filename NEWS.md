@@ -192,6 +192,11 @@
   covers. The QBMS comparison table and the notes on other BrAPI clients
   have moved into Related Packages, and Authentication now comes before
   the extended examples (@jmh579, ropensci/software-review#792).
+* The genomic selection article no longer fits the same trait with BGLR and
+  sommer as well as rrBLUP. The comparison of when to reach for each package
+  stays; the code that fitted them is shown rather than run, since neither
+  result was used and both added a heavy dependency to the build
+  (@jmh579, ropensci/software-review#792).
 
 
 ### Testing
