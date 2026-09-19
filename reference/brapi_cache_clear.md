@@ -25,9 +25,9 @@ Invisibly returns `con`.
 ``` r
 con <- brapi_connection("https://test-server.brapi.org")
 con <- brapi_cache_enable(con, dir = tempdir())
-#> ✔ Caching enabled at /tmp/RtmpaLHNf9 (TTL: 3600s)
+#> ✔ Caching enabled at /tmp/Rtmp1ZSLQw (TTL: 3600s)
 brapi_cache_clear(con)
-#> Warning: cannot remove file '/tmp/RtmpaLHNf9/bslib-e9b2b13fa612f50d23e4850d93d60d01', reason 'Directory not empty'
-#> Warning: cannot remove file '/tmp/RtmpaLHNf9/downlit', reason 'Directory not empty'
+#> Warning: cannot remove file '/tmp/Rtmp1ZSLQw/bslib-e9b2b13fa612f50d23e4850d93d60d01', reason 'Directory not empty'
+#> Warning: cannot remove file '/tmp/Rtmp1ZSLQw/downlit', reason 'Directory not empty'
 #> ✔ Cleared 7 cached response(s).
 ```

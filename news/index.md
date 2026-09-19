@@ -102,6 +102,20 @@
   treated as the envelope only when it is absent of scalars — that is,
   empty or holding objects.
 
+#### Minor improvements
+
+- Failed requests now report what the server said, not just the HTTP
+  status. A 401 from a Breedbase server reads “You must login and have
+  permission to access this BrAPI call” rather than a bare
+  `HTTP 401 Unauthorized`, and a failed login reports the server’s
+  reason — “Incorrect Password”, or “JSON array body required” — instead
+  of “no access token returned”. Servers report errors in several
+  different ways, and all of the forms seen across the test server,
+  Breedbase, T3 and GRIN-Global are handled; an HTML error page is not
+  shown, since it is never useful to a user
+  ([@dwaring87](https://github.com/dwaring87),
+  ropensci/software-review#792).
+
 #### New features
 
 - New Genome Maps entity support (`R/genome_maps.R`):
