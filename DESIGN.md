@@ -251,28 +251,12 @@ leaves out (see [Boundaries](#boundaries)).
 
 ### Downstream analysis tools
 
-`brapiR2` is designed to sit at the start of a breeding-data analysis
-pipeline, not to replace the tools downstream of it:
-
-- **phenoQC** - phenotypic data cleaning and quality control, consuming
-  the tibbles from
-  [`brapi_observations()`](https://josh45-source.github.io/brapiR2/reference/brapi_observations.md)
-  /
-  [`brapi_study_data()`](https://josh45-source.github.io/brapiR2/reference/brapi_study_data.md).
-- **vcf2dosage** - genotype format conversion, complementary to
-  [`brapi_get_dosage_matrix()`](https://josh45-source.github.io/brapiR2/reference/brapi_get_dosage_matrix.md)
-  for data that originates as VCF rather than from a BrAPI server.
-- **ggvariant** - variant and genotype visualisation, consuming
-  [`brapi_variants()`](https://josh45-source.github.io/brapiR2/reference/brapi_variants.md)
-  /
-  [`brapi_allele_matrix()`](https://josh45-source.github.io/brapiR2/reference/brapi_allele_matrix.md)
-  output.
-- **gsbench** - genomic selection model benchmarking, consuming the
-  dosage matrix and phenotyping tibble directly as model inputs.
-
-In each case, `brapiR2`’s job ends at “a tidy tibble or matrix retrieved
-from a BrAPI server”; cleaning, visualisation, and modelling are left to
-packages built for those tasks specifically.
+`brapiR2` sits at the start of a breeding-data analysis pipeline, not in
+place of the tools downstream of it. Its job ends at a tidy tibble or
+matrix retrieved from a BrAPI server; cleaning, visualisation and
+modelling belong to packages built for those tasks. The genomic
+selection and multi-environment articles show that boundary in practice,
+handing brapiR2’s output to rrBLUP, BGLR, sommer, metan and lme4.
 
 ## Maintenance Considerations
 
