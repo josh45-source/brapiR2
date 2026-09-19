@@ -99,7 +99,7 @@ vs_id <- vsets$variantSetDbId[1]
 ## each marker on a named map (genetic, cM, or physical, bp) and is
 ## populated here.
 markers <- brapi_get_marker_map(con, variantSetDbId = vs_id)
-#> ℹ Async search started (ID: e2e6aa79-1ce5-49ec-b9da-bb89d3d8fe09). Polling...
+#> ℹ Async search started (ID: 6d445fd3-2c9c-4cbd-a570-59cc0593d015). Polling...
 #> Warning: 14 of 20 variants in "variantset1" have no marker position record; returning
 #> positions for the remaining 6.
 markers
