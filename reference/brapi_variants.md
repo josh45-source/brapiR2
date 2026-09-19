@@ -28,6 +28,16 @@ brapi_variants(con, variantSetDbId = NULL, ...)
 
 A tibble with one row per variant.
 
+## BrAPI endpoint
+
+`GET /variants` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Variants/Variants_GET.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`variantDbId`, `variantSetDbId`, `referenceDbId`, `referenceSetDbId`.
+
 ## Examples
 
 ``` r

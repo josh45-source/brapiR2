@@ -25,6 +25,17 @@ brapi_germplasm(con, ...)
 
 A tibble with one row per germplasm accession.
 
+## BrAPI endpoint
+
+`GET /germplasm` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm/Germplasm_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`accessionNumber`, `collection`, `binomialName`, `genus`, `species`,
+`synonym`, `parentDbId`, `progenyDbId`.
+
 ## Examples
 
 ``` r

@@ -24,6 +24,16 @@ brapi_seed_lots(con, ...)
 
 A tibble with one row per seed lot.
 
+## BrAPI endpoint
+
+`GET /seedlots` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/SeedLots/SeedLots_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`seedLotDbId`, `crossDbId`, `crossName`.
+
 ## Examples
 
 ``` r

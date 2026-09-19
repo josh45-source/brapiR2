@@ -24,6 +24,11 @@ brapi_trial(con, trialDbId)
 
 A single-row tibble with trial details.
 
+## BrAPI endpoint
+
+`GET /trials/{trialDbId}` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Trials/Trials_TrialDbId_GET_PUT.yaml).
+
 ## Examples
 
 ``` r

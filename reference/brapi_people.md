@@ -24,6 +24,16 @@ brapi_people(con, ...)
 
 A tibble with one row per person.
 
+## BrAPI endpoint
+
+`GET /people` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/People/People_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`firstName`, `lastName`, `personDbId`, `userID`.
+
 ## Examples
 
 ``` r

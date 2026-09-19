@@ -71,6 +71,18 @@ originally called was deprecated in BrAPI v2.1. It now queries
 <code>parents</code>, <code>siblings</code> and <code>progeny</code> as list-columns of tidy tibbles.
 See <code><a href="brapi_pedigree.html">brapi_pedigree()</a></code>, which this function calls.</p>
     </div>
+    <div class="section level2">
+    <h2 id="brapi-endpoint">BrAPI endpoint<a class="anchor" aria-label="anchor" href="#brapi-endpoint"></a></h2>
+
+
+<p><code>GET /pedigree</code> - see the
+<a href="https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Pedigree_GET_POST_PUT.yaml" class="external-link">v2.1 specification</a>.</p>
+<p>Query parameters the specification defines, which may be passed
+through <code>...</code>:</p>
+<p><code>accessionNumber</code>, <code>collection</code>, <code>familyCode</code>, <code>binomialName</code>, <code>genus</code>,
+<code>species</code>, <code>synonym</code>, <code>includeParents</code>, <code>includeSiblings</code>,
+<code>includeProgeny</code>, <code>includeFullTree</code>, <code>pedigreeDepth</code>, <code>progenyDepth</code>.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

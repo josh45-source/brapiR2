@@ -57,6 +57,11 @@ brapi_search_marker_positions(
 
 A tibble of matching marker positions.
 
+## BrAPI endpoint
+
+`POST /search/markerpositions` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Search_MarkerPositions_POST.yaml).
+
 ## Examples
 
 ``` r

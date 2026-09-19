@@ -25,6 +25,17 @@ brapi_samples(con, ...)
 
 A tibble with one row per sample.
 
+## BrAPI endpoint
+
+`GET /samples` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Samples/Samples_GET_POST_PUT.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`sampleDbId`, `sampleName`, `sampleGroupDbId`, `observationUnitDbId`,
+`plateDbId`, `plateName`.
+
 ## Examples
 
 ``` r

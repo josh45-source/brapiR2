@@ -25,6 +25,11 @@ brapi_location(con, locationDbId)
 A single-row tibble with location metadata, including coordinates where
 the server provides them.
 
+## BrAPI endpoint
+
+`GET /locations/{locationDbId}` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Locations/Locations_LocationDbId_GET_PUT.yaml).
+
 ## Examples
 
 ``` r

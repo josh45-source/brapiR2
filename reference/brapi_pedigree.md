@@ -93,6 +93,18 @@ graph-shaped (each node has its own parents, siblings, and progeny
 edges), and the three relation types don't share a common row shape, so
 there is no lossless single flat table to fall back to.
 
+## BrAPI endpoint
+
+`GET /pedigree` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Pedigree_GET_POST_PUT.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`accessionNumber`, `collection`, `familyCode`, `binomialName`, `genus`,
+`species`, `synonym`, `includeParents`, `includeSiblings`,
+`includeProgeny`, `includeFullTree`, `pedigreeDepth`, `progenyDepth`.
+
 ## See also
 
 [`brapi_germplasm_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_germplasm_pedigree.md)

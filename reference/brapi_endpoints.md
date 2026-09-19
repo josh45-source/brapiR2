@@ -21,6 +21,16 @@ brapi_endpoints(con)
 
 A tibble with columns for endpoint service, method(s), and version(s).
 
+## BrAPI endpoint
+
+`GET /serverinfo` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/ServerInfo/ServerInfo_GET.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`contentType`, `dataType`.
+
 ## Examples
 
 ``` r

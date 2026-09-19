@@ -28,6 +28,11 @@ brapi_search_variants(con, variantSetDbIds = NULL, ...)
 
 A tibble of matching variants.
 
+## BrAPI endpoint
+
+`POST /search/variants` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Variants/Search_Variants_POST.yaml).
+
 ## Examples
 
 ``` r

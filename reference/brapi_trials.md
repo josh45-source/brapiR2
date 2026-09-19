@@ -28,6 +28,17 @@ brapi_trials(con, programDbId = NULL, ...)
 
 A tibble with one row per trial.
 
+## BrAPI endpoint
+
+`GET /trials` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Trials/Trials_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`active`, `contactDbId`, `locationDbId`, `searchDateRangeStart`,
+`searchDateRangeEnd`, `trialPUI`, `sortBy`, `sortOrder`.
+
 ## Examples
 
 ``` r

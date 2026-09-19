@@ -24,6 +24,11 @@ brapi_program(con, programDbId)
 
 A single-row tibble with program details.
 
+## BrAPI endpoint
+
+`GET /programs/{programDbId}` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Programs/Programs_ProgramDbId_GET_PUT.yaml).
+
 ## Examples
 
 ``` r

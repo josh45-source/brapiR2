@@ -28,6 +28,18 @@ brapi_observations(con, studyDbId = NULL, ...)
 
 A tibble with one row per observation (trait measurement).
 
+## BrAPI endpoint
+
+`GET /observations` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Observations/Observations_GET_POST_PUT.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`observationDbId`, `observationUnitDbId`, `observationVariableDbId`,
+`locationDbId`, `seasonDbId`, `observationTimeStampRangeStart`,
+`observationTimeStampRangeEnd`.
+
 ## Examples
 
 ``` r

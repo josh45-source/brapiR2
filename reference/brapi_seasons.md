@@ -24,6 +24,16 @@ brapi_seasons(con, ...)
 
 A tibble with one row per season.
 
+## BrAPI endpoint
+
+`GET /seasons` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Seasons/Seasons_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`seasonDbId`, `season`, `seasonName`, `year`.
+
 ## Examples
 
 ``` r

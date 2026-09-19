@@ -24,6 +24,17 @@ brapi_locations(con, ...)
 
 A tibble with one row per location.
 
+## BrAPI endpoint
+
+`GET /locations` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Locations/Locations_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`locationType`, `locationDbId`, `locationName`, `parentLocationDbId`,
+`parentLocationName`.
+
 ## Examples
 
 ``` r

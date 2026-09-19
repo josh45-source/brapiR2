@@ -63,6 +63,17 @@ brapi_marker_positions(
 
 A tibble with one row per marker placement.
 
+## BrAPI endpoint
+
+`GET /markerpositions` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/MarkerPositions_GET.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`mapDbId`, `linkageGroupName`, `variantDbId`, `minPosition`,
+`maxPosition`.
+
 ## Examples
 
 ``` r

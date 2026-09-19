@@ -24,6 +24,16 @@ brapi_germplasm_attributes(con, ...)
 
 A tibble with one row per attribute definition.
 
+## BrAPI endpoint
+
+`GET /attributes` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm_Attributes/Attributes_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`attributeCategory`, `attributeDbId`, `attributeName`, `attributePUI`.
+
 ## Examples
 
 ``` r

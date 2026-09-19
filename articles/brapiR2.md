@@ -249,7 +249,7 @@ now reads from there instead:
 
 # Positions for every variant in the set, wherever they have been placed
 markers <- brapi_get_marker_map(con, variantSetDbId = vs_id)
-#> ℹ Async search started (ID: 9e1bbb5a-2f2a-4171-a7da-1be37baa0f74). Polling...
+#> ℹ Async search started (ID: d001cf20-075c-4d73-9711-e140cef52763). Polling...
 #> Warning: 14 of 20 variants in "variantset1" have no marker position record; returning
 #> positions for the remaining 6.
 markers
@@ -414,7 +414,7 @@ by default, per connection, and never shared between connections.
 cache_dir <- tempfile("brapi_cache_")
 dir.create(cache_dir)
 perf_con <- brapi_cache_enable(con, ttl = 3600, dir = cache_dir)
-#> ✔ Caching enabled at /tmp/Rtmp0cJ802/brapi_cache_1e613d20c417 (TTL: 3600s)
+#> ✔ Caching enabled at /tmp/RtmpZsUBvv/brapi_cache_1f1825266f5 (TTL: 3600s)
 
 # First call: hits the server
 invisible(brapi_programs(perf_con))
@@ -499,7 +499,7 @@ different workflows**.
 | Pipe-friendly | Partial | Yes, all functions follow `f(con, ...)` |
 | Caching | No | Yes, disk-based with TTL |
 | Parallel fetch | No | Via the caller’s own `future` backend |
-| Genotyping | Limited | Allele matrix, dosage matrix, marker map (32/36 BrAPI entities covered overall, read-only) |
+| Genotyping | Limited | Allele matrix, dosage matrix, marker map (32/37 BrAPI entities covered overall, read-only) |
 | Authentication | Yes | Yes |
 
 brapiR2 targets BrAPI v2 only, by design - see the “Design History”

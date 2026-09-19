@@ -28,6 +28,17 @@ brapi_calls(con, variantSetDbId = NULL, ...)
 
 A tibble with one row per genotype call.
 
+## BrAPI endpoint
+
+`GET /calls` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Calls/Calls_GET_PUT.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`callSetDbId`, `variantDbId`, `variantSetDbId`, `expandHomozygotes`,
+`unknownString`, `sepPhased`, `sepUnphased`.
+
 ## Examples
 
 ``` r

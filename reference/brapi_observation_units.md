@@ -28,6 +28,17 @@ brapi_observation_units(con, studyDbId = NULL, ...)
 
 A tibble with one row per observation unit (plot/plant/sample).
 
+## BrAPI endpoint
+
+`GET /observationunits` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/ObservationUnits/ObservationUnits_GET_POST_PUT.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`observationUnitDbId`, `observationUnitName`, `locationDbId`,
+`seasonDbId`, `includeObservations`.
+
 ## Examples
 
 ``` r

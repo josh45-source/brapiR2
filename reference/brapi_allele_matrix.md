@@ -33,6 +33,17 @@ brapi_allele_matrix(con, variantSetDbId = NULL, ...)
 
 A tibble with columns `variantDbId`, `callSetDbId`, `genotype`.
 
+## BrAPI endpoint
+
+`GET /allelematrix` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/AlleleMatrix/AlleleMatrix_GET.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`dimensionVariantPage`, `dimensionVariantPageSize`,
+`dimensionCallSetPage`, `dimensionCallSetPageSize`.
+
 ## Examples
 
 ``` r

@@ -32,6 +32,16 @@ brapi_ontologies(con, ...)
 
 A tibble with one row per ontology.
 
+## BrAPI endpoint
+
+`GET /ontologies` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Ontologies/Ontologies_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`ontologyName`.
+
 ## See also
 
 [`brapi_ontology()`](https://josh45-source.github.io/brapiR2/reference/brapi_ontology.md)

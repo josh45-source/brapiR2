@@ -24,6 +24,16 @@ brapi_call_sets(con, ...)
 
 A tibble with one row per call set.
 
+## BrAPI endpoint
+
+`GET /callsets` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/CallSets/CallSets_GET.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`callSetDbId`, `callSetName`, `variantSetDbId`, `sampleDbId`.
+
 ## Examples
 
 ``` r

@@ -24,6 +24,16 @@ brapi_scales(con, ...)
 
 A tibble with one row per scale definition.
 
+## BrAPI endpoint
+
+`GET /scales` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Scales/Scales_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`scaleDbId`, `observationVariableDbId`.
+
 ## See also
 
 [`brapi_ontologies()`](https://josh45-source.github.io/brapiR2/reference/brapi_ontologies.md)

@@ -25,6 +25,11 @@ brapi_map(con, mapDbId)
 A single-row tibble with genome map details, including `type` (e.g.
 `"Genetic"` or `"Physical"`) and `unit` (e.g. `"cM"` or `"bp"`).
 
+## BrAPI endpoint
+
+`GET /maps/{mapDbId}` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Maps_MapDbId_GET.yaml).
+
 ## Examples
 
 ``` r

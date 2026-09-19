@@ -148,6 +148,18 @@ relation types don't share a common row shape, so there is no lossless
 single flat table to fall back to.</p>
     </div>
     <div class="section level2">
+    <h2 id="brapi-endpoint">BrAPI endpoint<a class="anchor" aria-label="anchor" href="#brapi-endpoint"></a></h2>
+
+
+<p><code>GET /pedigree</code> - see the
+<a href="https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Pedigree_GET_POST_PUT.yaml" class="external-link">v2.1 specification</a>.</p>
+<p>Query parameters the specification defines, which may be passed
+through <code>...</code>:</p>
+<p><code>accessionNumber</code>, <code>collection</code>, <code>familyCode</code>, <code>binomialName</code>, <code>genus</code>,
+<code>species</code>, <code>synonym</code>, <code>includeParents</code>, <code>includeSiblings</code>,
+<code>includeProgeny</code>, <code>includeFullTree</code>, <code>pedigreeDepth</code>, <code>progenyDepth</code>.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="brapi_germplasm_pedigree.html">brapi_germplasm_pedigree()</a></code> for one germplasm's pedigree via
 the germplasm sub-resource; <code><a href="brapi_search_pedigree.html">brapi_search_pedigree()</a></code> for the same

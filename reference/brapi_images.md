@@ -24,6 +24,17 @@ brapi_images(con, ...)
 
 A tibble with one row per image record.
 
+## BrAPI endpoint
+
+`GET /images` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Images/Images_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`imageDbId`, `imageName`, `observationUnitDbId`, `observationDbId`,
+`descriptiveOntologyTerm`.
+
 ## Examples
 
 ``` r

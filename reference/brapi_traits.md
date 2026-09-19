@@ -24,6 +24,16 @@ brapi_traits(con, ...)
 
 A tibble with one row per trait.
 
+## BrAPI endpoint
+
+`GET /traits` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Traits/Traits_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`traitDbId`, `observationVariableDbId`.
+
 ## See also
 
 [`brapi_ontologies()`](https://josh45-source.github.io/brapiR2/reference/brapi_ontologies.md)

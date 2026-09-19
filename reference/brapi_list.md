@@ -29,6 +29,11 @@ brapi_list(con, listDbId)
 A single-row tibble of list metadata, with the list's members as a
 character vector in the `data` list-column.
 
+## BrAPI endpoint
+
+`GET /lists/{listDbId}` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Lists/Lists_ListDbId_GET_PUT.yaml).
+
 ## Examples
 
 ``` r

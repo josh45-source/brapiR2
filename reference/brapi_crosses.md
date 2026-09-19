@@ -24,6 +24,16 @@ brapi_crosses(con, ...)
 
 A tibble with one row per cross.
 
+## BrAPI endpoint
+
+`GET /crosses` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Crosses/Crosses_GET_POST_PUT.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`crossingProjectDbId`, `crossingProjectName`, `crossDbId`, `crossName`.
+
 ## Examples
 
 ``` r

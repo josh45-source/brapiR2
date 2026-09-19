@@ -161,8 +161,8 @@
   [`brapi_methods()`](https://josh45-source.github.io/brapiR2/reference/brapi_methods.md),
   and
   [`brapi_observation_variables()`](https://josh45-source.github.io/brapiR2/reference/brapi_observation_variables.md).
-- brapiR2 now wraps 32 of the 36 BrAPI v2.1 entities across all four
-  modules (56 of 138 retrieval endpoints); see `DESIGN.md` for the full
+- brapiR2 now wraps 32 of the 37 BrAPI v2.1 entities across all four
+  modules (49 of 138 retrieval endpoints); see `DESIGN.md` for the full
   coverage breakdown and which entities remain uncovered.
 - [`brapi_connection()`](https://josh45-source.github.io/brapiR2/reference/brapi_connection.md)
   gains a `path` argument for servers that do not serve BrAPI under

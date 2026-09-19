@@ -73,6 +73,11 @@ A tibble with one row per pedigree node; see
 [`brapi_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_pedigree.md)
 for column details.
 
+## BrAPI endpoint
+
+`POST /search/pedigree` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Search_Pedigree_POST.yaml).
+
 ## See also
 
 [`brapi_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_pedigree.md),

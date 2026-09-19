@@ -24,6 +24,17 @@ brapi_references(con, ...)
 
 A tibble with one row per reference sequence.
 
+## BrAPI endpoint
+
+`GET /references` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/References/References_GET.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`referenceDbId`, `referenceSetDbId`, `accession`, `md5checksum`,
+`isDerived`, `minLength`, `maxLength`.
+
 ## Examples
 
 ``` r

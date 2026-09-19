@@ -28,6 +28,16 @@ brapi_variant_sets(con, studyDbId = NULL, ...)
 
 A tibble with one row per variant set.
 
+## BrAPI endpoint
+
+`GET /variantsets` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/VariantSets/VariantSets_GET.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`variantSetDbId`, `variantDbId`, `callSetDbId`, `referenceSetDbId`.
+
 ## Examples
 
 ``` r

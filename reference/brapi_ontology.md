@@ -24,6 +24,11 @@ brapi_ontology(con, ontologyDbId)
 
 A single-row tibble with ontology details.
 
+## BrAPI endpoint
+
+`GET /ontologies/{ontologyDbId}` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Ontologies/Ontologies_OntologyDbId_GET_PUT.yaml).
+
 ## See also
 
 [`brapi_ontologies()`](https://josh45-source.github.io/brapiR2/reference/brapi_ontologies.md);

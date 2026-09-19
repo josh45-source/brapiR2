@@ -32,13 +32,18 @@ brapi_search_calls(con, variantSetDbIds = NULL, callSetDbIds = NULL, ...)
 
 A tibble of matching genotype calls.
 
+## BrAPI endpoint
+
+`POST /search/calls` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Calls/Search_Calls_POST.yaml).
+
 ## Examples
 
 ``` r
 # \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 brapi_search_calls(con, variantSetDbIds = "variantset1")
-#> ℹ Async search started (ID: 18a00ecd-27fe-4851-abf8-7658cdd267bc). Polling...
+#> ℹ Async search started (ID: 908a524f-c9a0-457c-a050-627544c24ee9). Polling...
 #> # A tibble: 260 × 12
 #>    additionalInfo callSetDbId callSetName genotype         genotypeValue
 #>    <lgl>          <chr>       <chr>       <list>           <chr>        

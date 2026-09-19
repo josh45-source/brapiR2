@@ -28,6 +28,17 @@ brapi_events(con, studyDbId = NULL, ...)
 
 A tibble with one row per event.
 
+## BrAPI endpoint
+
+`GET /events` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Events/Events_GET.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`observationUnitDbId`, `eventDbId`, `eventType`, `dateRangeStart`,
+`dateRangeEnd`.
+
 ## Examples
 
 ``` r

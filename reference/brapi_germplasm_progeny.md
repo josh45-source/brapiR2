@@ -27,6 +27,18 @@ a list-column of a tidy tibble of descendants. See
 [`brapi_pedigree()`](https://josh45-source.github.io/brapiR2/reference/brapi_pedigree.md),
 which this function calls.
 
+## BrAPI endpoint
+
+`GET /pedigree` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Pedigree_GET_POST_PUT.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`accessionNumber`, `collection`, `familyCode`, `binomialName`, `genus`,
+`species`, `synonym`, `includeParents`, `includeSiblings`,
+`includeProgeny`, `includeFullTree`, `pedigreeDepth`, `progenyDepth`.
+
 ## Examples
 
 ``` r

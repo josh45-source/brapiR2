@@ -4,7 +4,7 @@
 v2](https://brapi.org/) (Breeding API) specification. It provides
 pipe-friendly, read-only access across all four BrAPI modules - Core,
 Germplasm, Phenotyping, and Genotyping - wrapping 32 of the
-specification’s 36 entities (56 of 138 retrieval endpoints) and
+specification’s 37 entities (49 of 138 retrieval endpoints) and
 returning tidy tibbles ready for analysis.
 
 Developed by **Joash Joshua Ayo** (<joashjoshua789@gmail.com>).
@@ -25,9 +25,10 @@ Every entity brapiR2 wraps, by module:
 - **Genotyping**: Samples, Variants, Variant Sets, Calls, Call Sets,
   References, Allele Matrix, Genome Maps
 
-Not yet covered: Common Crop Names, Germplasm Attribute Values, Plates,
-and Vendor (lab/vendor order-tracking endpoints). brapiR2 is read-only
-by design - it does not implement BrAPI’s `POST`/`PUT` write endpoints.
+Not yet covered: Common Crop Names, Germplasm Attribute Values, Planned
+Crosses, Plates, and Vendor Samples (lab/vendor order-tracking). brapiR2
+is read-only by design - it does not implement BrAPI’s `POST`/`PUT`
+write endpoints.
 
 ## Installation
 
@@ -143,7 +144,7 @@ brapi_get_marker_map(con, variantSetDbId = "my_variantset") |>
 | Feature | brapiR2 | QBMS |
 |----|----|----|
 | Design | Stateless, functional, pipeable | Stateful, menu-driven |
-| BrAPI v2 coverage | 32/36 entities, all 4 modules, read-only | See QBMS’s own documentation |
+| BrAPI v2 coverage | 32/37 entities, all 4 modules, read-only | See QBMS’s own documentation |
 | Genotyping support | Native variants, callsets, dosage matrix | Via GIGWA wrapper |
 | Return type | Always tibbles | Mixed lists/dataframes |
 | Auth | Unified token/OAuth2 | Engine-specific functions |

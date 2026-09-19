@@ -43,6 +43,11 @@ brapi_search_germplasm(
 
 A tibble of matching germplasm records.
 
+## BrAPI endpoint
+
+`POST /search/germplasm` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm/Search_Germplasm_POST.yaml).
+
 ## Examples
 
 ``` r

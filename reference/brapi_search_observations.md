@@ -37,6 +37,11 @@ brapi_search_observations(
 
 A tibble of matching observations.
 
+## BrAPI endpoint
+
+`POST /search/observations` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Observations/Search_Observations_POST.yaml).
+
 ## Examples
 
 ``` r

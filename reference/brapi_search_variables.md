@@ -28,6 +28,11 @@ brapi_search_variables(con, traitClasses = NULL, ...)
 
 A tibble of matching observation variables.
 
+## BrAPI endpoint
+
+`POST /search/variables` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/ObservationVariables/Search_Variables_POST.yaml).
+
 ## Examples
 
 ``` r

@@ -24,6 +24,11 @@ brapi_germplasm_detail(con, germplasmDbId)
 
 A single-row tibble with germplasm details.
 
+## BrAPI endpoint
+
+`GET /germplasm/{germplasmDbId}` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm/Germplasm_GermplasmDbId_GET_PUT.yaml).
+
 ## Examples
 
 ``` r

@@ -29,6 +29,17 @@ brapi_studies(con, trialDbId = NULL, ...)
 
 A tibble with one row per study.
 
+## BrAPI endpoint
+
+`GET /studies` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Studies/Studies_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`studyType`, `locationDbId`, `seasonDbId`, `studyCode`, `studyPUI`,
+`observationVariableDbId`, `active`, `sortBy`, `sortOrder`.
+
 ## Examples
 
 ``` r

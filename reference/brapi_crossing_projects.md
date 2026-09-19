@@ -24,6 +24,16 @@ brapi_crossing_projects(con, ...)
 
 A tibble with one row per crossing project.
 
+## BrAPI endpoint
+
+`GET /crossingprojects` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/CrossingProjects/CrossingProjects_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`crossingProjectDbId`, `crossingProjectName`, `includePotentialParents`.
+
 ## Examples
 
 ``` r

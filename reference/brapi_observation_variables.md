@@ -24,6 +24,17 @@ brapi_observation_variables(con, ...)
 
 A tibble with one row per variable definition.
 
+## BrAPI endpoint
+
+`GET /variables` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/ObservationVariables/Variables_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`observationVariableDbId`, `observationVariableName`,
+`observationVariablePUI`, `traitClass`.
+
 ## See also
 
 [`brapi_ontologies()`](https://josh45-source.github.io/brapiR2/reference/brapi_ontologies.md)

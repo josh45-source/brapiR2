@@ -24,6 +24,16 @@ brapi_lists(con, ...)
 
 A tibble with one row per list.
 
+## BrAPI endpoint
+
+`GET /lists` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Lists/Lists_GET_POST.yaml).
+
+Query parameters the specification defines, which may be passed through
+`...`:
+
+`listType`, `listName`, `listDbId`, `listSource`.
+
 ## Examples
 
 ``` r

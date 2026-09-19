@@ -24,6 +24,11 @@ brapi_study(con, studyDbId)
 
 A single-row tibble with study metadata.
 
+## BrAPI endpoint
+
+`GET /studies/{studyDbId}` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Studies/Studies_StudyDbId_GET_PUT.yaml).
+
 ## Examples
 
 ``` r

@@ -25,6 +25,11 @@ brapi_map_linkage_groups(con, mapDbId)
 
 A tibble with one row per linkage group on the map.
 
+## BrAPI endpoint
+
+`GET /maps/{mapDbId}/linkagegroups` - see the [v2.1
+specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Maps_MapDbId_LinkageGroups_GET.yaml).
+
 ## Examples
 
 ``` r
