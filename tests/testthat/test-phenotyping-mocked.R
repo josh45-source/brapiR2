@@ -157,3 +157,24 @@ test_that("brapi_study_data trims whitespace around values", {
   out <- brapi_study_data(brapi_connection("https://example.org"), "s1")
   expect_identical(sort(out$height), c("150", "80"))
 })
+
+test_that("brapi_study_data filters when the server ignores studyDbId", {
+  local_mocked_bindings(
+    brapi_observations = function(con, ...) {
+      tibble::tibble(
+        observationUnitDbId = c("u1", "u2"),
+        observationUnitName = c("p1", "p2"),
+        germplasmDbId = c("g1", "g2"),
+        germplasmName = c("A", "B"),
+        studyDbId = c("s1", "s2"),
+        observationVariableName = c("height", "height"),
+        value = c("10", "20")
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  out <- brapi_study_data(brapi_connection("https://example.org"), "s1")
+  expect_identical(nrow(out), 1L)
+  expect_identical(out$studyDbId, "s1")
+})

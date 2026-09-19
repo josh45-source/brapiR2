@@ -309,6 +309,19 @@ brapi_study_data <- function(con, studyDbId) {
     }
   }
 
+  # A server may accept the studyDbId filter and ignore it, returning every
+  # study's observations. The function promises one study, so filter here
+  # too rather than trusting the parameter was applied.
+  if (nrow(obs) > 0L && "studyDbId" %in% names(obs)) {
+    others <- setdiff(unique(obs$studyDbId), studyDbId)
+    if (length(others)) {
+      obs <- dplyr::filter(obs, .data$studyDbId == .env$studyDbId) # nolint
+      cli_alert_info(
+        "Server returned observations for {length(others) + 1} studies; filtered to {.val {studyDbId}}."
+      )
+    }
+  }
+
   if (nrow(obs) == 0L) {
     cli_alert_warning("No observations found for study {.val {studyDbId}}.")
     return(tibble())

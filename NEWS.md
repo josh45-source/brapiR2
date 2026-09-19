@@ -89,6 +89,12 @@
   the test server, Breedbase, T3 and GRIN-Global are handled; an HTML error
   page is not shown, since it is never useful to a user
   (@dwaring87, ropensci/software-review#792).
+* `brapi_study_data()` checks that the observations it received are really
+  from the study asked for. A server may accept the `studyDbId` filter and
+  ignore it — the public test server does exactly this on `/pedigree` — in
+  which case every study's observations would have been pivoted together.
+  Extra studies are now filtered out, and the function says how many it
+  found (@dwaring87, ropensci/software-review#792).
 
 ### New features
 
