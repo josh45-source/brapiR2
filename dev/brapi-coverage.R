@@ -57,6 +57,7 @@ lines <- c(
   "#' [brapi_post_search()] reach anything not wrapped here.",
   "#'",
   "#' @name brapi_coverage",
+  "#' @keywords internal",
   "NULL"
 )
 

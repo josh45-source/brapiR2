@@ -95,3 +95,4 @@ endpoints are out of scope by design. \code{\link[=brapi_get]{brapi_get()}} and
 \code{\link[=brapi_post_search]{brapi_post_search()}} reach anything not wrapped here.
 }
 
+\keyword{internal}
