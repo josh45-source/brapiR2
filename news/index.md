@@ -299,6 +299,13 @@
   wrapper. Asked for by [@jmh579](https://github.com/jmh579) and
   [@dwaring87](https://github.com/dwaring87)
   (ropensci/software-review#792).
+- `DESCRIPTION` no longer names specific BrAPI implementations. It
+  claimed compatibility with Breedbase, BMS, EBS, GIGWA and Germinate,
+  of which only Breedbase had been tested; it now claims the
+  specification instead. The README records which servers brapiR2 has
+  actually been exercised against — eight, across three implementations
+  — and which it has not ([@jmh579](https://github.com/jmh579),
+  ropensci/software-review#792).
 
 #### Testing
 
