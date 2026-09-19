@@ -103,12 +103,13 @@
   `brapi_search_marker_positions()`.
 * New Pedigree entity support (`R/germplasm.R`): `brapi_pedigree()` and
   `brapi_search_pedigree()` retrieve pedigree records across many
-  germplasm in one call (via `/pedigree` and `/search/pedigree`),
-  complementing the existing single-germplasm
-  `brapi_germplasm_pedigree()`. Each row is one pedigree node; `parents`,
-  `siblings`, and `progeny`, when requested, are list-columns of tidy
-  per-node tibbles (not raw nested lists), so a marker on several maps or
-  a node with several relatives is never silently collapsed to one row.
+  germplasm in one call, via `/pedigree` and `/search/pedigree`.
+  `brapi_germplasm_pedigree()` and `brapi_germplasm_progeny()` now
+  delegate to `brapi_pedigree()` rather than calling the sub-resources
+  BrAPI deprecated in v2.1. Each row is one pedigree node; `parents`,
+  `siblings` and `progeny`, when requested, are list-columns of tidy
+  per-node tibbles rather than raw nested lists, so a node with several
+  relatives is never silently collapsed to one row.
 * New Ontologies entity support (`R/phenotyping.R`): `brapi_ontologies()`
   and `brapi_ontology()`, cross-referenced from `brapi_traits()`,
   `brapi_scales()`, `brapi_methods()`, and
@@ -182,6 +183,11 @@
   been made consistent with it. Six American spellings were corrected, and
   `inst/WORDLIST` has been extended with the domain vocabulary and package
   names the spellchecker cannot know (@jmh579, ropensci/software-review#792).
+* The README installs with `pak::pak()` rather than
+  `remotes::install_github()`, which now warns (@jmh579,
+  ropensci/software-review#792), and notes that `remotes` and `devtools`
+  need `build_vignettes = TRUE` for the vignette to be installed at all
+  (@dwaring87, ropensci/software-review#792).
 * The README leads with what brapiR2 does and which BrAPI modules it
   covers. The QBMS comparison table and the notes on other BrAPI clients
   have moved into Related Packages, and Authentication now comes before
@@ -190,12 +196,20 @@
 
 ### Testing
 
-* Substantially expanded the mocked and live-server integration test
-  suites alongside the features above: argument-capturing tests for
-  every new thin wrapper, dedicated tests for the pedigree relative-list
-  parsing (nodes with parents, with progeny, and with neither), and
-  guarded integration tests against the public BrAPI test server for
-  every new function.
+* Substantially expanded the mocked and live-server test suites
+  alongside the features above: argument-capturing tests for every new
+  thin wrapper, dedicated tests for the pedigree relative-list parsing
+  (nodes with parents, with progeny, and with neither), and guarded
+  integration tests against the public BrAPI test server for every new
+  function.
+* Added tests for the work done in response to review: URL construction
+  and cache keys under a non-default `path`, the user agent as sent and
+  as overridden, login reaching a non-standard path, JSON key-order
+  normalisation, unmeasured traits filling with `NA` rather than
+  shortening the column, whitespace trimming, the client-side
+  `studyDbId` and `germplasmDbId` filters, the three response shapes the
+  parser must tell apart, and the error-message extraction for each form
+  a server uses.
 
 ## brapiR2 0.1.0
 
