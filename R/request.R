@@ -55,6 +55,11 @@ brapi_req <- function(con, endpoint) {
 #' @param query Named list. Query parameters to append to the URL.
 #'   `pageSize` defaults to the connection's page size; `page` is managed
 #'   by the pagination loop and should not be set here.
+#' @param max_pages Numeric. Stop after this many pages instead of
+#'   fetching all of them. `Inf`, the default, fetches everything. A
+#'   production server may hold hundreds of thousands of records, so a
+#'   small value is useful for looking at what an unfamiliar server holds.
+#'   A truncated result is never cached.
 #'
 #' @return A tibble of results, or an empty tibble if the endpoint
 #'   returned no data.
@@ -74,7 +79,7 @@ brapi_req <- function(con, endpoint) {
 #'
 #' @importFrom rlang hash
 #' @export
-brapi_get <- function(con, endpoint, query = list()) {
+brapi_get <- function(con, endpoint, query = list(), max_pages = Inf) {
   validate_con(con)
 
   query$pageSize <- query$pageSize %||% con$page_size
@@ -88,7 +93,7 @@ brapi_get <- function(con, endpoint, query = list()) {
     }
   }
 
-  pages <- brapi_get_pages(con, endpoint, query)
+  pages <- brapi_get_pages(con, endpoint, query, max_pages)
   if (pages$single) {
     return(parse_brapi_result(pages$data))
   }
@@ -98,7 +103,11 @@ brapi_get <- function(con, endpoint, query = list()) {
   # Use auto_unbox = TRUE so R scalars serialise as JSON scalars (not 1-element
   # arrays).  R lists from simplifyVector = FALSE are never auto-unboxed, so
   # true array fields remain arrays after the round-trip.
-  if (!is.null(cache_file) && length(all_data) > 0L) {
+  # A truncated result must never be cached: a later call would read it
+  # back as if it were the whole set.
+  cacheable <- !is.null(cache_file) && length(all_data) > 0L &&
+    is.infinite(max_pages)
+  if (cacheable) {
     writeLines(toJSON(all_data, auto_unbox = TRUE), cache_file)
   }
 
@@ -183,7 +192,7 @@ brapi_cache_read <- function(cache_file, ttl, endpoint) {
 #'   `TRUE` for single-object endpoints with no `data` envelope).
 #' @keywords internal
 #' @noRd
-brapi_get_pages <- function(con, endpoint, query) {
+brapi_get_pages <- function(con, endpoint, query, max_pages = Inf) {
   all_data <- list()
   total_pages <- 1L
   current_page <- 0L
@@ -228,6 +237,13 @@ brapi_get_pages <- function(con, endpoint, query) {
 
     current_page <- current_page + 1L
     if (current_page >= total_pages) break
+    if (current_page >= max_pages) {
+      cli_alert_info(paste(
+        "Stopped after {current_page} page{?s};",
+        "the server reports {total_pages}."
+      ))
+      break
+    }
   }
 
   list(data = all_data, single = FALSE)

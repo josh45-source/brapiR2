@@ -417,3 +417,47 @@ test_that("a result holding only data is a collection, even of scalars", {
   out <- brapi_get(brapi_connection("https://example.org"), "/commoncropnames")
   expect_identical(nrow(out), 3L)
 })
+
+test_that("max_pages stops the pagination loop early", {
+  page <- 0L
+  local_mocked_bindings(
+    req_perform = function(req) structure(list(), class = "httr2_response"),
+    resp_body_json = function(resp, ...) {
+      page <<- page + 1L
+      list(
+        metadata = list(pagination = list(totalPages = 10L)),
+        result = list(data = list(list(id = as.character(page))))
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  out <- suppressMessages(brapi_get(con, "/studies", max_pages = 2))
+  expect_identical(nrow(out), 2L)
+  expect_identical(page, 2L)
+})
+
+test_that("a truncated result is not cached", {
+  dir <- file.path(tempdir(), paste0("trunc_", Sys.getpid()))
+  on.exit(unlink(dir, recursive = TRUE), add = TRUE)
+
+  local_mocked_bindings(
+    req_perform = function(req) structure(list(), class = "httr2_response"),
+    resp_body_json = function(resp, ...) {
+      list(
+        metadata = list(pagination = list(totalPages = 5L)),
+        result = list(data = list(list(id = "1")))
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org") |>
+    brapi_cache_enable(dir = dir)
+  suppressMessages(brapi_get(con, "/studies", max_pages = 1))
+  expect_length(list.files(dir), 0L)
+
+  suppressMessages(brapi_get(con, "/studies"))
+  expect_length(list.files(dir), 1L)
+})

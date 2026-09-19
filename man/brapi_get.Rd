@@ -4,7 +4,7 @@
 \alias{brapi_get}
 \title{Call Any BrAPI GET Endpoint}
 \usage{
-brapi_get(con, endpoint, query = list())
+brapi_get(con, endpoint, query = list(), max_pages = Inf)
 }
 \arguments{
 \item{con}{A \code{\link[=brapi_connection]{brapi_connection()}} object.}
@@ -16,6 +16,12 @@ URL, BrAPI path and version come from \code{con}.}
 \item{query}{Named list. Query parameters to append to the URL.
 \code{pageSize} defaults to the connection's page size; \code{page} is managed
 by the pagination loop and should not be set here.}
+
+\item{max_pages}{Numeric. Stop after this many pages instead of
+fetching all of them. \code{Inf}, the default, fetches everything. A
+production server may hold hundreds of thousands of records, so a
+small value is useful for looking at what an unfamiliar server holds.
+A truncated result is never cached.}
 }
 \value{
 A tibble of results, or an empty tibble if the endpoint
