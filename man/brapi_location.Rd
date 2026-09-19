@@ -18,6 +18,12 @@ coordinates where the server provides them.
 \description{
 Get a Single Location by ID
 }
+\section{BrAPI endpoint}{
+
+\code{GET /locations/{locationDbId}} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Locations/Locations_LocationDbId_GET_PUT.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

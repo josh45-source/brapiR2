@@ -19,6 +19,12 @@ A tibble of matching variants.
 \description{
 Search Variants
 }
+\section{BrAPI endpoint}{
+
+\code{POST /search/variants} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Variants/Search_Variants_POST.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

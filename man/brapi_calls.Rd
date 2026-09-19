@@ -19,6 +19,18 @@ A tibble with one row per genotype call.
 \description{
 List Genotype Calls
 }
+\section{BrAPI endpoint}{
+
+\code{GET /calls} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Calls/Calls_GET_PUT.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{callSetDbId}, \code{variantDbId}, \code{variantSetDbId}, \code{expandHomozygotes},
+\code{unknownString}, \code{sepPhased}, \code{sepUnphased}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

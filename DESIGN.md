@@ -184,12 +184,13 @@ The current design deliberately leaves several things out of scope:
   endpoints (114 `GET`, 57 `POST` - 24 of them search, 30 `PUT`), the 63
   write and update endpoints are out of scope by design, not an oversight.
 - **Read coverage is intentionally partial, not exhaustive.** `brapiR2`
-  wraps 32 of the specification's 36 top-level entities across all four
-  modules, covering 56 of the 138 retrieval (`GET` + search `POST`)
-  endpoints - 56 of 123 endpoints within the entities it does cover.
-  Common Crop Names, Germplasm Attribute Values, Plates, and Vendor
-  (lab/vendor order-tracking) currently have no coverage at all. New
-  entities are added as real analysis needs surface, not to chase 100%.
+  wraps 32 of the specification's 37 top-level entities across all four
+  modules, covering 49 of the 138 retrieval (`GET` + search `POST`)
+  endpoints - 49 of 122 endpoints within the entities it does cover.
+  Common Crop Names, Germplasm Attribute Values, Planned Crosses,
+  Plates, and Vendor Samples (lab/vendor order-tracking) currently have
+  no coverage at all. New entities are added as real analysis needs
+  surface, not to chase 100%.
 - **No analysis.** Dosage matrices and wide phenotyping tibbles are
   produced in shapes that downstream genomic-selection and analysis
   packages expect, but `brapiR2` does not itself fit models, compute BLUPs,

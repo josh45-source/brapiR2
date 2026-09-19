@@ -17,6 +17,17 @@ A tibble with one row per genome map.
 \description{
 List Genome Maps
 }
+\section{BrAPI endpoint}{
+
+\code{GET /maps} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Maps_GET.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{mapDbId}, \code{mapPUI}, \code{scientificName}, \code{type}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

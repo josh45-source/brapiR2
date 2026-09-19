@@ -17,6 +17,12 @@ A single-row tibble with trial details.
 \description{
 Get a Single Trial by ID
 }
+\section{BrAPI endpoint}{
+
+\code{GET /trials/{trialDbId}} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Trials/Trials_TrialDbId_GET_PUT.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

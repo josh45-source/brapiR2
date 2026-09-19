@@ -17,6 +17,12 @@ A single-row tibble with study metadata.
 \description{
 Get a Single Study by ID
 }
+\section{BrAPI endpoint}{
+
+\code{GET /studies/{studyDbId}} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Studies/Studies_StudyDbId_GET_PUT.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

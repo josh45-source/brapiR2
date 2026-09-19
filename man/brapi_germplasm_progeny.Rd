@@ -19,6 +19,19 @@ A single-row tibble of the germplasm's pedigree node, with
 \description{
 Get Germplasm Progeny
 }
+\section{BrAPI endpoint}{
+
+\code{GET /pedigree} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Pedigree_GET_POST_PUT.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{accessionNumber}, \code{collection}, \code{familyCode}, \code{binomialName}, \code{genus},
+\code{species}, \code{synonym}, \code{includeParents}, \code{includeSiblings},
+\code{includeProgeny}, \code{includeFullTree}, \code{pedigreeDepth}, \code{progenyDepth}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

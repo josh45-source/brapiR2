@@ -13,6 +13,15 @@
 #'
 #' @return A tibble with one row per program.
 #'
+#' @section BrAPI endpoint:
+#' `GET /programs` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Programs/Programs_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `abbreviation`, `programType`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -32,6 +41,10 @@ brapi_programs <- function(con, ...) {
 #' @inheritParams brapi_shared_ids
 #'
 #' @return A single-row tibble with program details.
+#'
+#' @section BrAPI endpoint:
+#' `GET /programs/{programDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Programs/Programs_ProgramDbId_GET_PUT.yaml).
 #'
 #' @examples
 #' \donttest{
@@ -54,6 +67,16 @@ brapi_program <- function(con, programDbId) {
 #'
 #' @return A tibble with one row per trial.
 #'
+#' @section BrAPI endpoint:
+#' `GET /trials` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Trials/Trials_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `active`, `contactDbId`, `locationDbId`, `searchDateRangeStart`,
+#' `searchDateRangeEnd`, `trialPUI`, `sortBy`, `sortOrder`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -75,6 +98,10 @@ brapi_trials <- function(con, programDbId = NULL, ...) {
 #'
 #' @return A single-row tibble with trial details.
 #'
+#' @section BrAPI endpoint:
+#' `GET /trials/{trialDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Trials/Trials_TrialDbId_GET_PUT.yaml).
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -95,6 +122,16 @@ brapi_trial <- function(con, trialDbId) {
 #' @inheritParams brapi_shared_filters
 #'
 #' @return A tibble with one row per study.
+#'
+#' @section BrAPI endpoint:
+#' `GET /studies` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Studies/Studies_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `studyType`, `locationDbId`, `seasonDbId`, `studyCode`, `studyPUI`,
+#' `observationVariableDbId`, `active`, `sortBy`, `sortOrder`.
 #'
 #' @examples
 #' \donttest{
@@ -118,6 +155,10 @@ brapi_studies <- function(con, trialDbId = NULL, ...) {
 #'
 #' @return A single-row tibble with study metadata.
 #'
+#' @section BrAPI endpoint:
+#' `GET /studies/{studyDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Studies/Studies_StudyDbId_GET_PUT.yaml).
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -137,6 +178,16 @@ brapi_study <- function(con, studyDbId) {
 #'
 #' @return A tibble with one row per location.
 #'
+#' @section BrAPI endpoint:
+#' `GET /locations` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Locations/Locations_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `locationType`, `locationDbId`, `locationName`, `parentLocationDbId`,
+#' `parentLocationName`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -155,6 +206,10 @@ brapi_locations <- function(con, ...) {
 #'
 #' @return A single-row tibble with location metadata, including
 #'   coordinates where the server provides them.
+#'
+#' @section BrAPI endpoint:
+#' `GET /locations/{locationDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Locations/Locations_LocationDbId_GET_PUT.yaml).
 #'
 #' @examples
 #' \donttest{
@@ -176,6 +231,15 @@ brapi_location <- function(con, locationDbId) {
 #'
 #' @return A tibble with one row per season.
 #'
+#' @section BrAPI endpoint:
+#' `GET /seasons` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Seasons/Seasons_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `seasonDbId`, `season`, `seasonName`, `year`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -194,6 +258,15 @@ brapi_seasons <- function(con, ...) {
 #' @param ... Additional query parameters (e.g. `listType`).
 #'
 #' @return A tibble with one row per list.
+#'
+#' @section BrAPI endpoint:
+#' `GET /lists` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Lists/Lists_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `listType`, `listName`, `listDbId`, `listSource`.
 #'
 #' @examples
 #' \donttest{
@@ -217,6 +290,10 @@ brapi_lists <- function(con, ...) {
 #'
 #' @return A single-row tibble of list metadata, with the list's members
 #'   as a character vector in the `data` list-column.
+#'
+#' @section BrAPI endpoint:
+#' `GET /lists/{listDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Lists/Lists_ListDbId_GET_PUT.yaml).
 #'
 #' @examples
 #' \donttest{
@@ -250,6 +327,15 @@ brapi_list <- function(con, listDbId) {
 #'
 #' @return A tibble with one row per person.
 #'
+#' @section BrAPI endpoint:
+#' `GET /people` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/People/People_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `firstName`, `lastName`, `personDbId`, `userID`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -271,6 +357,15 @@ brapi_people <- function(con, ...) {
 #' @inheritParams brapi_shared_params
 #'
 #' @return A tibble of supported endpoints and their methods.
+#'
+#' @section BrAPI endpoint:
+#' `GET /serverinfo` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/ServerInfo/ServerInfo_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `contentType`, `dataType`.
 #'
 #' @examples
 #' \donttest{

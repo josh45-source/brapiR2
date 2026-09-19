@@ -17,6 +17,12 @@ A single-row tibble with ontology details.
 \description{
 Get a Single Ontology by ID
 }
+\section{BrAPI endpoint}{
+
+\code{GET /ontologies/{ontologyDbId}} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Ontologies/Ontologies_OntologyDbId_GET_PUT.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

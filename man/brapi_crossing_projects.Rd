@@ -17,6 +17,18 @@ A tibble with one row per crossing project.
 \description{
 List Crossing Projects
 }
+\section{BrAPI endpoint}{
+
+\code{GET /crossingprojects} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/CrossingProjects/CrossingProjects_GET_POST.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{crossingProjectDbId}, \code{crossingProjectName},
+\code{includePotentialParents}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

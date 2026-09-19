@@ -20,6 +20,12 @@ Unlike \code{\link[=brapi_lists]{brapi_lists()}}, which returns only list metada
 a single list together with its members in the \code{data} list-column.
 \code{listType} says what the members are (for example \code{"germplasm"}).
 }
+\section{BrAPI endpoint}{
+
+\code{GET /lists/{listDbId}} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Lists/Lists_ListDbId_GET_PUT.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

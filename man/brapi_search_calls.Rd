@@ -21,6 +21,12 @@ A tibble of matching genotype calls.
 \description{
 Search Genotype Calls
 }
+\section{BrAPI endpoint}{
+
+\code{POST /search/calls} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Calls/Search_Calls_POST.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

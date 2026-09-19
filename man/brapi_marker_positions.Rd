@@ -43,6 +43,18 @@ physical, in bp) - a different coordinate system from
 a reference assembly instead. A server may populate either, both, or
 neither; one being empty does not imply the other is.
 }
+\section{BrAPI endpoint}{
+
+\code{GET /markerpositions} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/MarkerPositions_GET.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{mapDbId}, \code{linkageGroupName}, \code{variantDbId}, \code{minPosition},
+\code{maxPosition}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

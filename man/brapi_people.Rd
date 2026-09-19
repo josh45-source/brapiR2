@@ -17,6 +17,17 @@ A tibble with one row per person.
 \description{
 List People
 }
+\section{BrAPI endpoint}{
+
+\code{GET /people} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/People/People_GET_POST.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{firstName}, \code{lastName}, \code{personDbId}, \code{userID}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

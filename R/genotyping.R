@@ -13,6 +13,16 @@
 #'
 #' @return A tibble with one row per sample.
 #'
+#' @section BrAPI endpoint:
+#' `GET /samples` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Samples/Samples_GET_POST_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `sampleDbId`, `sampleName`, `sampleGroupDbId`, `observationUnitDbId`,
+#' `plateDbId`, `plateName`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -31,6 +41,15 @@ brapi_samples <- function(con, ...) {
 #' @inheritParams brapi_shared_filters
 #'
 #' @return A tibble with one row per variant.
+#'
+#' @section BrAPI endpoint:
+#' `GET /variants` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Variants/Variants_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `variantDbId`, `variantSetDbId`, `referenceDbId`, `referenceSetDbId`.
 #'
 #' @examples
 #' \donttest{
@@ -53,6 +72,15 @@ brapi_variants <- function(con, variantSetDbId = NULL, ...) {
 #'
 #' @return A tibble with one row per variant set.
 #'
+#' @section BrAPI endpoint:
+#' `GET /variantsets` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/VariantSets/VariantSets_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `variantSetDbId`, `variantDbId`, `callSetDbId`, `referenceSetDbId`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -74,6 +102,16 @@ brapi_variant_sets <- function(con, studyDbId = NULL, ...) {
 #'
 #' @return A tibble with one row per genotype call.
 #'
+#' @section BrAPI endpoint:
+#' `GET /calls` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Calls/Calls_GET_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `callSetDbId`, `variantDbId`, `variantSetDbId`, `expandHomozygotes`,
+#' `unknownString`, `sepPhased`, `sepUnphased`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -94,6 +132,15 @@ brapi_calls <- function(con, variantSetDbId = NULL, ...) {
 #'
 #' @return A tibble with one row per call set.
 #'
+#' @section BrAPI endpoint:
+#' `GET /callsets` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/CallSets/CallSets_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `callSetDbId`, `callSetName`, `variantSetDbId`, `sampleDbId`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -112,6 +159,16 @@ brapi_call_sets <- function(con, ...) {
 #'
 #' @return A tibble with one row per reference sequence.
 #'
+#' @section BrAPI endpoint:
+#' `GET /references` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/References/References_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `referenceDbId`, `referenceSetDbId`, `accession`, `md5checksum`,
+#' `isDerived`, `minLength`, `maxLength`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -129,6 +186,15 @@ brapi_references <- function(con, ...) {
 #' @inheritParams brapi_shared_params
 #'
 #' @return A tibble with one row per reference set.
+#'
+#' @section BrAPI endpoint:
+#' `GET /referencesets` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/ReferenceSets/ReferenceSets_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `referenceSetDbId`, `accession`, `assemblyPUI`, `md5checksum`.
 #'
 #' @examples
 #' \donttest{
@@ -155,6 +221,16 @@ brapi_reference_sets <- function(con, ...) {
 #'   (e.g. `expandHomozygotes`, `unknownString`, `sepPhased`, `sepUnphased`).
 #'
 #' @return A tibble with columns `variantDbId`, `callSetDbId`, `genotype`.
+#'
+#' @section BrAPI endpoint:
+#' `GET /allelematrix` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/AlleleMatrix/AlleleMatrix_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `dimensionVariantPage`, `dimensionVariantPageSize`,
+#' `dimensionCallSetPage`, `dimensionCallSetPageSize`.
 #'
 #' @examples
 #' \donttest{
@@ -265,6 +341,10 @@ fetch_allele_matrix_pages <- function(con, query) {
 #'
 #' @return A tibble of matching variants.
 #'
+#' @section BrAPI endpoint:
+#' `POST /search/variants` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Variants/Search_Variants_POST.yaml).
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -285,6 +365,10 @@ brapi_search_variants <- function(con, variantSetDbIds = NULL, ...) {
 #' @param callSetDbIds Character vector. Filter by call set IDs.
 #'
 #' @return A tibble of matching genotype calls.
+#'
+#' @section BrAPI endpoint:
+#' `POST /search/calls` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Calls/Search_Calls_POST.yaml).
 #'
 #' @examples
 #' \donttest{

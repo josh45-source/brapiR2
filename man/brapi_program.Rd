@@ -17,6 +17,12 @@ A single-row tibble with program details.
 \description{
 Get a Single Program by ID
 }
+\section{BrAPI endpoint}{
+
+\code{GET /programs/{programDbId}} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Programs/Programs_ProgramDbId_GET_PUT.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

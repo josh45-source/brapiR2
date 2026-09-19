@@ -18,6 +18,18 @@ A tibble with one row per germplasm accession.
 \description{
 List Germplasm
 }
+\section{BrAPI endpoint}{
+
+\code{GET /germplasm} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm/Germplasm_GET_POST.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{accessionNumber}, \code{collection}, \code{binomialName}, \code{genus}, \code{species},
+\code{synonym}, \code{parentDbId}, \code{progenyDbId}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

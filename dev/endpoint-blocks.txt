@@ -1,0 +1,472 @@
+## brapi_allele_matrix
+#' @section BrAPI endpoint:
+#' `GET /allelematrix` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/AlleleMatrix/AlleleMatrix_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `dimensionVariantPage`, `dimensionVariantPageSize`,
+#' `dimensionCallSetPage`, `dimensionCallSetPageSize`.
+
+## brapi_call_sets
+#' @section BrAPI endpoint:
+#' `GET /callsets` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/CallSets/CallSets_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `callSetDbId`, `callSetName`, `variantSetDbId`, `sampleDbId`.
+
+## brapi_calls
+#' @section BrAPI endpoint:
+#' `GET /calls` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Calls/Calls_GET_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `callSetDbId`, `variantDbId`, `variantSetDbId`, `expandHomozygotes`,
+#' `unknownString`, `sepPhased`, `sepUnphased`.
+
+## brapi_crosses
+#' @section BrAPI endpoint:
+#' `GET /crosses` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Crosses/Crosses_GET_POST_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `crossingProjectDbId`, `crossingProjectName`, `crossDbId`, `crossName`.
+
+## brapi_crossing_projects
+#' @section BrAPI endpoint:
+#' `GET /crossingprojects` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/CrossingProjects/CrossingProjects_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `crossingProjectDbId`, `crossingProjectName`,
+#' `includePotentialParents`.
+
+## brapi_endpoints
+#' @section BrAPI endpoint:
+#' `GET /serverinfo` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/ServerInfo/ServerInfo_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `contentType`, `dataType`.
+
+## brapi_events
+#' @section BrAPI endpoint:
+#' `GET /events` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Events/Events_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `observationUnitDbId`, `eventDbId`, `eventType`, `dateRangeStart`,
+#' `dateRangeEnd`.
+
+## brapi_germplasm
+#' @section BrAPI endpoint:
+#' `GET /germplasm` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm/Germplasm_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `accessionNumber`, `collection`, `binomialName`, `genus`, `species`,
+#' `synonym`, `parentDbId`, `progenyDbId`.
+
+## brapi_germplasm_attributes
+#' @section BrAPI endpoint:
+#' `GET /attributes` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm_Attributes/Attributes_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `attributeCategory`, `attributeDbId`, `attributeName`, `attributePUI`.
+
+## brapi_germplasm_detail
+#' @section BrAPI endpoint:
+#' `GET /germplasm/{germplasmDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm/Germplasm_GermplasmDbId_GET_PUT.yaml).
+
+## brapi_germplasm_pedigree
+#' @section BrAPI endpoint:
+#' `GET /pedigree` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Pedigree_GET_POST_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `accessionNumber`, `collection`, `familyCode`, `binomialName`, `genus`,
+#' `species`, `synonym`, `includeParents`, `includeSiblings`,
+#' `includeProgeny`, `includeFullTree`, `pedigreeDepth`, `progenyDepth`.
+
+## brapi_germplasm_progeny
+#' @section BrAPI endpoint:
+#' `GET /pedigree` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Pedigree_GET_POST_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `accessionNumber`, `collection`, `familyCode`, `binomialName`, `genus`,
+#' `species`, `synonym`, `includeParents`, `includeSiblings`,
+#' `includeProgeny`, `includeFullTree`, `pedigreeDepth`, `progenyDepth`.
+
+## brapi_images
+#' @section BrAPI endpoint:
+#' `GET /images` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Images/Images_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `imageDbId`, `imageName`, `observationUnitDbId`, `observationDbId`,
+#' `descriptiveOntologyTerm`.
+
+## brapi_list
+#' @section BrAPI endpoint:
+#' `GET /lists/{listDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Lists/Lists_ListDbId_GET_PUT.yaml).
+
+## brapi_lists
+#' @section BrAPI endpoint:
+#' `GET /lists` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Lists/Lists_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `listType`, `listName`, `listDbId`, `listSource`.
+
+## brapi_location
+#' @section BrAPI endpoint:
+#' `GET /locations/{locationDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Locations/Locations_LocationDbId_GET_PUT.yaml).
+
+## brapi_locations
+#' @section BrAPI endpoint:
+#' `GET /locations` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Locations/Locations_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `locationType`, `locationDbId`, `locationName`, `parentLocationDbId`,
+#' `parentLocationName`.
+
+## brapi_map
+#' @section BrAPI endpoint:
+#' `GET /maps/{mapDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Maps_MapDbId_GET.yaml).
+
+## brapi_map_linkage_groups
+#' @section BrAPI endpoint:
+#' `GET /maps/{mapDbId}/linkagegroups` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Maps_MapDbId_LinkageGroups_GET.yaml).
+
+## brapi_maps
+#' @section BrAPI endpoint:
+#' `GET /maps` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Maps_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `mapDbId`, `mapPUI`, `scientificName`, `type`.
+
+## brapi_marker_positions
+#' @section BrAPI endpoint:
+#' `GET /markerpositions` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/MarkerPositions_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `mapDbId`, `linkageGroupName`, `variantDbId`, `minPosition`,
+#' `maxPosition`.
+
+## brapi_methods
+#' @section BrAPI endpoint:
+#' `GET /methods` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Methods/Methods_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `methodDbId`, `observationVariableDbId`.
+
+## brapi_observation_units
+#' @section BrAPI endpoint:
+#' `GET /observationunits` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/ObservationUnits/ObservationUnits_GET_POST_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `observationUnitDbId`, `observationUnitName`, `locationDbId`,
+#' `seasonDbId`, `includeObservations`.
+
+## brapi_observation_variables
+#' @section BrAPI endpoint:
+#' `GET /variables` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/ObservationVariables/Variables_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `observationVariableDbId`, `observationVariableName`,
+#' `observationVariablePUI`, `traitClass`.
+
+## brapi_observations
+#' @section BrAPI endpoint:
+#' `GET /observations` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Observations/Observations_GET_POST_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `observationDbId`, `observationUnitDbId`, `observationVariableDbId`,
+#' `locationDbId`, `seasonDbId`, `observationTimeStampRangeStart`,
+#' `observationTimeStampRangeEnd`.
+
+## brapi_ontologies
+#' @section BrAPI endpoint:
+#' `GET /ontologies` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Ontologies/Ontologies_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `ontologyName`.
+
+## brapi_ontology
+#' @section BrAPI endpoint:
+#' `GET /ontologies/{ontologyDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Ontologies/Ontologies_OntologyDbId_GET_PUT.yaml).
+
+## brapi_pedigree
+#' @section BrAPI endpoint:
+#' `GET /pedigree` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Pedigree_GET_POST_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `accessionNumber`, `collection`, `familyCode`, `binomialName`, `genus`,
+#' `species`, `synonym`, `includeParents`, `includeSiblings`,
+#' `includeProgeny`, `includeFullTree`, `pedigreeDepth`, `progenyDepth`.
+
+## brapi_people
+#' @section BrAPI endpoint:
+#' `GET /people` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/People/People_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `firstName`, `lastName`, `personDbId`, `userID`.
+
+## brapi_ping
+#' @section BrAPI endpoint:
+#' `GET /serverinfo` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/ServerInfo/ServerInfo_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `contentType`, `dataType`.
+
+## brapi_program
+#' @section BrAPI endpoint:
+#' `GET /programs/{programDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Programs/Programs_ProgramDbId_GET_PUT.yaml).
+
+## brapi_programs
+#' @section BrAPI endpoint:
+#' `GET /programs` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Programs/Programs_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `abbreviation`, `programType`.
+
+## brapi_reference_sets
+#' @section BrAPI endpoint:
+#' `GET /referencesets` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/ReferenceSets/ReferenceSets_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `referenceSetDbId`, `accession`, `assemblyPUI`, `md5checksum`.
+
+## brapi_references
+#' @section BrAPI endpoint:
+#' `GET /references` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/References/References_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `referenceDbId`, `referenceSetDbId`, `accession`, `md5checksum`,
+#' `isDerived`, `minLength`, `maxLength`.
+
+## brapi_samples
+#' @section BrAPI endpoint:
+#' `GET /samples` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Samples/Samples_GET_POST_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `sampleDbId`, `sampleName`, `sampleGroupDbId`, `observationUnitDbId`,
+#' `plateDbId`, `plateName`.
+
+## brapi_scales
+#' @section BrAPI endpoint:
+#' `GET /scales` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Scales/Scales_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `scaleDbId`, `observationVariableDbId`.
+
+## brapi_search_calls
+#' @section BrAPI endpoint:
+#' `POST /search/calls` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Calls/Search_Calls_POST.yaml).
+
+## brapi_search_germplasm
+#' @section BrAPI endpoint:
+#' `POST /search/germplasm` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm/Search_Germplasm_POST.yaml).
+
+## brapi_search_marker_positions
+#' @section BrAPI endpoint:
+#' `POST /search/markerpositions` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Search_MarkerPositions_POST.yaml).
+
+## brapi_search_observations
+#' @section BrAPI endpoint:
+#' `POST /search/observations` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Observations/Search_Observations_POST.yaml).
+
+## brapi_search_pedigree
+#' @section BrAPI endpoint:
+#' `POST /search/pedigree` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Search_Pedigree_POST.yaml).
+
+## brapi_search_variables
+#' @section BrAPI endpoint:
+#' `POST /search/variables` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/ObservationVariables/Search_Variables_POST.yaml).
+
+## brapi_search_variants
+#' @section BrAPI endpoint:
+#' `POST /search/variants` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Variants/Search_Variants_POST.yaml).
+
+## brapi_seasons
+#' @section BrAPI endpoint:
+#' `GET /seasons` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Seasons/Seasons_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `seasonDbId`, `season`, `seasonName`, `year`.
+
+## brapi_seed_lots
+#' @section BrAPI endpoint:
+#' `GET /seedlots` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/SeedLots/SeedLots_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `seedLotDbId`, `crossDbId`, `crossName`.
+
+## brapi_server_info
+#' @section BrAPI endpoint:
+#' `GET /serverinfo` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/ServerInfo/ServerInfo_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `contentType`, `dataType`.
+
+## brapi_studies
+#' @section BrAPI endpoint:
+#' `GET /studies` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Studies/Studies_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `studyType`, `locationDbId`, `seasonDbId`, `studyCode`, `studyPUI`,
+#' `observationVariableDbId`, `active`, `sortBy`, `sortOrder`.
+
+## brapi_study
+#' @section BrAPI endpoint:
+#' `GET /studies/{studyDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Studies/Studies_StudyDbId_GET_PUT.yaml).
+
+## brapi_traits
+#' @section BrAPI endpoint:
+#' `GET /traits` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Traits/Traits_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `traitDbId`, `observationVariableDbId`.
+
+## brapi_trial
+#' @section BrAPI endpoint:
+#' `GET /trials/{trialDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Trials/Trials_TrialDbId_GET_PUT.yaml).
+
+## brapi_trials
+#' @section BrAPI endpoint:
+#' `GET /trials` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Trials/Trials_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `active`, `contactDbId`, `locationDbId`, `searchDateRangeStart`,
+#' `searchDateRangeEnd`, `trialPUI`, `sortBy`, `sortOrder`.
+
+## brapi_variant_sets
+#' @section BrAPI endpoint:
+#' `GET /variantsets` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/VariantSets/VariantSets_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `variantSetDbId`, `variantDbId`, `callSetDbId`, `referenceSetDbId`.
+
+## brapi_variants
+#' @section BrAPI endpoint:
+#' `GET /variants` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Variants/Variants_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `variantDbId`, `variantSetDbId`, `referenceDbId`, `referenceSetDbId`.
+

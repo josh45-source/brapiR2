@@ -23,6 +23,18 @@ tidy tibble with one row per (variant, callSet) combination. The
 \verb{/allelematrix} response has a unique structure (2-D pagination, no
 \code{result$data} envelope) so it cannot use the generic \code{brapi_get()}.
 }
+\section{BrAPI endpoint}{
+
+\code{GET /allelematrix} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/AlleleMatrix/AlleleMatrix_GET.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{dimensionVariantPage}, \code{dimensionVariantPageSize},
+\code{dimensionCallSetPage}, \code{dimensionCallSetPageSize}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

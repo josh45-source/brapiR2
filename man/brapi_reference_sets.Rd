@@ -17,6 +17,17 @@ A tibble with one row per reference set.
 \description{
 List Reference Sets (Genome Assemblies)
 }
+\section{BrAPI endpoint}{
+
+\code{GET /referencesets} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/ReferenceSets/ReferenceSets_GET.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{referenceSetDbId}, \code{accession}, \code{assemblyPUI}, \code{md5checksum}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

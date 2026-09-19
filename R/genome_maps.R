@@ -18,6 +18,15 @@
 #'
 #' @return A tibble with one row per genome map.
 #'
+#' @section BrAPI endpoint:
+#' `GET /maps` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Maps_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `mapDbId`, `mapPUI`, `scientificName`, `type`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -37,6 +46,10 @@ brapi_maps <- function(con, ...) {
 #'
 #' @return A single-row tibble with genome map details, including `type`
 #'   (e.g. `"Genetic"` or `"Physical"`) and `unit` (e.g. `"cM"` or `"bp"`).
+#'
+#' @section BrAPI endpoint:
+#' `GET /maps/{mapDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Maps_MapDbId_GET.yaml).
 #'
 #' @examples
 #' \donttest{
@@ -59,6 +72,10 @@ brapi_map <- function(con, mapDbId) {
 #' @inheritParams brapi_shared_ids
 #'
 #' @return A tibble with one row per linkage group on the map.
+#'
+#' @section BrAPI endpoint:
+#' `GET /maps/{mapDbId}/linkagegroups` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Maps_MapDbId_LinkageGroups_GET.yaml).
 #'
 #' @examples
 #' \donttest{
@@ -92,6 +109,16 @@ brapi_map_linkage_groups <- function(con, mapDbId) {
 #' @param maxPosition Integer or NULL. Maximum position, inclusive.
 #'
 #' @return A tibble with one row per marker placement.
+#'
+#' @section BrAPI endpoint:
+#' `GET /markerpositions` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/MarkerPositions_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `mapDbId`, `linkageGroupName`, `variantDbId`, `minPosition`,
+#' `maxPosition`.
 #'
 #' @examples
 #' \donttest{
@@ -130,6 +157,10 @@ brapi_marker_positions <- function(con, mapDbId = NULL, variantDbId = NULL,
 #' @param maxPosition Integer. Maximum position, inclusive.
 #'
 #' @return A tibble of matching marker positions.
+#'
+#' @section BrAPI endpoint:
+#' `POST /search/markerpositions` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Search_MarkerPositions_POST.yaml).
 #'
 #' @examples
 #' \donttest{

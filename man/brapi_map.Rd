@@ -18,6 +18,12 @@ A single-row tibble with genome map details, including \code{type}
 \description{
 Get a Single Genome Map by ID
 }
+\section{BrAPI endpoint}{
+
+\code{GET /maps/{mapDbId}} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Maps_MapDbId_GET.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

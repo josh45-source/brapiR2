@@ -17,6 +17,18 @@ A tibble with one row per image record.
 \description{
 List Images
 }
+\section{BrAPI endpoint}{
+
+\code{GET /images} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Images/Images_GET_POST.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{imageDbId}, \code{imageName}, \code{observationUnitDbId}, \code{observationDbId},
+\code{descriptiveOntologyTerm}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

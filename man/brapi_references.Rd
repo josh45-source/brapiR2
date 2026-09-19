@@ -17,6 +17,18 @@ A tibble with one row per reference sequence.
 \description{
 List References (Chromosomes/Contigs)
 }
+\section{BrAPI endpoint}{
+
+\code{GET /references} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/References/References_GET.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{referenceDbId}, \code{referenceSetDbId}, \code{accession}, \code{md5checksum},
+\code{isDerived}, \code{minLength}, \code{maxLength}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

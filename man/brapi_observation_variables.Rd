@@ -17,6 +17,18 @@ A tibble with one row per variable definition.
 \description{
 Returns the ontology of observation variables (trait + method + scale).
 }
+\section{BrAPI endpoint}{
+
+\code{GET /variables} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/ObservationVariables/Variables_GET_POST.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{observationVariableDbId}, \code{observationVariableName},
+\code{observationVariablePUI}, \code{traitClass}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

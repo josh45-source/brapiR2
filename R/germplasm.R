@@ -11,6 +11,16 @@
 #'
 #' @return A tibble with one row per germplasm accession.
 #'
+#' @section BrAPI endpoint:
+#' `GET /germplasm` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm/Germplasm_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `accessionNumber`, `collection`, `binomialName`, `genus`, `species`,
+#' `synonym`, `parentDbId`, `progenyDbId`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -29,6 +39,10 @@ brapi_germplasm <- function(con, ...) {
 #' @inheritParams brapi_shared_ids
 #'
 #' @return A single-row tibble with germplasm details.
+#'
+#' @section BrAPI endpoint:
+#' `GET /germplasm/{germplasmDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm/Germplasm_GermplasmDbId_GET_PUT.yaml).
 #'
 #' @examples
 #' \donttest{
@@ -54,6 +68,17 @@ brapi_germplasm_detail <- function(con, germplasmDbId) {
 #' @return A single-row tibble of the germplasm's pedigree node, with
 #'   `parents`, `siblings` and `progeny` as list-columns of tidy tibbles.
 #'   See [brapi_pedigree()], which this function calls.
+#'
+#' @section BrAPI endpoint:
+#' `GET /pedigree` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Pedigree_GET_POST_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `accessionNumber`, `collection`, `familyCode`, `binomialName`, `genus`,
+#' `species`, `synonym`, `includeParents`, `includeSiblings`,
+#' `includeProgeny`, `includeFullTree`, `pedigreeDepth`, `progenyDepth`.
 #'
 #' @examples
 #' \donttest{
@@ -83,6 +108,17 @@ brapi_germplasm_pedigree <- function(con, germplasmDbId) {
 #'   `progeny` as a list-column of a tidy tibble of descendants. See
 #'   [brapi_pedigree()], which this function calls.
 #'
+#' @section BrAPI endpoint:
+#' `GET /pedigree` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Pedigree_GET_POST_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `accessionNumber`, `collection`, `familyCode`, `binomialName`, `genus`,
+#' `species`, `synonym`, `includeParents`, `includeSiblings`,
+#' `includeProgeny`, `includeFullTree`, `pedigreeDepth`, `progenyDepth`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -109,6 +145,15 @@ brapi_germplasm_progeny <- function(con, germplasmDbId) {
 #'
 #' @return A tibble with one row per attribute definition.
 #'
+#' @section BrAPI endpoint:
+#' `GET /attributes` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm_Attributes/Attributes_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `attributeCategory`, `attributeDbId`, `attributeName`, `attributePUI`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -126,6 +171,15 @@ brapi_germplasm_attributes <- function(con, ...) {
 #' @inheritParams brapi_shared_params
 #'
 #' @return A tibble with one row per cross.
+#'
+#' @section BrAPI endpoint:
+#' `GET /crosses` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Crosses/Crosses_GET_POST_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `crossingProjectDbId`, `crossingProjectName`, `crossDbId`, `crossName`.
 #'
 #' @examples
 #' \donttest{
@@ -145,6 +199,16 @@ brapi_crosses <- function(con, ...) {
 #'
 #' @return A tibble with one row per crossing project.
 #'
+#' @section BrAPI endpoint:
+#' `GET /crossingprojects` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/CrossingProjects/CrossingProjects_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `crossingProjectDbId`, `crossingProjectName`,
+#' `includePotentialParents`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -162,6 +226,15 @@ brapi_crossing_projects <- function(con, ...) {
 #' @inheritParams brapi_shared_params
 #'
 #' @return A tibble with one row per seed lot.
+#'
+#' @section BrAPI endpoint:
+#' `GET /seedlots` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/SeedLots/SeedLots_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `seedLotDbId`, `crossDbId`, `crossName`.
 #'
 #' @examples
 #' \donttest{
@@ -186,6 +259,10 @@ brapi_seed_lots <- function(con, ...) {
 #' @param ... Additional body parameters for the search request.
 #'
 #' @return A tibble of matching germplasm records.
+#'
+#' @section BrAPI endpoint:
+#' `POST /search/germplasm` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm/Search_Germplasm_POST.yaml).
 #'
 #' @examples
 #' \donttest{
@@ -254,6 +331,17 @@ brapi_search_germplasm <- function(con,
 #'   the germplasm sub-resource; [brapi_search_pedigree()] for the same
 #'   batch retrieval via `POST`, with a fuller set of filters.
 #'
+#' @section BrAPI endpoint:
+#' `GET /pedigree` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Pedigree_GET_POST_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `accessionNumber`, `collection`, `familyCode`, `binomialName`, `genus`,
+#' `species`, `synonym`, `includeParents`, `includeSiblings`,
+#' `includeProgeny`, `includeFullTree`, `pedigreeDepth`, `progenyDepth`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -300,6 +388,10 @@ brapi_pedigree <- function(con, germplasmDbId = NULL, includeParents = NULL,
 #'   for column details.
 #'
 #' @seealso [brapi_pedigree()], [brapi_germplasm_pedigree()]
+#'
+#' @section BrAPI endpoint:
+#' `POST /search/pedigree` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Search_Pedigree_POST.yaml).
 #'
 #' @examples
 #' \donttest{

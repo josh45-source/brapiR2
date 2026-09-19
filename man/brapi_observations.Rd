@@ -19,6 +19,19 @@ A tibble with one row per observation (trait measurement).
 \description{
 List Observations
 }
+\section{BrAPI endpoint}{
+
+\code{GET /observations} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Observations/Observations_GET_POST_PUT.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{observationDbId}, \code{observationUnitDbId}, \code{observationVariableDbId},
+\code{locationDbId}, \code{seasonDbId}, \code{observationTimeStampRangeStart},
+\code{observationTimeStampRangeEnd}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

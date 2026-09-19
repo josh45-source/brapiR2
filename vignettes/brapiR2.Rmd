@@ -382,7 +382,7 @@ different workflows**.
 | Pipe-friendly | Partial | Yes, all functions follow `f(con, ...)` |
 | Caching | No | Yes, disk-based with TTL |
 | Parallel fetch | No | Via the caller's own `future` backend |
-| Genotyping | Limited | Allele matrix, dosage matrix, marker map (32/36 BrAPI entities covered overall, read-only) |
+| Genotyping | Limited | Allele matrix, dosage matrix, marker map (32/37 BrAPI entities covered overall, read-only) |
 | Authentication | Yes | Yes |
 
 brapiR2 targets BrAPI v2 only, by design - see the "Design History" section

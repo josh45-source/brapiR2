@@ -15,6 +15,17 @@ Logical. \code{TRUE} if the server responds, \code{FALSE} otherwise.
 \description{
 Tests whether the BrAPI server is reachable and responding.
 }
+\section{BrAPI endpoint}{
+
+\code{GET /serverinfo} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/ServerInfo/ServerInfo_GET.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{contentType}, \code{dataType}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

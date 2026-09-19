@@ -10,6 +10,16 @@
 #'
 #' @return A tibble with one row per observation unit (plot/plant/sample).
 #'
+#' @section BrAPI endpoint:
+#' `GET /observationunits` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/ObservationUnits/ObservationUnits_GET_POST_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `observationUnitDbId`, `observationUnitName`, `locationDbId`,
+#' `seasonDbId`, `includeObservations`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -30,6 +40,17 @@ brapi_observation_units <- function(con, studyDbId = NULL, ...) {
 #' @inheritParams brapi_shared_filters
 #'
 #' @return A tibble with one row per observation (trait measurement).
+#'
+#' @section BrAPI endpoint:
+#' `GET /observations` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Observations/Observations_GET_POST_PUT.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `observationDbId`, `observationUnitDbId`, `observationVariableDbId`,
+#' `locationDbId`, `seasonDbId`, `observationTimeStampRangeStart`,
+#' `observationTimeStampRangeEnd`.
 #'
 #' @examples
 #' \donttest{
@@ -56,6 +77,16 @@ brapi_observations <- function(con, studyDbId = NULL, ...) {
 #' @seealso [brapi_ontologies()] and [brapi_ontology()] to resolve the
 #'   ontology a variable's `ontologyDbId`/`ontologyReference` points to.
 #'
+#' @section BrAPI endpoint:
+#' `GET /variables` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/ObservationVariables/Variables_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `observationVariableDbId`, `observationVariableName`,
+#' `observationVariablePUI`, `traitClass`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -76,6 +107,15 @@ brapi_observation_variables <- function(con, ...) {
 #'
 #' @seealso [brapi_ontologies()] and [brapi_ontology()] to resolve the
 #'   ontology a trait's `ontologyDbId`/`ontologyReference` points to.
+#'
+#' @section BrAPI endpoint:
+#' `GET /traits` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Traits/Traits_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `traitDbId`, `observationVariableDbId`.
 #'
 #' @examples
 #' \donttest{
@@ -98,6 +138,15 @@ brapi_traits <- function(con, ...) {
 #' @seealso [brapi_ontologies()] and [brapi_ontology()] to resolve the
 #'   ontology a scale's `ontologyDbId`/`ontologyReference` points to.
 #'
+#' @section BrAPI endpoint:
+#' `GET /scales` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Scales/Scales_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `scaleDbId`, `observationVariableDbId`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -118,6 +167,15 @@ brapi_scales <- function(con, ...) {
 #'
 #' @seealso [brapi_ontologies()] and [brapi_ontology()] to resolve the
 #'   ontology a method's `ontologyDbId`/`ontologyReference` points to.
+#'
+#' @section BrAPI endpoint:
+#' `GET /methods` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Methods/Methods_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `methodDbId`, `observationVariableDbId`.
 #'
 #' @examples
 #' \donttest{
@@ -148,6 +206,15 @@ brapi_methods <- function(con, ...) {
 #'   [brapi_observation_variables()] for the records that reference these
 #'   ontologies.
 #'
+#' @section BrAPI endpoint:
+#' `GET /ontologies` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Ontologies/Ontologies_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `ontologyName`.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -171,6 +238,10 @@ brapi_ontologies <- function(con, ...) {
 #'   [brapi_methods()], and [brapi_observation_variables()] for the
 #'   records that reference ontologies.
 #'
+#' @section BrAPI endpoint:
+#' `GET /ontologies/{ontologyDbId}` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Ontologies/Ontologies_OntologyDbId_GET_PUT.yaml).
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -188,6 +259,16 @@ brapi_ontology <- function(con, ontologyDbId) {
 #' @inheritParams brapi_shared_params
 #'
 #' @return A tibble with one row per image record.
+#'
+#' @section BrAPI endpoint:
+#' `GET /images` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Images/Images_GET_POST.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `imageDbId`, `imageName`, `observationUnitDbId`, `observationDbId`,
+#' `descriptiveOntologyTerm`.
 #'
 #' @examples
 #' \donttest{
@@ -207,6 +288,16 @@ brapi_images <- function(con, ...) {
 #' @inheritParams brapi_shared_filters
 #'
 #' @return A tibble with one row per event.
+#'
+#' @section BrAPI endpoint:
+#' `GET /events` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Events/Events_GET.yaml).
+#'
+#' Query parameters the specification defines, which may be passed
+#' through `...`:
+#'
+#' `observationUnitDbId`, `eventDbId`, `eventType`, `dateRangeStart`,
+#' `dateRangeEnd`.
 #'
 #' @examples
 #' \donttest{
@@ -229,6 +320,10 @@ brapi_events <- function(con, studyDbId = NULL, ...) {
 #' @param observationVariableDbIds Character vector. Filter by variable IDs.
 #'
 #' @return A tibble of matching observations.
+#'
+#' @section BrAPI endpoint:
+#' `POST /search/observations` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Observations/Search_Observations_POST.yaml).
 #'
 #' @examples
 #' \donttest{
@@ -256,6 +351,10 @@ brapi_search_observations <- function(con,
 #' @param traitClasses Character vector. Filter by trait class.
 #'
 #' @return A tibble of matching observation variables.
+#'
+#' @section BrAPI endpoint:
+#' `POST /search/variables` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/ObservationVariables/Search_Variables_POST.yaml).
 #'
 #' @examples
 #' \donttest{

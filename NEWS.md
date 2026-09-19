@@ -114,8 +114,8 @@
   and `brapi_ontology()`, cross-referenced from `brapi_traits()`,
   `brapi_scales()`, `brapi_methods()`, and
   `brapi_observation_variables()`.
-* brapiR2 now wraps 32 of the 36 BrAPI v2.1 entities across all four
-  modules (56 of 138 retrieval endpoints); see `DESIGN.md` for the full
+* brapiR2 now wraps 32 of the 37 BrAPI v2.1 entities across all four
+  modules (49 of 138 retrieval endpoints); see `DESIGN.md` for the full
   coverage breakdown and which entities remain uncovered.
 * `brapi_connection()` gains a `path` argument for servers that do not
   serve BrAPI under `/brapi/`. GRIN-Global instances use

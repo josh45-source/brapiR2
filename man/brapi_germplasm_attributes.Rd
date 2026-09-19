@@ -17,6 +17,17 @@ A tibble with one row per attribute definition.
 \description{
 List Germplasm Attributes
 }
+\section{BrAPI endpoint}{
+
+\code{GET /attributes} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm_Attributes/Attributes_GET_POST.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{attributeCategory}, \code{attributeDbId}, \code{attributeName}, \code{attributePUI}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

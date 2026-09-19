@@ -19,6 +19,17 @@ A tibble with one row per variant set.
 \description{
 List Variant Sets (Datasets)
 }
+\section{BrAPI endpoint}{
+
+\code{GET /variantsets} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/VariantSets/VariantSets_GET.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{variantSetDbId}, \code{variantDbId}, \code{callSetDbId}, \code{referenceSetDbId}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

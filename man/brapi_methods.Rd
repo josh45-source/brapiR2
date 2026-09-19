@@ -17,6 +17,17 @@ A tibble with one row per measurement method.
 \description{
 List Methods
 }
+\section{BrAPI endpoint}{
+
+\code{GET /methods} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Methods/Methods_GET_POST.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{methodDbId}, \code{observationVariableDbId}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

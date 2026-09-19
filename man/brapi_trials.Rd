@@ -19,6 +19,18 @@ A tibble with one row per trial.
 \description{
 Retrieves trials, optionally filtered by program.
 }
+\section{BrAPI endpoint}{
+
+\code{GET /trials} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Trials/Trials_GET_POST.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{active}, \code{contactDbId}, \code{locationDbId}, \code{searchDateRangeStart},
+\code{searchDateRangeEnd}, \code{trialPUI}, \code{sortBy}, \code{sortOrder}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

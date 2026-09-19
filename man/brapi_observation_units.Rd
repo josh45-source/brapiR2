@@ -19,6 +19,18 @@ A tibble with one row per observation unit (plot/plant/sample).
 \description{
 List Observation Units
 }
+\section{BrAPI endpoint}{
+
+\code{GET /observationunits} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/ObservationUnits/ObservationUnits_GET_POST_PUT.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{observationUnitDbId}, \code{observationUnitName}, \code{locationDbId},
+\code{seasonDbId}, \code{includeObservations}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

@@ -39,6 +39,12 @@ takes a single \code{variantDbId}; this search endpoint accepts many IDs at
 once, which is what \code{\link[=brapi_get_marker_map]{brapi_get_marker_map()}} uses internally when
 looking up positions for an entire variant set.
 }
+\section{BrAPI endpoint}{
+
+\code{POST /search/markerpositions} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Search_MarkerPositions_POST.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

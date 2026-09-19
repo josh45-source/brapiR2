@@ -26,6 +26,12 @@ A tibble of matching observations.
 \description{
 Search Observations
 }
+\section{BrAPI endpoint}{
+
+\code{POST /search/observations} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Observations/Search_Observations_POST.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

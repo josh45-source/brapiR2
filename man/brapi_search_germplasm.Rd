@@ -29,6 +29,12 @@ A tibble of matching germplasm records.
 \description{
 Performs a BrAPI search for germplasm records matching the given criteria.
 }
+\section{BrAPI endpoint}{
+
+\code{POST /search/germplasm} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm/Search_Germplasm_POST.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

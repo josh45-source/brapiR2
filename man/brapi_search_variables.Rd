@@ -19,6 +19,12 @@ A tibble of matching observation variables.
 \description{
 Search Observation Variables
 }
+\section{BrAPI endpoint}{
+
+\code{POST /search/variables} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/ObservationVariables/Search_Variables_POST.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

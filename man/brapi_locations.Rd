@@ -17,6 +17,18 @@ A tibble with one row per location.
 \description{
 List Locations
 }
+\section{BrAPI endpoint}{
+
+\code{GET /locations} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Locations/Locations_GET_POST.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{locationType}, \code{locationDbId}, \code{locationName}, \code{parentLocationDbId},
+\code{parentLocationName}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

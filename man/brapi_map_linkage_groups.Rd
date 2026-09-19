@@ -18,6 +18,12 @@ A tibble with one row per linkage group on the map.
 A linkage group is BrAPI's generic term for a named section of a map -
 it may represent a chromosome, a scaffold, or a generic linkage group.
 }
+\section{BrAPI endpoint}{
+
+\code{GET /maps/{mapDbId}/linkagegroups} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Maps_MapDbId_LinkageGroups_GET.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

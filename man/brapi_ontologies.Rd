@@ -21,6 +21,17 @@ terms that belong to it. \code{\link[=brapi_traits]{brapi_traits()}}, \code{\lin
 \code{\link[=brapi_methods]{brapi_methods()}}, and \code{\link[=brapi_observation_variables]{brapi_observation_variables()}} each carry an
 ontology reference back to one of these records.
 }
+\section{BrAPI endpoint}{
+
+\code{GET /ontologies} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Ontologies/Ontologies_GET_POST.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{ontologyName}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

@@ -17,6 +17,17 @@ version(s).
 Queries the \verb{/serverinfo} endpoint to list which BrAPI calls the
 server supports, along with their HTTP methods and versions.
 }
+\section{BrAPI endpoint}{
+
+\code{GET /serverinfo} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/ServerInfo/ServerInfo_GET.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{contentType}, \code{dataType}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

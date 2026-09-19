@@ -48,6 +48,12 @@ number, collection, family code, genus/species, and more - pass any of
 these through \code{...}). See \code{\link[=brapi_pedigree]{brapi_pedigree()}} for the shape of the
 returned tibble and its relationship to \code{\link[=brapi_germplasm_pedigree]{brapi_germplasm_pedigree()}}.
 }
+\section{BrAPI endpoint}{
+
+\code{POST /search/pedigree} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Pedigree/Search_Pedigree_POST.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

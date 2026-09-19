@@ -17,6 +17,17 @@ A tibble with one row per call set.
 \description{
 List Call Sets (Samples with Genotype Data)
 }
+\section{BrAPI endpoint}{
+
+\code{GET /callsets} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/CallSets/CallSets_GET.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{callSetDbId}, \code{callSetName}, \code{variantSetDbId}, \code{sampleDbId}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

@@ -17,6 +17,17 @@ A tibble with one row per list.
 \description{
 List Generic Lists
 }
+\section{BrAPI endpoint}{
+
+\code{GET /lists} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Lists/Lists_GET_POST.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{listType}, \code{listName}, \code{listDbId}, \code{listSource}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

@@ -13,8 +13,8 @@ Authors@R: c(
 Description: Provides pipe-friendly, stateless read access to the Breeding
     API ('BrAPI') v2.1 specification, an open community standard for plant
     breeding data interchange maintained by the BrAPI project
-    <https://brapi.org>. Wraps 32 of the 36 'BrAPI' v2.1 entities across all
-    four modules, Core, Germplasm, Phenotyping, and Genotyping, covering 56
+    <https://brapi.org>. Wraps 32 of the 37 'BrAPI' v2.1 entities across all
+    four modules, Core, Germplasm, Phenotyping, and Genotyping, covering 49
     of the specification's 138 retrieval ('GET' and search) endpoints and
     returning tidy tibbles ready for analysis. Write and update endpoints
     are out of scope by design. Features include automatic pagination, async

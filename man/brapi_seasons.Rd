@@ -17,6 +17,17 @@ A tibble with one row per season.
 \description{
 List Seasons
 }
+\section{BrAPI endpoint}{
+
+\code{GET /seasons} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Seasons/Seasons_GET_POST.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{seasonDbId}, \code{season}, \code{seasonName}, \code{year}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

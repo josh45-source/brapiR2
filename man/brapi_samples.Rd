@@ -18,6 +18,18 @@ A tibble with one row per sample.
 \description{
 List Samples
 }
+\section{BrAPI endpoint}{
+
+\code{GET /samples} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Samples/Samples_GET_POST_PUT.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{sampleDbId}, \code{sampleName}, \code{sampleGroupDbId}, \code{observationUnitDbId},
+\code{plateDbId}, \code{plateName}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

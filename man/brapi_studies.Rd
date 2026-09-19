@@ -19,6 +19,18 @@ A tibble with one row per study.
 \description{
 Retrieves studies (occurrences/environments), optionally filtered by trial.
 }
+\section{BrAPI endpoint}{
+
+\code{GET /studies} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Core/Studies/Studies_GET_POST.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{studyType}, \code{locationDbId}, \code{seasonDbId}, \code{studyCode}, \code{studyPUI},
+\code{observationVariableDbId}, \code{active}, \code{sortBy}, \code{sortOrder}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

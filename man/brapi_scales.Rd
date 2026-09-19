@@ -17,6 +17,17 @@ A tibble with one row per scale definition.
 \description{
 List Scales
 }
+\section{BrAPI endpoint}{
+
+\code{GET /scales} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Scales/Scales_GET_POST.yaml}{v2.1 specification}.
+
+Query parameters the specification defines, which may be passed
+through \code{...}:
+
+\code{scaleDbId}, \code{observationVariableDbId}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

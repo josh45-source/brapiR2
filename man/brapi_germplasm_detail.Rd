@@ -17,6 +17,12 @@ A single-row tibble with germplasm details.
 \description{
 Get a Single Germplasm by ID
 }
+\section{BrAPI endpoint}{
+
+\code{GET /germplasm/{germplasmDbId}} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Germplasm/Germplasm/Germplasm_GermplasmDbId_GET_PUT.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
