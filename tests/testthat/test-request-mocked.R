@@ -401,3 +401,19 @@ test_that("brapi_server_message ignores an HTML error page", {
                           body = charToRaw("<html>oops</html>"))
   expect_null(brapiR2:::brapi_server_message(resp))
 })
+
+test_that("a result holding only data is a collection, even of scalars", {
+  local_mocked_bindings(
+    req_perform = function(req) structure(list(), class = "httr2_response"),
+    resp_body_json = function(resp, ...) {
+      list(
+        metadata = list(pagination = list(totalPages = 1L)),
+        result = list(data = list("Tomatillo", "Paw Paw", "Maize"))
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  out <- brapi_get(brapi_connection("https://example.org"), "/commoncropnames")
+  expect_identical(nrow(out), 3L)
+})

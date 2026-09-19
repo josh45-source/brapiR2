@@ -75,6 +75,9 @@
   the record envelope, so `/lists/{listDbId}` returned only its members and
   discarded every other field. `data` is now treated as the envelope only
   when it is absent of scalars — that is, empty or holding objects.
+* A collection whose records are bare strings is no longer mistaken for a
+  single object. `/commoncropnames` returns its crop names that way, and the
+  whole response came back as one row with a list-column.
 
 ### Minor improvements
 * Failed requests now report what the server said, not just the HTTP status.
@@ -129,6 +132,12 @@
   no way to reach a list's members at all. The members come back as a
   character vector in the `data` list-column, ready to pass to another
   function (@dwaring87, ropensci/software-review#792).
+* `brapi_get()` and `brapi_post_search()` are now exported, so an endpoint
+  brapiR2 does not wrap, a server extension, or a query parameter no named
+  function exposes can be reached without dropping to raw HTTP. Pagination,
+  caching, authentication and error reporting work as they do for the named
+  functions. Recommended by both reviewers and by the rOpenSci packaging
+  guidelines (@dwaring87, @jmh579, ropensci/software-review#792).
 
 ### Deprecated
 

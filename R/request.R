@@ -33,23 +33,47 @@ brapi_req <- function(con, endpoint) {
 }
 
 
-#' Internal: GET a BrAPI Endpoint with Automatic Pagination
+#' Call Any BrAPI GET Endpoint
 #'
-#' Sends a GET request to a BrAPI endpoint and handles pagination
-#' transparently. Returns all pages concatenated into a single tibble.
-#' When caching is enabled on `con` (via [brapi_cache_enable()]), the
-#' full multi-page result is stored as a JSON file keyed by URL +
-#' sorted query parameters. Subsequent calls within the TTL window skip
-#' the HTTP request and return the cached result.
+#' The named functions in brapiR2 cover 32 of the 36 BrAPI v2.1 entities.
+#' This is the layer beneath them, for endpoints brapiR2 does not wrap, for
+#' servers with non-standard extensions, and for query parameters a named
+#' function does not expose. Pagination, caching, authentication and error
+#' reporting work exactly as they do for the named functions.
+#'
+#' @section Return shape:
+#' The response passes through the same parser the named functions use, so
+#' a well-formed BrAPI collection returns one row per record. An endpoint
+#' returning something the parser does not recognise may come back with
+#' list-columns or a shape you need to reshape yourself. The named
+#' functions are the better choice wherever one exists.
 #'
 #' @inheritParams brapi_shared_params
-#' @param endpoint Character. The API endpoint (e.g. "/programs").
+#' @param endpoint Character. The endpoint path, with or without a leading
+#'   slash (for example `"/programs"` or `"commoncropnames"`). The base
+#'   URL, BrAPI path and version come from `con`.
 #' @param query Named list. Query parameters to append to the URL.
+#'   `pageSize` defaults to the connection's page size; `page` is managed
+#'   by the pagination loop and should not be set here.
 #'
-#' @return A tibble of results, or an empty tibble if no data.
+#' @return A tibble of results, or an empty tibble if the endpoint
+#'   returned no data.
+#'
+#' @seealso [brapi_post_search()] for the POST search endpoints.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#'
+#' # An endpoint brapiR2 does not wrap
+#' brapi_get(con, "/commoncropnames")
+#'
+#' # A query parameter no named function exposes
+#' brapi_get(con, "/studies", query = list(active = "true"))
+#' }
+#'
 #' @importFrom rlang hash
-#' @keywords internal
-#' @noRd
+#' @export
 brapi_get <- function(con, endpoint, query = list()) {
   validate_con(con)
 
@@ -187,10 +211,13 @@ brapi_get_pages <- function(con, endpoint, query) {
     # A collection endpoint's `data` is a list of record objects. A
     # single-object endpoint may itself carry a field called `data`
     # (`/lists/{listDbId}` holds its members there, as bare strings), so
-    # treat `data` as the record envelope only when it holds objects.
+    # treat `data` as the record envelope when it holds objects, or when
+    # it is the only field in `result` (`/commoncropnames` returns a bare
+    # list of crop names that way).
     is_envelope <- !is.null(body$result$data) &&
       (length(data) == 0L ||
-        all(vapply(data, is.list, logical(1))))
+        all(vapply(data, is.list, logical(1))) ||
+        identical(names(body$result), "data"))
     if (!is.null(body$result) && !is_envelope) {
       return(list(data = list(body$result), single = TRUE))
     }
@@ -207,24 +234,46 @@ brapi_get_pages <- function(con, endpoint, query) {
 }
 
 
-#' Internal: POST Search to a BrAPI Endpoint
+#' Call Any BrAPI Search Endpoint
 #'
-#' Handles the BrAPI search pattern:
-#' - POST to `/search/{entity}` with a JSON body
-#' - If 200: results are in the response body directly
-#' - If 202: server returns a `searchResultsDbId`; poll
-#'   `GET /search/{entity}/{searchResultsDbId}` until results are ready
+#' The companion to [brapi_get()] for the POST `/search/{entity}`
+#' endpoints, which take a filter body rather than query parameters and
+#' may run asynchronously. Use it for search endpoints brapiR2 does not
+#' wrap, or for filter fields a named search function does not expose.
+#'
+#' @section Asynchronous searches:
+#' A server may answer immediately with the results, or with HTTP 202 and
+#' a `searchResultsDbId` to be polled until the results are ready. Both
+#' are handled here; the polling happens inside the call and you get the
+#' finished results either way.
+#'
+#' @section Return shape:
+#' As with [brapi_get()], the response passes through the same parser the
+#' named functions use. A well-formed BrAPI result returns one row per
+#' record; an unusual one may need reshaping yourself.
 #'
 #' @inheritParams brapi_shared_params
-#' @param endpoint Character. The search endpoint (e.g. "/search/germplasm").
-#' @param body Named list. The search request body.
-#' @param poll_interval Numeric. Seconds between polling attempts. Default 2.
+#' @param endpoint Character. The search endpoint, with or without a
+#'   leading slash (for example `"/search/germplasm"`).
+#' @param body Named list. The search request body. Filter fields are sent
+#'   as JSON arrays, as BrAPI expects, even when you supply a single value.
+#' @param poll_interval Numeric. Seconds between polling attempts for an
+#'   asynchronous search. Default 2.
 #' @param max_polls Integer. Maximum polling attempts before giving up.
 #'   Default 30.
 #'
 #' @return A tibble of search results.
-#' @keywords internal
-#' @noRd
+#'
+#' @seealso [brapi_get()] for the GET endpoints.
+#'
+#' @examples
+#' \donttest{
+#' con <- brapi_connection("https://test-server.brapi.org")
+#' brapi_post_search(con, "/search/germplasm",
+#'                   body = list(germplasmNames = "Tomatillo Fantastico"))
+#' }
+#'
+#' @export
 brapi_post_search <- function(con, endpoint, body = list(),
                               poll_interval = 2, max_polls = 30L) {
   validate_con(con)

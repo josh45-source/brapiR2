@@ -85,6 +85,14 @@ reference:
       - brapi_get_dosage_matrix
       - brapi_get_marker_map
 
+  - title: "Low-Level Requests"
+    desc: >
+      Call any BrAPI endpoint directly, including those brapiR2 does not
+      wrap.
+    contents:
+      - brapi_get
+      - brapi_post_search
+
   - title: "Caching & Performance"
     desc: Response caching and parallel data fetching.
     contents:
