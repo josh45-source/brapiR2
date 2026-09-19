@@ -23,23 +23,31 @@ servers <- list(
        url = "https://wheat-sandbox.triticeaetoolbox.org", auth = TRUE)
 )
 
-calls <- list(
-  serverinfo   = function(con) brapi_server_info(con),
-  programs     = function(con) brapi_programs(con, pageSize = 10),
-  trials       = function(con) brapi_trials(con, pageSize = 10),
-  studies      = function(con) brapi_studies(con, pageSize = 10),
-  locations    = function(con) brapi_locations(con, pageSize = 10),
-  germplasm    = function(con) brapi_germplasm(con, pageSize = 10),
-  variables    = function(con) brapi_observation_variables(con, pageSize = 10),
-  traits       = function(con) brapi_traits(con, pageSize = 10),
-  variant_sets = function(con) brapi_variant_sets(con, pageSize = 10),
-  samples      = function(con) brapi_samples(con, pageSize = 10)
+# One request per endpoint, not a full paginated fetch: the survey asks
+# whether a server answers, not for all its data. brapi_get() walks every
+# page, which on a large production server means thousands of requests.
+probe <- function(con, endpoint) {
+  resp <- brapi_req(con, endpoint) |>
+    httr2::req_url_query(page = 0, pageSize = 5) |>
+    httr2::req_perform()
+  brapi_stop_for_status(resp, con, endpoint)
+  b <- httr2::resp_body_json(resp, simplifyVector = FALSE)
+  n <- b$metadata$pagination$totalCount
+  if (is.null(n)) length(b$result$data %||% list()) else n
+}
+
+endpoints <- c(
+  serverinfo = "/serverinfo", programs = "/programs", trials = "/trials",
+  studies = "/studies", locations = "/locations", germplasm = "/germplasm",
+  variables = "/variables", traits = "/traits",
+  variant_sets = "/variantsets", samples = "/samples"
 )
 
 rows <- list()
 for (s in servers) {
   message("\n== ", s$name, " ==")
-  con <- brapi_connection(s$url, path = s$path %||% "brapi", page_size = 10L)
+  con <- brapi_connection(s$url, path = s$path %||% "brapi",
+                          page_size = 10L, timeout = 30)
 
   if (isTRUE(s$auth)) {
     u <- Sys.getenv("T3_USERNAME"); p <- Sys.getenv("T3_PASSWORD")
@@ -54,20 +62,22 @@ for (s in servers) {
     }
   }
 
-  for (nm in names(calls)) {
+  for (nm in names(endpoints)) {
+    ep <- endpoints[[nm]]
     t0 <- Sys.time()
-    r <- try(suppressMessages(calls[[nm]](con)), silent = TRUE)
+    r <- try(suppressMessages(probe(con, ep)), silent = TRUE)
     secs <- round(as.numeric(difftime(Sys.time(), t0, units = "secs")), 1)
     ok <- !inherits(r, "try-error")
     rows[[length(rows) + 1L]] <- data.frame(
-      server = s$name, call = nm, ok = ok,
-      rows = if (ok) nrow(r) else NA_integer_, secs = secs,
-      error = if (ok) NA_character_ else trimws(conditionMessage(attr(r, "condition"))),
+      server = s$name, call = nm, endpoint = ep, ok = ok,
+      total = if (ok) as.integer(r) else NA_integer_, secs = secs,
+      error = if (ok) NA_character_ else
+        trimws(conditionMessage(attr(r, "condition"))),
       stringsAsFactors = FALSE
     )
-    message(sprintf("  %-13s %-4s %5s rows %6ss", nm,
+    message(sprintf("  %-13s %-4s %9s %6ss", nm,
                     if (ok) "ok" else "FAIL",
-                    if (ok) nrow(r) else "-", secs))
+                    if (ok) format(r, big.mark = ",") else "-", secs))
   }
 }
 

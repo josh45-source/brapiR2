@@ -1,24 +1,54 @@
-# Server survey notes
+# Server survey
 
-Working notes for the compatibility survey (Tier 5). Not part of the
-package; `dev/` is .Rbuildignored.
+Working notes for the rOpenSci review. Not part of the package; `dev/`
+is `.Rbuildignore`d.
+
+`dev/survey-servers.R` runs one request against each of ten endpoints on
+every reachable server and records what happened, to `dev/server-survey.rds`.
+One request per endpoint, not a paginated fetch: the question is whether a
+server answers, not how much data it holds.
+
+Last run: 19 September 2026. 62 of 80 probes succeeded.
 
 ## Servers
 
-| Server | Base URL | Path | Auth for reads | Services | Studies |
-|---|---|---|---|---|---|
-| BrAPI test server | test-server.brapi.org | brapi | no | 148 | 3 |
-| Cassavabase | cassavabase.org | brapi | no | 118 | 8537 |
-| T3/Oat Sandbox | oat-sandbox.triticeaetoolbox.org | brapi | yes | 118 | 2624 |
-| T3/Wheat Sandbox | wheat-sandbox.triticeaetoolbox.org | brapi | yes | 118 | 9030 |
-| USDA-GRIN | npgsweb.ars-grin.gov | gringlobal/brapi | no | 13 | n/a |
+| Server | Implementation | Auth for reads | Services | Probes passed |
+|---|---|---|---|---|
+| BrAPI test server | reference | no | 148 | 10/10 |
+| Cassavabase | Breedbase | no | 118 | 7/10 |
+| Sweetpotatobase | Breedbase | no | 118 | 9/10 |
+| Coffeabase | Breedbase | no | 117 | 10/10 |
+| Citrusgreening | Breedbase | no | 117 | 8/10 |
+| USDA-GRIN | GRIN-Global | no | 13 | 2/10 |
+| T3/Oat Sandbox | Breedbase | yes | 118 | 8/10 |
+| T3/Wheat Sandbox | Breedbase | yes | 118 | 8/10 |
 
-T3 accounts are per-instance; oat credentials do not work on wheat.
-T3 requires authentication even for /serverinfo, which the spec treats
-as the discovery endpoint. Cassavabase and GRIN do not.
+T3 accounts are per instance; oat credentials do not work on wheat.
+T3 requires authentication even for `/serverinfo`, which the specification
+treats as the discovery endpoint. The others do not.
 
-Login worked first time on both T3 sandboxes, so the Breedbase login
-bug @dwaring87 and @jmh579 hit on Cassavabase is not present there.
+## What failed
+
+| Server | Endpoint | Seconds | Result |
+|---|---|---|---|
+| Cassavabase | `/samples` | 30.0 | no response within the 30s timeout |
+| Cassavabase | `/trials` | 30.0 | no response within the 30s timeout |
+| Cassavabase | `/variantsets` | 30.0 | no response within the 30s timeout |
+| Citrusgreening | `/studies` | 1.3 | BrAPI request failed (HTTP 500). |
+| Citrusgreening | `/variantsets` | 1.3 | BrAPI request failed (HTTP 500). |
+| Sweetpotatobase | `/samples` | 1.6 | BrAPI request failed (HTTP 500). |
+| T3/Oat Sandbox | `/samples` | 21.1 | could not connect (transient) |
+| T3/Oat Sandbox | `/variantsets` | 30.0 | no response within the 30s timeout |
+| T3/Wheat Sandbox | `/trials` | 30.0 | no response within the 30s timeout |
+| T3/Wheat Sandbox | `/variantsets` | 30.1 | no response within the 30s timeout |
+| USDA-GRIN | `/germplasm` | 0.4 | BrAPI request failed (HTTP 404). |
+| USDA-GRIN | `/programs` | 0.3 | BrAPI request failed (HTTP 404). |
+| USDA-GRIN | `/samples` | 0.4 | BrAPI request failed (HTTP 404). |
+| USDA-GRIN | `/studies` | 0.3 | BrAPI request failed (HTTP 404). |
+| USDA-GRIN | `/traits` | 0.6 | BrAPI request failed (HTTP 404). |
+| USDA-GRIN | `/trials` | 0.3 | BrAPI request failed (HTTP 404). |
+| USDA-GRIN | `/variables` | 0.3 | BrAPI request failed (HTTP 404). |
+| USDA-GRIN | `/variantsets` | 0.3 | BrAPI request failed (HTTP 404). |
 
 ## Findings
 
@@ -45,9 +75,11 @@ bug @dwaring87 and @jmh579 hit on Cassavabase is not present there.
   (15 columns) return different shapes on both T3 sandboxes; `pedigree`
   becomes `pedigreeString`, and relatives come back as tidy tibbles
   rather than raw nested lists.
-- An unfiltered brapi_germplasm() does not complete on Cassavabase
-  (120s timeout at page sizes 10 and 1000) or wheat-sandbox (85+ min).
-  Worth documenting, and possibly warning on large totalCount.
+- An unfiltered brapi_germplasm() does not complete on Cassavabase or
+  wheat-sandbox: a single request answers in under a second, but
+  brapi_get() walks every page, and these servers hold hundreds of
+  thousands of records. Cassavabase took 18 minutes to walk 8,539 studies.
+  There is no way to ask brapi_get() for just the first page.
 - /locations/{locationDbId} works on all four reachable servers. Column
   counts differ (21 on the test server, 19 on Cassavabase, oat-sandbox
   and GRIN), since servers return different optional fields.
@@ -56,8 +88,9 @@ bug @dwaring87 and @jmh579 hit on Cassavabase is not present there.
 
 - brapi_study_data() failure: oat-sandbox studyDbId 6882 (@dwaring87).
 
-## Not yet reachable
+## Not reached
 
-- T3/Wheat, Oat, Barley production; T3/WheatCAP; barley-sandbox
-- BMS, EBS: institutional accounts
-- GIGWA, Germinate: no public v2 instance found yet
+- BMS, EBS: institutional accounts needed.
+- GIGWA, Germinate: no public v2 instance found.
+- Ricebase answers but returns HTTP 500 even on `/serverinfo`.
+- Yambase, Musabase: authenticate even for `/serverinfo`; no account.
