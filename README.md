@@ -45,6 +45,26 @@ For the full list of endpoints and the function that wraps each one, see
 links to the BrAPI v2.1 specification, and lists the query parameters
 that endpoint accepts.
 
+## Tested against
+
+brapiR2 is developed against the public BrAPI test server and exercised
+against every publicly reachable BrAPI v2 server I could find. As of
+September 2026 that is eight servers across three implementations: the
+reference server, six Breedbase deployments (Cassavabase,
+Sweetpotatobase, Coffeabase, Citrusgreening, and the T3 oat and wheat
+sandboxes), and USDA-GRIN, which runs GRIN-Global. Of 80 endpoint
+probes, 62 succeeded. The failures are server-side rather than
+client-side - timeouts on the largest Breedbase instances, `HTTP 500` on
+two of them, and endpoints GRIN-Global does not implement - and each one
+is recorded in
+[dev/SERVERS.md](https://github.com/josh45-source/brapiR2/blob/main/dev/SERVERS.md),
+alongside the script that produced them.
+
+BMS, EBS, GIGWA and Germinate have not been tested; I have no access to
+an instance of any of them. If you use brapiR2 against one of those, or
+any other BrAPI v2 server, reports of what does and does not work are
+welcome in the issue tracker.
+
 ## Installation
 
 Install the development version from GitHub:
