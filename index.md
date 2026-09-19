@@ -30,6 +30,12 @@ Crosses, Plates, and Vendor Samples (lab/vendor order-tracking). brapiR2
 is read-only by design - it does not implement BrAPI’s `POST`/`PUT`
 write endpoints.
 
+For the full list of endpoints and the function that wraps each one, see
+[`?brapi_coverage`](https://josh45-source.github.io/brapiR2/reference/brapi_coverage.md).
+Each function’s own help page names its endpoint, links to the BrAPI
+v2.1 specification, and lists the query parameters that endpoint
+accepts.
+
 ## Installation
 
 Install the development version from GitHub:

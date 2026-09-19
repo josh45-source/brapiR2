@@ -148,6 +148,13 @@ helpers.
 - [`brapi_get_marker_map()`](https://josh45-source.github.io/brapiR2/reference/brapi_get_marker_map.md)
   : Get Marker Map
 
+## Coverage
+
+Which BrAPI endpoints brapiR2 wraps.
+
+- [`brapi_coverage`](https://josh45-source.github.io/brapiR2/reference/brapi_coverage.md)
+  : BrAPI Endpoints Covered by brapiR2
+
 ## Low-Level Requests
 
 Call any BrAPI endpoint directly, including those brapiR2 does not wrap.
