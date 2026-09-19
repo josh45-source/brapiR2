@@ -207,6 +207,13 @@
   functions. Recommended by both reviewers and by the rOpenSci packaging
   guidelines ([@dwaring87](https://github.com/dwaring87),
   [@jmh579](https://github.com/jmh579), ropensci/software-review#792).
+- [`brapi_get()`](https://josh45-source.github.io/brapiR2/reference/brapi_get.md)
+  gains a `max_pages` argument. An unfiltered call against a production
+  server walks every page: Cassavabase holds 8,539 studies and took 18
+  minutes to return them, and a germplasm listing on T3/Wheat ran for
+  over an hour before being interrupted. There was no way to ask for
+  just the first page. The default fetches everything as before, and a
+  truncated result is never cached.
 
 #### Deprecated
 

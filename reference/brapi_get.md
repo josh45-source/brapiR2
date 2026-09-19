@@ -9,7 +9,7 @@ reporting work exactly as they do for the named functions.
 ## Usage
 
 ``` r
-brapi_get(con, endpoint, query = list())
+brapi_get(con, endpoint, query = list(), max_pages = Inf)
 ```
 
 ## Arguments
@@ -31,6 +31,14 @@ brapi_get(con, endpoint, query = list())
   Named list. Query parameters to append to the URL. `pageSize` defaults
   to the connection's page size; `page` is managed by the pagination
   loop and should not be set here.
+
+- max_pages:
+
+  Numeric. Stop after this many pages instead of fetching all of them.
+  `Inf`, the default, fetches everything. A production server may hold
+  hundreds of thousands of records, so a small value is useful for
+  looking at what an unfamiliar server holds. A truncated result is
+  never cached.
 
 ## Value
 

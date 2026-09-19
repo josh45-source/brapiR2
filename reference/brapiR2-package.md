@@ -11,8 +11,8 @@ are out of scope by design. Features include automatic pagination, async
 search handling, response caching, parallel batch fetching, and
 convenience functions for genomic selection workflows (e.g. dosage
 matrix extraction). Designed for plant breeders and bioinformaticians
-who need programmatic access to 'Breedbase', 'BMS', 'EBS', 'GIGWA',
-'Germinate', and any 'BrAPI'-compliant server.
+who need programmatic access to plant breeding databases that implement
+the 'BrAPI' v2 specification.
 
 ## See also
 
