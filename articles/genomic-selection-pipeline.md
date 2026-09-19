@@ -99,7 +99,7 @@ vs_id <- vsets$variantSetDbId[1]
 ## each marker on a named map (genetic, cM, or physical, bp) and is
 ## populated here.
 markers <- brapi_get_marker_map(con, variantSetDbId = vs_id)
-#> ℹ Async search started (ID: 9635cba8-cd35-4a7e-93c1-73ad19bae2e7). Polling...
+#> ℹ Async search started (ID: 567917dc-e17e-4b66-aa73-a7282a3a236c). Polling...
 #> Warning: 14 of 20 variants in "variantset1" have no marker position record; returning
 #> positions for the remaining 6.
 markers
@@ -508,6 +508,9 @@ them to something else. Its polyploid-aware methods matter for crops
 such as potato and sugarcane where the diploid assumptions elsewhere in
 this article do not hold.
 
+The code below is shown rather than run: it fits the same trait three
+ways, and the comparison above is the useful part.
+
 ``` r
 
 # ---- BGLR (Bayesian regression) ----
@@ -525,51 +528,13 @@ fm_bglr <- BGLR(
 )
 gebvs_bglr <- geno_aligned %*% fm_bglr$ETA$MRK$b
 head(gebvs_bglr)
-#>           [,1]
-#> 151 -0.9225619
-#> 152 -1.1793316
-#> 153 -0.2136794
-#> 154 -2.0190439
-#> 155 -0.2096473
-#> 156 -0.4108689
 
 # ---- sommer (mixed model with G matrix) ----
 library(sommer)
-#> Loading required package: Matrix
-#> Loading required package: MASS
-#> 
-#> Attaching package: 'MASS'
-#> The following object is masked from 'package:dplyr':
-#> 
-#>     select
-#> Loading required package: crayon
-#> Loading required package: enhancer
-#> 
-#> Attaching package: 'sommer'
-#> The following objects are masked from 'package:rrBLUP':
-#> 
-#>     A.mat, GWAS
 library(AGHmatrix)
 
 # Build genomic relationship matrix
 G <- Gmatrix(geno_aligned, method = "VanRaden")
-#> 
-#> Missing data check: 
-#>  Total SNPs: 700 
-#>   0 SNPs dropped due to missing data threshold of 0.5 
-#>  Total of: 700  SNPs 
-#> 
-#> MAF check: 
-#>  No SNPs with MAF below 0 
-#> 
-#> Heterozigosity data check: 
-#>  No SNPs with heterozygosity, missing threshold of = 0 
-#> 
-#> Summary check: 
-#>  Initial:  700 SNPs 
-#>  Final:  700  SNPs ( 0  SNPs removed) 
-#> 
-#> Completed! Time = 0.01  seconds
 
 fm_sommer <- mmer(
   Grain_Yield_t_ha ~ 1,
@@ -580,7 +545,6 @@ fm_sommer <- mmer(
 )
 gebvs_sommer <- randef(fm_sommer)$`u:germplasmName`
 head(gebvs_sommer)
-#> NULL
 ```
 
 ### Cross-Validation
