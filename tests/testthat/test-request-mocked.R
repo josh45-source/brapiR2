@@ -377,3 +377,27 @@ test_that("a result field named data is not mistaken for the record envelope", {
   expect_identical(nrow(out), 1L)
   expect_true(all(c("listDbId", "listName", "data") %in% names(out)))
 })
+
+test_that("brapi_server_message reads the spec status envelope", {
+  resp <- httr2::response_json(
+    status_code = 401,
+    body = list(metadata = list(status = list(
+      list(messageType = "INFO", message = "loading"),
+      list(messageType = "ERROR", message = "You must login.")
+    )))
+  )
+  expect_identical(brapiR2:::brapi_server_message(resp), "You must login.")
+})
+
+test_that("brapi_server_message reads a bare Message field", {
+  resp <- httr2::response_json(status_code = 404,
+                               body = list(Message = "Not found."))
+  expect_identical(brapiR2:::brapi_server_message(resp), "Not found.")
+})
+
+test_that("brapi_server_message ignores an HTML error page", {
+  resp <- httr2::response(status_code = 500,
+                          headers = list(`content-type` = "text/html"),
+                          body = charToRaw("<html>oops</html>"))
+  expect_null(brapiR2:::brapi_server_message(resp))
+})

@@ -20,7 +20,10 @@ brapi_req <- function(con, endpoint) {
       "User-Agent" = con$user_agent %||% brapi_user_agent()
     ) |>
     req_retry(max_tries = 3, backoff = ~2) |>
-    req_timeout(con$timeout %||% 120)
+    req_timeout(con$timeout %||% 120) |>
+    # Errors are raised by the caller instead, so the server's own
+    # message can be read out of the response body first.
+    req_error(is_error = function(resp) FALSE)
 
   if (!is.null(con$token)) {
     req <- req |> req_auth_bearer_token(con$token)
@@ -168,6 +171,8 @@ brapi_get_pages <- function(con, endpoint, query) {
       req_url_query(!!!query) |>
       req_perform()
 
+    brapi_stop_for_status(resp, con, endpoint)
+
     body <- resp_body_json(resp, simplifyVector = FALSE)
 
     pagination <- body$metadata$pagination
@@ -238,6 +243,8 @@ brapi_post_search <- function(con, endpoint, body = list(),
     req_method("POST") |>
     req_perform()
 
+  brapi_stop_for_status(resp, con, endpoint)
+
   status <- resp_status(resp)
   resp_body <- resp_body_json(resp, simplifyVector = FALSE)
 
@@ -285,6 +292,8 @@ brapi_poll_search <- function(con, endpoint, search_id,
     poll_resp <- brapi_req(con, poll_endpoint) |>
       req_url_query(pageSize = con$page_size) |>
       req_perform()
+
+    brapi_stop_for_status(poll_resp, con, poll_endpoint)
 
     poll_status <- resp_status(poll_resp)
     if (poll_status == 200L) {

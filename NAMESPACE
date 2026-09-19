@@ -85,6 +85,7 @@ importFrom(glue,glue)
 importFrom(httr2,
   req_auth_bearer_token,
   req_body_json,
+  req_error,
   req_headers,
   req_method,
   req_perform,
@@ -94,6 +95,8 @@ importFrom(httr2,
   req_url_query,
   request,
   resp_body_json,
+  resp_body_string,
+  resp_content_type,
   resp_status
 )
 importFrom(jsonlite,

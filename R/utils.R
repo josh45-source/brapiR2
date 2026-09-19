@@ -82,3 +82,93 @@ brapi_user_agent <- function() {
   }
   ua
 }
+
+
+#' Internal: Extract a Server-Supplied Error Message
+#'
+#' BrAPI servers report problems in several different ways. The
+#' specification puts them in `metadata.status[]` with a `messageType` of
+#' `ERROR`, and Breedbase servers do this for authentication failures
+#' (including on HTTP 200, where a bad password returns a null token).
+#' Others return a bare JSON object with a `Message` field, or a plain
+#' text sentence. Some return an HTML error page, which is never worth
+#' showing a user, and some return nothing at all.
+#'
+#' @param resp An httr2 response.
+#'
+#' @return A character vector of messages, or NULL if none can be found.
+#' @keywords internal
+#' @noRd
+brapi_server_message <- function(resp) {
+  ctype <- tryCatch(resp_content_type(resp), error = function(e) NA_character_)
+  if (isTRUE(grepl("html", ctype, fixed = TRUE))) {
+    return(NULL)
+  }
+
+  body <- tryCatch(
+    resp_body_json(resp, simplifyVector = FALSE),
+    error = function(e) NULL
+  )
+
+  if (!is.null(body)) {
+    status <- body$metadata$status
+    if (length(status)) {
+      msgs <- vapply(
+        status,
+        function(s) {
+          if (identical(s$messageType, "ERROR")) {
+            s$message %||% NA_character_
+          } else {
+            NA_character_
+          }
+        },
+        character(1)
+      )
+      msgs <- msgs[!is.na(msgs)]
+      if (length(msgs)) {
+        return(msgs)
+      }
+    }
+    for (field in c("Message", "message", "error")) {
+      if (is.character(body[[field]]) && nzchar(body[[field]])) {
+        return(body[[field]])
+      }
+    }
+    return(NULL)
+  }
+
+  txt <- tryCatch(resp_body_string(resp), error = function(e) "")
+  txt <- trimws(gsub('^"|"$', "", txt))
+  if (nzchar(txt) && nchar(txt) < 500L) txt else NULL
+}
+
+
+#' Internal: Raise an Error for a Failed BrAPI Response
+#'
+#' `brapi_req()` disables httr2's own error handling so the server's
+#' message can be read out of the body. This restores it, adding that
+#' message where the server supplied one.
+#'
+#' @param resp An httr2 response.
+#' @param con A `brapi_con` object.
+#' @param endpoint Character. The endpoint requested.
+#'
+#' @return Invisibly `NULL`; called for its side effect.
+#' @keywords internal
+#' @noRd
+brapi_stop_for_status <- function(resp, con = NULL, endpoint = NULL) {
+  status <- tryCatch(resp_status(resp), error = function(e) NA_integer_)
+  if (length(status) != 1L || is.na(status) || status < 400L) {
+    return(invisible(NULL))
+  }
+
+  msgs <- brapi_server_message(resp)
+  bullets <- c("BrAPI request failed (HTTP {status}).")
+  if (length(msgs)) {
+    bullets <- c(bullets, stats::setNames(msgs, rep("i", length(msgs))))
+  }
+  if (!is.null(endpoint)) {
+    bullets <- c(bullets, "i" = "Endpoint: {.field {endpoint}}")
+  }
+  cli_abort(bullets)
+}

@@ -35,6 +35,8 @@ brapi_login <- function(con, username, password) {
     req_method("POST") |>
     req_perform()
 
+  brapi_stop_for_status(resp, con)
+
   result <- resp_body_json(resp)
 
   token <- result$access_token %||%
@@ -42,6 +44,13 @@ brapi_login <- function(con, username, password) {
     result$metadata$token
 
   if (is.null(token)) {
+    msgs <- brapi_server_message(resp)
+    if (length(msgs)) {
+      cli_abort(c(
+        "Login failed.",
+        stats::setNames(msgs, rep("i", length(msgs)))
+      ))
+    }
     cli_abort("Login failed: no access token returned by the server.")
   }
 
@@ -96,6 +105,8 @@ brapi_login_oauth2 <- function(con, client_id, client_secret,
     req_method("POST") |>
     req_retry(max_tries = 3) |>
     req_perform()
+
+  brapi_stop_for_status(resp, con)
 
   result <- resp_body_json(resp)
 
