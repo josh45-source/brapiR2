@@ -85,6 +85,11 @@ reference:
       - brapi_get_dosage_matrix
       - brapi_get_marker_map
 
+  - title: "Coverage"
+    desc: Which BrAPI endpoints brapiR2 wraps.
+    contents:
+      - brapi_coverage
+
   - title: "Low-Level Requests"
     desc: >
       Call any BrAPI endpoint directly, including those brapiR2 does not

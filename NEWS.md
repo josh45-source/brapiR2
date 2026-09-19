@@ -210,6 +210,10 @@
   defines 37 top-level entities rather than 36, brapiR2 wraps 49 retrieval
   endpoints rather than 56, and Planned Crosses was missing from the list of
   uncovered entities.
+* New `?brapi_coverage` lists every BrAPI endpoint brapiR2 wraps, grouped
+  by module, with the function that wraps each one, and names the entities
+  that have no wrapper. Asked for by @jmh579 and @dwaring87
+  (ropensci/software-review#792).
 
 
 ### Testing
