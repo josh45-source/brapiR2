@@ -249,7 +249,7 @@ now reads from there instead:
 
 # Positions for every variant in the set, wherever they have been placed
 markers <- brapi_get_marker_map(con, variantSetDbId = vs_id)
-#> ℹ Async search started (ID: b7042efd-6ef2-49be-8805-92cb855dc704). Polling...
+#> ℹ Async search started (ID: 6cea0791-cb31-41a8-bdc7-afd87ce3641f). Polling...
 #> Warning: 14 of 20 variants in "variantset1" have no marker position record; returning
 #> positions for the remaining 6.
 markers
@@ -421,7 +421,7 @@ by default, per connection, and never shared between connections.
 cache_dir <- tempfile("brapi_cache_")
 dir.create(cache_dir)
 perf_con <- brapi_cache_enable(con, ttl = 3600, dir = cache_dir)
-#> ✔ Caching enabled at /tmp/RtmpbnCy06/brapi_cache_1f3e42344aa8 (TTL: 3600s)
+#> ✔ Caching enabled at /tmp/Rtmp2l8V53/brapi_cache_20352c04a108 (TTL: 3600s)
 
 # First call: hits the server
 invisible(brapi_programs(perf_con))

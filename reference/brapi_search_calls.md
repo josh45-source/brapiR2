@@ -43,7 +43,7 @@ specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/Br
 # \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 brapi_search_calls(con, variantSetDbIds = "variantset1")
-#> ℹ Async search started (ID: ed1210e2-8462-440d-954e-ffcb7429f2bb). Polling...
+#> ℹ Async search started (ID: 34b3550d-9455-4a06-b90f-bb92bfa3128a). Polling...
 #> # A tibble: 260 × 12
 #>    additionalInfo callSetDbId callSetName genotype         genotypeValue
 #>    <lgl>          <chr>       <chr>       <list>           <chr>        
