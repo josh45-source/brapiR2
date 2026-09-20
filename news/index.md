@@ -313,6 +313,9 @@
   actually been exercised against — eight, across three implementations
   — and which it has not ([@jmh579](https://github.com/jmh579),
   ropensci/software-review#792).
+- `DESIGN.md` no longer lists four packages of mine as brapiR2’s
+  downstream pipeline. Two are unreleased and two are at early versions,
+  so the pipeline was described as though it were established.
 
 #### Testing
 
