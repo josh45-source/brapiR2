@@ -316,6 +316,12 @@
 - `DESIGN.md` no longer lists four packages of mine as brapiR2’s
   downstream pipeline. Two are unreleased and two are at early versions,
   so the pipeline was described as though it were established.
+- The vignette’s credentials section now says that the token is held in
+  the connection object, so it is written to disk by
+  [`saveRDS()`](https://rdrr.io/r/base/readRDS.html) and printed by
+  [`str()`](https://rdrr.io/r/utils/str.html), while
+  [`print()`](https://rdrr.io/r/base/print.html) shows only whether the
+  connection is authenticated.
 
 #### Testing
 

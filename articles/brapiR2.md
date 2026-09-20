@@ -249,7 +249,7 @@ now reads from there instead:
 
 # Positions for every variant in the set, wherever they have been placed
 markers <- brapi_get_marker_map(con, variantSetDbId = vs_id)
-#> ℹ Async search started (ID: c7cc7674-bb72-4ad5-a556-0a4b67e832ec). Polling...
+#> ℹ Async search started (ID: be3747ce-2a38-4a4d-9f2d-c55402eef95a). Polling...
 #> Warning: 14 of 20 variants in "variantset1" have no marker position record; returning
 #> positions for the remaining 6.
 markers
@@ -395,6 +395,13 @@ con <- brapi_login(
 Either approach keeps the secret out of the script itself, out of shell
 history, and out of anything you might `git commit` or share.
 
+**The token lives in the connection object.** Once you have
+authenticated, the credential is held inside `con` and goes wherever
+`con` goes: `saveRDS(con, "con.rds")` writes it to disk in plain text,
+and `str(con)` or `unclass(con)` prints it in full. `print(con)` shows
+only whether the connection is authenticated, never the token itself, so
+that is what to paste when sharing a session or reporting a problem.
+
 ## Caching and Parallel Fetching
 
 Two features for when you are fetching the same data repeatedly, or a
@@ -414,7 +421,7 @@ by default, per connection, and never shared between connections.
 cache_dir <- tempfile("brapi_cache_")
 dir.create(cache_dir)
 perf_con <- brapi_cache_enable(con, ttl = 3600, dir = cache_dir)
-#> ✔ Caching enabled at /tmp/Rtmpts7suW/brapi_cache_1eff49176cc8 (TTL: 3600s)
+#> ✔ Caching enabled at /tmp/RtmptliNdR/brapi_cache_1f2915f4cc5d (TTL: 3600s)
 
 # First call: hits the server
 invisible(brapi_programs(perf_con))

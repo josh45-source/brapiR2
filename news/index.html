@@ -111,6 +111,7 @@
 <code>DESCRIPTION</code> no longer names specific BrAPI implementations. It claimed compatibility with Breedbase, BMS, EBS, GIGWA and Germinate, of which only Breedbase had been tested; it now claims the specification instead. The README records which servers brapiR2 has actually been exercised against — eight, across three implementations — and which it has not (<a href="https://github.com/jmh579" class="external-link">@jmh579</a>, ropensci/software-review#792).</li>
 <li>
 <code>DESIGN.md</code> no longer lists four packages of mine as brapiR2’s downstream pipeline. Two are unreleased and two are at early versions, so the pipeline was described as though it were established.</li>
+<li>The vignette’s credentials section now says that the token is held in the connection object, so it is written to disk by <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS()</a></code> and printed by <code><a href="https://rdrr.io/r/utils/str.html" class="external-link">str()</a></code>, while <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> shows only whether the connection is authenticated.</li>
 </ul></div>
 <div class="section level4">
 <h4 id="testing-development-version">Testing<a class="anchor" aria-label="anchor" href="#testing-development-version"></a></h4>
