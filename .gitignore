@@ -13,3 +13,7 @@ docs/
 Thumbs.db
 /doc/
 /Meta/
+rc.txt
+pk.txt
+ci.txt
+pkgdown.txt
