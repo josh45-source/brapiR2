@@ -306,6 +306,13 @@ con <- brapi_login(
 Either approach keeps the secret out of the script itself, out of shell
 history, and out of anything you might `git commit` or share.
 
+**The token lives in the connection object.** Once you have
+authenticated, the credential is held inside `con` and goes wherever
+`con` goes: `saveRDS(con, "con.rds")` writes it to disk in plain text,
+and `str(con)` or `unclass(con)` prints it in full. `print(con)` shows
+only whether the connection is authenticated, never the token itself, so
+that is what to paste when sharing a session or reporting a problem.
+
 ## Caching and Parallel Fetching
 
 Two features for when you are fetching the same data repeatedly, or a lot

@@ -230,6 +230,10 @@
 * `DESIGN.md` no longer lists four packages of mine as brapiR2's
   downstream pipeline. Two are unreleased and two are at early versions,
   so the pipeline was described as though it were established.
+* The vignette's credentials section now says that the token is held in
+  the connection object, so it is written to disk by `saveRDS()` and
+  printed by `str()`, while `print()` shows only whether the connection
+  is authenticated.
 
 ### Testing
 
