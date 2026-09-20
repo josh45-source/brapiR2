@@ -80,6 +80,7 @@
   whole response came back as one row with a list-column.
 
 ### Minor improvements
+
 * Failed requests now report what the server said, not just the HTTP status.
   A 401 from a Breedbase server reads "You must login and have permission to
   access this BrAPI call" rather than a bare `HTTP 401 Unauthorized`, and a
@@ -226,7 +227,9 @@
   README records which servers brapiR2 has actually been exercised against
   — eight, across three implementations — and which it has not
   (@jmh579, ropensci/software-review#792).
-
+* `DESIGN.md` no longer lists four packages of mine as brapiR2's
+  downstream pipeline. Two are unreleased and two are at early versions,
+  so the pipeline was described as though it were established.
 
 ### Testing
 
