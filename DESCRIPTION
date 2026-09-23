@@ -1,6 +1,6 @@
 Package: brapiR2
 Title: A Tidyverse-Native Client for the 'BrAPI' v2 (Breeding API) Specification
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person("Joash Joshua", "Ayo", , "joashjoshua789@gmail.com",
            role = c("aut", "cre", "cph"),
@@ -24,9 +24,9 @@ Description: Provides pipe-friendly, stateless read access to the Breeding
     who need programmatic access to plant breeding databases that
     implement the 'BrAPI' v2 specification.
 License: MIT + file LICENSE
-URL: https://github.com/josh45-source/brapiR2,
-    https://josh45-source.github.io/brapiR2/
-BugReports: https://github.com/josh45-source/brapiR2/issues
+URL: https://github.com/ropensci/brapiR2,
+    https://docs.ropensci.org/brapiR2/
+BugReports: https://github.com/ropensci/brapiR2/issues
 Encoding: UTF-8
 Language: en-GB
 Roxygen: list(markdown = TRUE)

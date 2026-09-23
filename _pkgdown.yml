@@ -1,7 +1,4 @@
-url: https://josh45-source.github.io/brapiR2/
-
-template:
-  bootstrap: 5
+url: https://docs.ropensci.org/brapiR2/
 
 reference:
   - title: Connection & Authentication
@@ -117,11 +114,11 @@ navbar:
     github:
       icon: fa-github
       aria-label: GitHub
-      href: https://github.com/josh45-source/brapiR2
+      href: https://github.com/ropensci/brapiR2
 
 repo:
   url:
-    home: https://github.com/josh45-source/brapiR2
-    source: https://github.com/josh45-source/brapiR2/blob/main/
-    issue: https://github.com/josh45-source/brapiR2/issues/
+    home: https://github.com/ropensci/brapiR2
+    source: https://github.com/ropensci/brapiR2/blob/main/
+    issue: https://github.com/ropensci/brapiR2/issues/
     user: https://github.com/

@@ -1,4 +1,4 @@
-# brapiR2 (development version)
+# brapiR2 0.2.0
 
 ### Breaking changes
 
@@ -252,7 +252,7 @@
   parser must tell apart, and the error-message extraction for each form
   a server uses.
 
-## brapiR2 0.1.0
+# brapiR2 0.1.0
 
 ### New features
 

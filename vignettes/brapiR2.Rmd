@@ -33,13 +33,16 @@ building downstream tools.
 
 ## Installation
 
-If you don't already have **remotes** installed, run
-`install.packages("remotes")` first.
+brapiR2 is on rOpenSci's R-universe, so `install.packages()` works once
+that repository is added.
 
 ```{r install, eval = FALSE}
 # Not run here: this would reinstall the package while building its own
 # documentation.
-remotes::install_github("josh45-source/brapiR2")
+install.packages(
+  "brapiR2",
+  repos = c("https://ropensci.r-universe.dev", "https://cloud.r-project.org")
+)
 ```
 
 ## Connecting to a Server
@@ -393,7 +396,7 @@ different workflows**.
 | Authentication | Yes | Yes |
 
 brapiR2 targets BrAPI v2 only, by design - see the "Design History" section
-of [DESIGN.md](https://github.com/josh45-source/brapiR2/blob/main/DESIGN.md)
+of [DESIGN.md](https://github.com/ropensci/brapiR2/blob/main/DESIGN.md)
 for why. QBMS's own BrAPI version support is a separate question from this
 comparison; check QBMS's own documentation for its current v1/v2 coverage
 rather than relying on a claim made here.

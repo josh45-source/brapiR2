@@ -81,7 +81,7 @@ met_raw
 Only one of these three studies (`study1`) actually has recorded
 observations on the public server today - two germplasm, one trait, as the
 survey at
-[`dev/explore-test-server.R`](https://github.com/josh45-source/brapiR2/blob/main/dev/explore-test-server.R)
+[`dev/explore-test-server.R`](https://github.com/ropensci/brapiR2/blob/main/dev/explore-test-server.R)
 found. The other two studies come back empty. AMMI and GGE decompositions
 need many genotypes scored across several environments to estimate
 genotype, environment, and interaction effects separately; a mixed model

@@ -90,7 +90,7 @@ brapi_endpoints <- function(con) {
 #' @noRd
 brapi_user_agent <- function() {
   ua <- sprintf(
-    "brapiR2/%s (https://github.com/josh45-source/brapiR2) httr2/%s R/%s",
+    "brapiR2/%s (https://github.com/ropensci/brapiR2) httr2/%s R/%s",
     utils::packageVersion("brapiR2"),
     utils::packageVersion("httr2"),
     getRversion()

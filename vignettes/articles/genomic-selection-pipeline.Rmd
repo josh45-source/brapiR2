@@ -121,7 +121,7 @@ germplasm have both phenotype and genotype records on this server today.
 That is genuinely more than zero, but far short of the dozens of individuals
 a real genomic prediction exercise needs to fit a model and hold out a
 validation set. See
-[`dev/explore-test-server.R`](https://github.com/josh45-source/brapiR2/blob/main/dev/explore-test-server.R)
+[`dev/explore-test-server.R`](https://github.com/ropensci/brapiR2/blob/main/dev/explore-test-server.R)
 for the full survey this is drawn from. Part 3 below uses simulated data so
 the modelling section can actually run.
 

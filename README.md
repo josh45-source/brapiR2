@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/josh45-source/brapiR2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/josh45-source/brapiR2/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/ropensci/brapiR2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ropensci/brapiR2/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![Status at rOpenSci Software Peer
@@ -57,7 +57,7 @@ probes, 62 succeeded. The failures are server-side rather than
 client-side - timeouts on the largest Breedbase instances, `HTTP 500` on
 two of them, and endpoints GRIN-Global does not implement - and each one
 is recorded in
-[dev/SERVERS.md](https://github.com/josh45-source/brapiR2/blob/main/dev/SERVERS.md),
+[dev/SERVERS.md](https://github.com/ropensci/brapiR2/blob/main/dev/SERVERS.md),
 alongside the script that produced them.
 
 BMS, EBS, GIGWA and Germinate have not been tested; I have no access to
@@ -67,11 +67,20 @@ welcome in the issue tracker.
 
 ## Installation
 
-Install the development version from GitHub:
+Install from rOpenSci's R-universe:
+
+``` r
+install.packages(
+  "brapiR2",
+  repos = c("https://ropensci.r-universe.dev", "https://cloud.r-project.org")
+)
+```
+
+Or the development version from GitHub:
 
 ``` r
 # install.packages("pak")
-pak::pak("josh45-source/brapiR2")
+pak::pak("ropensci/brapiR2")
 ```
 
 `pak` builds the vignette as part of the install. If you prefer
@@ -79,7 +88,7 @@ pak::pak("josh45-source/brapiR2")
 will not be installed:
 
 ``` r
-remotes::install_github("josh45-source/brapiR2", build_vignettes = TRUE)
+remotes::install_github("ropensci/brapiR2", build_vignettes = TRUE)
 ```
 
 ## Quick Start
