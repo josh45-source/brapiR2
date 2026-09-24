@@ -13,9 +13,9 @@ Provides pipe-friendly, stateless read access to the Breeding API ('BrAPI') v2.1
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/josh45-source/brapiR2}
-  \item \url{https://josh45-source.github.io/brapiR2/}
-  \item Report bugs at \url{https://github.com/josh45-source/brapiR2/issues}
+  \item \url{https://github.com/ropensci/brapiR2}
+  \item \url{https://docs.ropensci.org/brapiR2/}
+  \item Report bugs at \url{https://github.com/ropensci/brapiR2/issues}
 }
 
 }
