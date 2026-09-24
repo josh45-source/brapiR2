@@ -31,7 +31,9 @@ through \code{...}:
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_call_sets(con)
+if (brapi_ping(con)) {
+  brapi_call_sets(con)
+}
 }
 
 }

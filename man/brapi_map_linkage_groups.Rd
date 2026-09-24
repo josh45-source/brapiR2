@@ -27,7 +27,9 @@ it may represent a chromosome, a scaffold, or a generic linkage group.
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_map_linkage_groups(con, "genome_map1")
+if (brapi_ping(con)) {
+  brapi_map_linkage_groups(con, "genome_map1")
+}
 }
 
 }

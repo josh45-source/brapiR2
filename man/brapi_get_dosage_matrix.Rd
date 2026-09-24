@@ -36,11 +36,13 @@ Allele dosage is computed by splitting each genotype string on \code{sep} (or
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-dosage <- brapi_get_dosage_matrix(con, "variantset1")
-dim(dosage)
-# Use with rrBLUP:
-# library(rrBLUP)
-# result <- mixed.solve(y = pheno$yield, Z = dosage)
+if (brapi_ping(con)) {
+  dosage <- brapi_get_dosage_matrix(con, "variantset1")
+  dim(dosage)
+  # Use with rrBLUP:
+  # library(rrBLUP)
+  # result <- mixed.solve(y = pheno$yield, Z = dosage)
+}
 }
 
 }

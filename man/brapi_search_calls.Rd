@@ -30,7 +30,9 @@ Search Genotype Calls
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_search_calls(con, variantSetDbIds = "variantset1")
+if (brapi_ping(con)) {
+  brapi_search_calls(con, variantSetDbIds = "variantset1")
+}
 }
 
 }

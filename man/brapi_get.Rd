@@ -46,12 +46,14 @@ functions are the better choice wherever one exists.
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
+if (brapi_ping(con)) {
 
-# An endpoint brapiR2 does not wrap
-brapi_get(con, "/commoncropnames")
+  # An endpoint brapiR2 does not wrap
+  brapi_get(con, "/commoncropnames")
 
-# A query parameter no named function exposes
-brapi_get(con, "/studies", query = list(active = "true"))
+  # A query parameter no named function exposes
+  brapi_get(con, "/studies", query = list(active = "true"))
+}
 }
 
 }

@@ -24,7 +24,9 @@
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_germplasm(con)
+#' if (brapi_ping(con)) {
+#'   brapi_germplasm(con)
+#' }
 #' }
 #'
 #' @export
@@ -47,7 +49,9 @@ brapi_germplasm <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_germplasm_detail(con, "germplasm1")
+#' if (brapi_ping(con)) {
+#'   brapi_germplasm_detail(con, "germplasm1")
+#' }
 #' }
 #'
 #' @export
@@ -83,7 +87,9 @@ brapi_germplasm_detail <- function(con, germplasmDbId) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_germplasm_pedigree(con, "germplasm1")
+#' if (brapi_ping(con)) {
+#'   brapi_germplasm_pedigree(con, "germplasm1")
+#' }
 #' }
 #'
 #' @export
@@ -122,7 +128,9 @@ brapi_germplasm_pedigree <- function(con, germplasmDbId) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_germplasm_progeny(con, "germplasm1")
+#' if (brapi_ping(con)) {
+#'   brapi_germplasm_progeny(con, "germplasm1")
+#' }
 #' }
 #'
 #' @export
@@ -157,7 +165,9 @@ brapi_germplasm_progeny <- function(con, germplasmDbId) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_germplasm_attributes(con)
+#' if (brapi_ping(con)) {
+#'   brapi_germplasm_attributes(con)
+#' }
 #' }
 #'
 #' @export
@@ -184,7 +194,9 @@ brapi_germplasm_attributes <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_crosses(con)
+#' if (brapi_ping(con)) {
+#'   brapi_crosses(con)
+#' }
 #' }
 #'
 #' @export
@@ -212,7 +224,9 @@ brapi_crosses <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_crossing_projects(con)
+#' if (brapi_ping(con)) {
+#'   brapi_crossing_projects(con)
+#' }
 #' }
 #'
 #' @export
@@ -239,7 +253,9 @@ brapi_crossing_projects <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_seed_lots(con)
+#' if (brapi_ping(con)) {
+#'   brapi_seed_lots(con)
+#' }
 #' }
 #'
 #' @export
@@ -267,7 +283,9 @@ brapi_seed_lots <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_search_germplasm(con, commonCropNames = "Tomatillo")
+#' if (brapi_ping(con)) {
+#'   brapi_search_germplasm(con, commonCropNames = "Tomatillo")
+#' }
 #' }
 #'
 #' @export
@@ -345,7 +363,9 @@ brapi_search_germplasm <- function(con,
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_pedigree(con, includeParents = TRUE, includeProgeny = TRUE)
+#' if (brapi_ping(con)) {
+#'   brapi_pedigree(con, includeParents = TRUE, includeProgeny = TRUE)
+#' }
 #' }
 #'
 #' @export
@@ -396,7 +416,9 @@ brapi_pedigree <- function(con, germplasmDbId = NULL, includeParents = NULL,
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_search_pedigree(con, includeParents = TRUE)
+#' if (brapi_ping(con)) {
+#'   brapi_search_pedigree(con, includeParents = TRUE)
+#' }
 #' }
 #'
 #' @export

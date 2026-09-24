@@ -29,8 +29,10 @@ a single list together with its members in the \code{data} list-column.
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-lst <- brapi_list(con, "list1")
-lst$data[[1]]
+if (brapi_ping(con)) {
+  lst <- brapi_list(con, "list1")
+  lst$data[[1]]
+}
 }
 
 }

@@ -30,7 +30,9 @@
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_maps(con)
+#' if (brapi_ping(con)) {
+#'   brapi_maps(con)
+#' }
 #' }
 #'
 #' @export
@@ -54,7 +56,9 @@ brapi_maps <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_map(con, "genome_map1")
+#' if (brapi_ping(con)) {
+#'   brapi_map(con, "genome_map1")
+#' }
 #' }
 #'
 #' @export
@@ -80,7 +84,9 @@ brapi_map <- function(con, mapDbId) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_map_linkage_groups(con, "genome_map1")
+#' if (brapi_ping(con)) {
+#'   brapi_map_linkage_groups(con, "genome_map1")
+#' }
 #' }
 #'
 #' @export
@@ -123,7 +129,9 @@ brapi_map_linkage_groups <- function(con, mapDbId) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_marker_positions(con, mapDbId = "genome_map1")
+#' if (brapi_ping(con)) {
+#'   brapi_marker_positions(con, mapDbId = "genome_map1")
+#' }
 #' }
 #'
 #' @export
@@ -165,7 +173,9 @@ brapi_marker_positions <- function(con, mapDbId = NULL, variantDbId = NULL,
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_search_marker_positions(con, variantDbIds = c("variant01", "variant02"))
+#' if (brapi_ping(con)) {
+#'   brapi_search_marker_positions(con, variantDbIds = c("variant01", "variant02"))
+#' }
 #' }
 #'
 #' @export

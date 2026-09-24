@@ -28,7 +28,9 @@ Search Observation Variables
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_search_variables(con, traitClasses = "agronomic")
+if (brapi_ping(con)) {
+  brapi_search_variables(con, traitClasses = "agronomic")
+}
 }
 
 }

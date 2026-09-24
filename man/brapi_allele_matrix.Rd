@@ -38,7 +38,9 @@ through \code{...}:
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_allele_matrix(con, variantSetDbId = "variantset1")
+if (brapi_ping(con)) {
+  brapi_allele_matrix(con, variantSetDbId = "variantset1")
+}
 }
 
 }

@@ -34,8 +34,10 @@ through \code{...}:
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_studies(con)
-brapi_studies(con, trialDbId = "trial1")
+if (brapi_ping(con)) {
+  brapi_studies(con)
+  brapi_studies(con, trialDbId = "trial1")
+}
 }
 
 }

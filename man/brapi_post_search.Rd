@@ -54,8 +54,10 @@ record; an unusual one may need reshaping yourself.
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_post_search(con, "/search/germplasm",
-                  body = list(germplasmNames = "Tomatillo Fantastico"))
+if (brapi_ping(con)) {
+  brapi_post_search(con, "/search/germplasm",
+                    body = list(germplasmNames = "Tomatillo Fantastico"))
+}
 }
 
 }

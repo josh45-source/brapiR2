@@ -26,7 +26,9 @@
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_samples(con)
+#' if (brapi_ping(con)) {
+#'   brapi_samples(con)
+#' }
 #' }
 #'
 #' @export
@@ -54,7 +56,9 @@ brapi_samples <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_variants(con, variantSetDbId = "variantset1")
+#' if (brapi_ping(con)) {
+#'   brapi_variants(con, variantSetDbId = "variantset1")
+#' }
 #' }
 #'
 #' @export
@@ -84,7 +88,9 @@ brapi_variants <- function(con, variantSetDbId = NULL, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_variant_sets(con)
+#' if (brapi_ping(con)) {
+#'   brapi_variant_sets(con)
+#' }
 #' }
 #'
 #' @export
@@ -115,7 +121,9 @@ brapi_variant_sets <- function(con, studyDbId = NULL, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_calls(con, variantSetDbId = "variantset1")
+#' if (brapi_ping(con)) {
+#'   brapi_calls(con, variantSetDbId = "variantset1")
+#' }
 #' }
 #'
 #' @export
@@ -144,7 +152,9 @@ brapi_calls <- function(con, variantSetDbId = NULL, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_call_sets(con)
+#' if (brapi_ping(con)) {
+#'   brapi_call_sets(con)
+#' }
 #' }
 #'
 #' @export
@@ -172,7 +182,9 @@ brapi_call_sets <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_references(con)
+#' if (brapi_ping(con)) {
+#'   brapi_references(con)
+#' }
 #' }
 #'
 #' @export
@@ -199,7 +211,9 @@ brapi_references <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_reference_sets(con)
+#' if (brapi_ping(con)) {
+#'   brapi_reference_sets(con)
+#' }
 #' }
 #'
 #' @export
@@ -235,7 +249,9 @@ brapi_reference_sets <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_allele_matrix(con, variantSetDbId = "variantset1")
+#' if (brapi_ping(con)) {
+#'   brapi_allele_matrix(con, variantSetDbId = "variantset1")
+#' }
 #' }
 #'
 #' @export
@@ -348,7 +364,9 @@ fetch_allele_matrix_pages <- function(con, query) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_search_variants(con, variantSetDbIds = "variantset1")
+#' if (brapi_ping(con)) {
+#'   brapi_search_variants(con, variantSetDbIds = "variantset1")
+#' }
 #' }
 #'
 #' @export
@@ -373,7 +391,9 @@ brapi_search_variants <- function(con, variantSetDbIds = NULL, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_search_calls(con, variantSetDbIds = "variantset1")
+#' if (brapi_ping(con)) {
+#'   brapi_search_calls(con, variantSetDbIds = "variantset1")
+#' }
 #' }
 #'
 #' @export
@@ -413,11 +433,13 @@ brapi_search_calls <- function(con, variantSetDbIds = NULL,
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' dosage <- brapi_get_dosage_matrix(con, "variantset1")
-#' dim(dosage)
-#' # Use with rrBLUP:
-#' # library(rrBLUP)
-#' # result <- mixed.solve(y = pheno$yield, Z = dosage)
+#' if (brapi_ping(con)) {
+#'   dosage <- brapi_get_dosage_matrix(con, "variantset1")
+#'   dim(dosage)
+#'   # Use with rrBLUP:
+#'   # library(rrBLUP)
+#'   # result <- mixed.solve(y = pheno$yield, Z = dosage)
+#' }
 #' }
 #'
 #' @export
@@ -510,8 +532,10 @@ brapi_get_dosage_matrix <- function(con, variantSetDbId,
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_get_marker_map(con, mapDbId = "genome_map1")
-#' brapi_get_marker_map(con, variantSetDbId = "variantset1")
+#' if (brapi_ping(con)) {
+#'   brapi_get_marker_map(con, mapDbId = "genome_map1")
+#'   brapi_get_marker_map(con, variantSetDbId = "variantset1")
+#' }
 #' }
 #'
 #' @export

@@ -27,7 +27,9 @@ Get a Single Location by ID
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_location(con, "location_01")
+if (brapi_ping(con)) {
+  brapi_location(con, "location_01")
+}
 }
 
 }

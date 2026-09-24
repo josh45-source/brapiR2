@@ -27,14 +27,16 @@ Returns an updated connection object with the Bearer token set.
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-con <- brapi_login_oauth2(
-  con,
-  client_id = "brapi_client",
-  client_secret = "brapi_secret",
-  authorize_url = "https://test-server.brapi.org/brapi/v2/authorize",
-  access_url = "https://test-server.brapi.org/brapi/v2/token"
-)
-con
+if (brapi_ping(con)) {
+  con <- brapi_login_oauth2(
+    con,
+    client_id = "brapi_client",
+    client_secret = "brapi_secret",
+    authorize_url = "https://test-server.brapi.org/brapi/v2/authorize",
+    access_url = "https://test-server.brapi.org/brapi/v2/token"
+  )
+  con
+}
 }
 
 }

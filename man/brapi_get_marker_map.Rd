@@ -46,8 +46,10 @@ placement - the result is never collapsed to one row per marker.
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_get_marker_map(con, mapDbId = "genome_map1")
-brapi_get_marker_map(con, variantSetDbId = "variantset1")
+if (brapi_ping(con)) {
+  brapi_get_marker_map(con, mapDbId = "genome_map1")
+  brapi_get_marker_map(con, variantSetDbId = "variantset1")
+}
 }
 
 }

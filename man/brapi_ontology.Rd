@@ -26,7 +26,9 @@ Get a Single Ontology by ID
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_ontology(con, "O_001")
+if (brapi_ping(con)) {
+  brapi_ontology(con, "O_001")
+}
 }
 
 }

@@ -25,8 +25,10 @@
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_programs(con)
-#' brapi_programs(con, commonCropName = "rice")
+#' if (brapi_ping(con)) {
+#'   brapi_programs(con)
+#'   brapi_programs(con, commonCropName = "rice")
+#' }
 #' }
 #'
 #' @export
@@ -49,7 +51,9 @@ brapi_programs <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_program(con, "program1")
+#' if (brapi_ping(con)) {
+#'   brapi_program(con, "program1")
+#' }
 #' }
 #'
 #' @export
@@ -80,7 +84,9 @@ brapi_program <- function(con, programDbId) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_trials(con)
+#' if (brapi_ping(con)) {
+#'   brapi_trials(con)
+#' }
 #' }
 #'
 #' @export
@@ -105,7 +111,9 @@ brapi_trials <- function(con, programDbId = NULL, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_trial(con, "trial1")
+#' if (brapi_ping(con)) {
+#'   brapi_trial(con, "trial1")
+#' }
 #' }
 #'
 #' @export
@@ -136,8 +144,10 @@ brapi_trial <- function(con, trialDbId) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_studies(con)
-#' brapi_studies(con, trialDbId = "trial1")
+#' if (brapi_ping(con)) {
+#'   brapi_studies(con)
+#'   brapi_studies(con, trialDbId = "trial1")
+#' }
 #' }
 #'
 #' @export
@@ -162,7 +172,9 @@ brapi_studies <- function(con, trialDbId = NULL, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_study(con, "study1")
+#' if (brapi_ping(con)) {
+#'   brapi_study(con, "study1")
+#' }
 #' }
 #'
 #' @export
@@ -191,7 +203,9 @@ brapi_study <- function(con, studyDbId) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_locations(con)
+#' if (brapi_ping(con)) {
+#'   brapi_locations(con)
+#' }
 #' }
 #'
 #' @export
@@ -214,7 +228,9 @@ brapi_locations <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_location(con, "location_01")
+#' if (brapi_ping(con)) {
+#'   brapi_location(con, "location_01")
+#' }
 #' }
 #'
 #' @export
@@ -243,7 +259,9 @@ brapi_location <- function(con, locationDbId) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_seasons(con)
+#' if (brapi_ping(con)) {
+#'   brapi_seasons(con)
+#' }
 #' }
 #'
 #' @export
@@ -271,7 +289,9 @@ brapi_seasons <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_lists(con)
+#' if (brapi_ping(con)) {
+#'   brapi_lists(con)
+#' }
 #' }
 #'
 #' @export
@@ -298,8 +318,10 @@ brapi_lists <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' lst <- brapi_list(con, "list1")
-#' lst$data[[1]]
+#' if (brapi_ping(con)) {
+#'   lst <- brapi_list(con, "list1")
+#'   lst$data[[1]]
+#' }
 #' }
 #'
 #' @export
@@ -339,7 +361,9 @@ brapi_list <- function(con, listDbId) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_people(con)
+#' if (brapi_ping(con)) {
+#'   brapi_people(con)
+#' }
 #' }
 #'
 #' @export
@@ -370,7 +394,9 @@ brapi_people <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_server_info(con)
+#' if (brapi_ping(con)) {
+#'   brapi_server_info(con)
+#' }
 #' }
 #'
 #' @export

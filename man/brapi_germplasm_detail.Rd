@@ -26,7 +26,9 @@ Get a Single Germplasm by ID
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_germplasm_detail(con, "germplasm1")
+if (brapi_ping(con)) {
+  brapi_germplasm_detail(con, "germplasm1")
+}
 }
 
 }

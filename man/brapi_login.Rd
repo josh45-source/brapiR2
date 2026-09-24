@@ -23,8 +23,10 @@ connection object with the Bearer token set.
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-con <- brapi_login(con, "brapi_reader", "brapi_reader")
-con
+if (brapi_ping(con)) {
+  con <- brapi_login(con, "brapi_reader", "brapi_reader")
+  con
+}
 }
 
 }

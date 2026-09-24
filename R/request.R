@@ -69,12 +69,14 @@ brapi_req <- function(con, endpoint) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
+#' if (brapi_ping(con)) {
 #'
-#' # An endpoint brapiR2 does not wrap
-#' brapi_get(con, "/commoncropnames")
+#'   # An endpoint brapiR2 does not wrap
+#'   brapi_get(con, "/commoncropnames")
 #'
-#' # A query parameter no named function exposes
-#' brapi_get(con, "/studies", query = list(active = "true"))
+#'   # A query parameter no named function exposes
+#'   brapi_get(con, "/studies", query = list(active = "true"))
+#' }
 #' }
 #'
 #' @importFrom rlang hash
@@ -285,8 +287,10 @@ brapi_get_pages <- function(con, endpoint, query, max_pages = Inf) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_post_search(con, "/search/germplasm",
-#'                   body = list(germplasmNames = "Tomatillo Fantastico"))
+#' if (brapi_ping(con)) {
+#'   brapi_post_search(con, "/search/germplasm",
+#'                     body = list(germplasmNames = "Tomatillo Fantastico"))
+#' }
 #' }
 #'
 #' @export

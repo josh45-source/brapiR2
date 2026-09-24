@@ -23,8 +23,10 @@ row per observation unit and one column per trait — ready for analysis.
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-data <- brapi_study_data(con, "study1")
-head(data)
+if (brapi_ping(con)) {
+  data <- brapi_study_data(con, "study1")
+  head(data)
+}
 }
 
 }

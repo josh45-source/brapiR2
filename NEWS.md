@@ -234,6 +234,10 @@
   the connection object, so it is written to disk by `saveRDS()` and
   printed by `str()`, while `print()` shows only whether the connection
   is authenticated.
+* Examples now check that the test server is reachable before running,
+  so they report the server being down rather than failing. Every
+  example makes live requests, and CRAN runs `\donttest{}` examples on
+  some check flavours.
 
 ### Testing
 

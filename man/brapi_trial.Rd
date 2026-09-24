@@ -26,7 +26,9 @@ Get a Single Trial by ID
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_trial(con, "trial1")
+if (brapi_ping(con)) {
+  brapi_trial(con, "trial1")
+}
 }
 
 }

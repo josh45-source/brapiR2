@@ -23,7 +23,9 @@
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_observation_units(con, studyDbId = "study1")
+#' if (brapi_ping(con)) {
+#'   brapi_observation_units(con, studyDbId = "study1")
+#' }
 #' }
 #'
 #' @export
@@ -55,7 +57,9 @@ brapi_observation_units <- function(con, studyDbId = NULL, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_observations(con, studyDbId = "study1")
+#' if (brapi_ping(con)) {
+#'   brapi_observations(con, studyDbId = "study1")
+#' }
 #' }
 #'
 #' @export
@@ -90,7 +94,9 @@ brapi_observations <- function(con, studyDbId = NULL, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_observation_variables(con)
+#' if (brapi_ping(con)) {
+#'   brapi_observation_variables(con)
+#' }
 #' }
 #'
 #' @export
@@ -120,7 +126,9 @@ brapi_observation_variables <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_traits(con)
+#' if (brapi_ping(con)) {
+#'   brapi_traits(con)
+#' }
 #' }
 #'
 #' @export
@@ -150,7 +158,9 @@ brapi_traits <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_scales(con)
+#' if (brapi_ping(con)) {
+#'   brapi_scales(con)
+#' }
 #' }
 #'
 #' @export
@@ -180,7 +190,9 @@ brapi_scales <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_methods(con)
+#' if (brapi_ping(con)) {
+#'   brapi_methods(con)
+#' }
 #' }
 #'
 #' @export
@@ -218,7 +230,9 @@ brapi_methods <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_ontologies(con)
+#' if (brapi_ping(con)) {
+#'   brapi_ontologies(con)
+#' }
 #' }
 #'
 #' @export
@@ -245,7 +259,9 @@ brapi_ontologies <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_ontology(con, "O_001")
+#' if (brapi_ping(con)) {
+#'   brapi_ontology(con, "O_001")
+#' }
 #' }
 #'
 #' @export
@@ -273,7 +289,9 @@ brapi_ontology <- function(con, ontologyDbId) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_images(con)
+#' if (brapi_ping(con)) {
+#'   brapi_images(con)
+#' }
 #' }
 #'
 #' @export
@@ -302,7 +320,9 @@ brapi_images <- function(con, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_events(con, studyDbId = "study1")
+#' if (brapi_ping(con)) {
+#'   brapi_events(con, studyDbId = "study1")
+#' }
 #' }
 #'
 #' @export
@@ -328,7 +348,9 @@ brapi_events <- function(con, studyDbId = NULL, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_search_observations(con, studyDbIds = "study1")
+#' if (brapi_ping(con)) {
+#'   brapi_search_observations(con, studyDbIds = "study1")
+#' }
 #' }
 #'
 #' @export
@@ -359,7 +381,9 @@ brapi_search_observations <- function(con,
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' brapi_search_variables(con, traitClasses = "agronomic")
+#' if (brapi_ping(con)) {
+#'   brapi_search_variables(con, traitClasses = "agronomic")
+#' }
 #' }
 #'
 #' @export
@@ -384,8 +408,10 @@ brapi_search_variables <- function(con, traitClasses = NULL, ...) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' data <- brapi_study_data(con, "study1")
-#' head(data)
+#' if (brapi_ping(con)) {
+#'   data <- brapi_study_data(con, "study1")
+#'   head(data)
+#' }
 #' }
 #'
 #' @importFrom tidyselect where

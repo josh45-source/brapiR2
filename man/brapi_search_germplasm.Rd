@@ -38,7 +38,9 @@ Performs a BrAPI search for germplasm records matching the given criteria.
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_search_germplasm(con, commonCropNames = "Tomatillo")
+if (brapi_ping(con)) {
+  brapi_search_germplasm(con, commonCropNames = "Tomatillo")
+}
 }
 
 }

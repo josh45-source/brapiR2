@@ -84,7 +84,9 @@ through \code{...}:
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_pedigree(con, includeParents = TRUE, includeProgeny = TRUE)
+if (brapi_ping(con)) {
+  brapi_pedigree(con, includeParents = TRUE, includeProgeny = TRUE)
+}
 }
 
 }

@@ -27,7 +27,9 @@ Get a Single Genome Map by ID
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_map(con, "genome_map1")
+if (brapi_ping(con)) {
+  brapi_map(con, "genome_map1")
+}
 }
 
 }

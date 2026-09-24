@@ -31,7 +31,9 @@ through \code{...}:
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_germplasm_attributes(con)
+if (brapi_ping(con)) {
+  brapi_germplasm_attributes(con)
+}
 }
 
 }

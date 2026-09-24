@@ -57,7 +57,9 @@ returned tibble and its relationship to \code{\link[=brapi_germplasm_pedigree]{b
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
-brapi_search_pedigree(con, includeParents = TRUE)
+if (brapi_ping(con)) {
+  brapi_search_pedigree(con, includeParents = TRUE)
+}
 }
 
 }

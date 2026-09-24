@@ -110,13 +110,15 @@ brapi_cache_clear <- function(con) {
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' study_ids <- c("study1", "study2", "study3")
+#' if (brapi_ping(con)) {
+#'   study_ids <- c("study1", "study2", "study3")
 #'
-#' # Set the parallel backend yourself before calling; brapi_fetch_parallel()
-#' # uses whatever plan is active rather than setting one for you.
-#' future::plan(future::multisession, workers = 2)
-#' all_data <- brapi_fetch_parallel(con, brapi_study_data, study_ids)
-#' future::plan(future::sequential) # shut the workers back down when done
+#'   # Set the parallel backend yourself before calling; brapi_fetch_parallel()
+#'   # uses whatever plan is active rather than setting one for you.
+#'   future::plan(future::multisession, workers = 2)
+#'   all_data <- brapi_fetch_parallel(con, brapi_study_data, study_ids)
+#'   future::plan(future::sequential) # shut the workers back down when done
+#' }
 #' }
 #'
 #' @export
