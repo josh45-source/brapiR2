@@ -214,7 +214,7 @@ covers exactly the write operations brapiR2 deliberately omits.
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please see [CONTRIBUTING.md](https://github.com/ropensci/brapiR2/blob/main/CONTRIBUTING.md) for guidelines.
 
 ## License
 

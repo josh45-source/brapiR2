@@ -17,3 +17,4 @@
 ^dev$
 ^doc$
 ^Meta$
+^cran-comments\.md$
