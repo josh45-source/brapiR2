@@ -17,4 +17,5 @@ jobs:
       - name: Mark workspace safe for git
         run: git config --global --add safe.directory /github/workspace
 
-      - uses: ropensci-review-tools/pkgcheck-action@main
+      # Pinned to the action's main as of our last green run (24 Sep 2026).
+      - uses: ropensci-review-tools/pkgcheck-action@fa6dc3e9dec0580397ae44ec6fb9e7953947758c

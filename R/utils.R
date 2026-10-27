@@ -7,7 +7,9 @@
 #'
 #' @inheritParams brapi_shared_params
 #'
-#' @return Logical. `TRUE` if the server responds, `FALSE` otherwise.
+#' @return Logical, invisibly. `TRUE` if `/serverinfo` answers with HTTP 200
+#'   and a JSON body, `FALSE` otherwise. The HTTP status is attached as the
+#'   `"status"` attribute (`NA` if the server could not be reached).
 #'
 #' @section BrAPI endpoint:
 #' `GET /serverinfo` - see the
@@ -32,16 +34,27 @@ brapi_ping <- function(con) {
       resp <- brapi_req(con, "/serverinfo") |>
         req_perform()
       status <- resp_status(resp)
-      if (status == 200L) {
-        cli_alert_success("Server {.url {con$base_url}} is reachable.")
-        return(invisible(TRUE))
+      if (status != 200L) {
+        cli_alert_warning("Server returned status {status}.")
+        return(invisible(structure(FALSE, status = status)))
       }
-      cli_alert_warning("Server returned status {status}.")
-      invisible(FALSE)
+      is_json <- tryCatch(
+        {
+          resp_body_json(resp)
+          TRUE
+        },
+        error = function(e) FALSE
+      )
+      if (!is_json) {
+        cli_alert_warning("Server returned status {status} but not JSON.")
+        return(invisible(structure(FALSE, status = status)))
+      }
+      cli_alert_success("Server {.url {con$base_url}} is reachable.")
+      invisible(structure(TRUE, status = status))
     },
     error = function(e) {
       cli_alert_warning("Cannot reach {.url {con$base_url}}: {e$message}")
-      invisible(FALSE)
+      invisible(structure(FALSE, status = NA_integer_))
     }
   )
 }

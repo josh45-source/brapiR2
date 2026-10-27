@@ -10,7 +10,9 @@ brapi_ping(con)
 \item{con}{A \code{\link[=brapi_connection]{brapi_connection()}} object.}
 }
 \value{
-Logical. \code{TRUE} if the server responds, \code{FALSE} otherwise.
+Logical, invisibly. \code{TRUE} if \verb{/serverinfo} answers with HTTP 200
+and a JSON body, \code{FALSE} otherwise. The HTTP status is attached as the
+\code{"status"} attribute (\code{NA} if the server could not be reached).
 }
 \description{
 Tests whether the BrAPI server is reachable and responding.
