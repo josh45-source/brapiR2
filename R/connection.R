@@ -60,6 +60,26 @@ brapi_connection <- function(url,
     )
   }
 
+  if (!is.null(token) && !is_single_string(token)) {
+    cli_abort(
+      "{.arg token} must be NULL or a single non-empty character string."
+    )
+  }
+
+  if (!is_single_string(version)) {
+    cli_abort("{.arg version} must be a single non-empty character string.")
+  }
+
+  ok_page_size <- is_single_number(page_size) && page_size >= 1 &&
+    page_size == round(page_size)
+  if (!ok_page_size) {
+    cli_abort("{.arg page_size} must be a single whole number of at least 1.")
+  }
+
+  if (!is_single_number(timeout) || timeout <= 0) {
+    cli_abort("{.arg timeout} must be a single positive number of seconds.")
+  }
+
   # Clean URL: remove trailing slashes
 
   url <- sub("/+$", "", url)
@@ -140,6 +160,24 @@ print.brapi_con <- function(x, ...) {
 #' @export
 is_brapi_con <- function(x) {
   inherits(x, "brapi_con")
+}
+
+
+#' Internal: Is `x` One Non-Missing, Non-Empty String?
+#' @param x Object to test.
+#' @return Logical.
+#' @noRd
+is_single_string <- function(x) {
+  is.character(x) && length(x) == 1L && !is.na(x) && nzchar(x)
+}
+
+
+#' Internal: Is `x` One Non-Missing Number?
+#' @param x Object to test.
+#' @return Logical.
+#' @noRd
+is_single_number <- function(x) {
+  is.numeric(x) && length(x) == 1L && !is.na(x)
 }
 
 

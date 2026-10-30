@@ -63,7 +63,7 @@ brapi_maps <- function(con, ...) {
 #'
 #' @export
 brapi_map <- function(con, mapDbId) {
-  brapi_get(con, glue("/maps/{mapDbId}"))
+  brapi_get(con, paste0("/maps/", brapi_id_segment(mapDbId, "mapDbId")))
 }
 
 
@@ -91,7 +91,9 @@ brapi_map <- function(con, mapDbId) {
 #'
 #' @export
 brapi_map_linkage_groups <- function(con, mapDbId) {
-  brapi_get(con, glue("/maps/{mapDbId}/linkagegroups"))
+  brapi_get(con, paste0(
+    "/maps/", brapi_id_segment(mapDbId, "mapDbId"), "/linkagegroups"
+  ))
 }
 
 

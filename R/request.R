@@ -92,6 +92,21 @@ brapi_get <- function(con, endpoint, query = list(), max_pages = Inf) {
     )
   }
 
+  # A NULL filter means "not set". A GET filter takes one value; several
+  # are what the POST search functions are for.
+  query <- query[!vapply(query, is.null, logical(1))]
+  multi <- names(query)[lengths(query) > 1L]
+  if (length(multi)) {
+    cli_abort(c(
+      "Query parameter{?s} {.arg {multi}} must be a single value.",
+      "i" = paste(
+        "To filter on several values, use the matching",
+        "{.code brapi_search_*()} function, or {.fn brapi_fetch_parallel}",
+        "to make one call per value."
+      )
+    ))
+  }
+
   query$pageSize <- query$pageSize %||% con$page_size
   query$page <- 0L
 
