@@ -76,6 +76,13 @@
   those records for every remaining page, and doesn't cache the result.
   `max_pages` is validated (#16).
 
+* A field whose JSON type differs between records, such as a plot number
+  that is `1` in one and `"2A"` in another, no longer changes the shape of
+  the result. The parser used to fall back to `jsonlite::fromJSON(flatten =
+  TRUE)`, which turned nested objects into dotted columns (`geo` became
+  `geo.type`); now such a column becomes character, or a list-column if any
+  record holds a list (#17).
+
 ## Documentation
 
 ## Internal

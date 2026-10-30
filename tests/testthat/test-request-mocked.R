@@ -158,15 +158,78 @@ test_that("a cached response returns the same values as a fresh one", {
   ))
 })
 
-test_that("the parser fallback keeps full numeric precision", {
-  # A column that changes type between records sends the parser down its
-  # jsonlite fallback.
+test_that("a column that changes type keeps full numeric precision", {
   data <- list(
     list(plotNumber = 1L, latitude = 0.123456789),
     list(plotNumber = "2A", latitude = 1.5)
   )
   res <- parse_brapi_result(data)
   expect_identical(res$latitude, c(0.123456789, 1.5))
+})
+
+test_that("a type conflict between records doesn't change the columns", {
+  consistent <- list(
+    list(id = "1", geo = list(type = "Point")),
+    list(id = "2", geo = list(type = "Point"))
+  )
+  conflicting <- list(
+    list(id = 1L, geo = list(type = "Point")),
+    list(id = "2A", geo = list(type = "Point"))
+  )
+
+  expected_names <- names(parse_brapi_result(consistent))
+  res <- parse_brapi_result(conflicting)
+
+  expect_identical(names(res), expected_names)
+  expect_identical(res$id, c("1", "2A"))
+  expect_true(is.list(res$geo))
+  expect_identical(res$geo[[2]], list(type = "Point"))
+})
+
+test_that("a field that is a list in any record becomes a list-column", {
+  data <- list(
+    list(id = "a", synonyms = "x"),
+    list(id = "b", synonyms = list("y", "z"))
+  )
+  res <- parse_brapi_result(data)
+
+  expect_true(is.list(res$synonyms))
+  expect_identical(res$synonyms[[1]], "x")
+  expect_identical(res$synonyms[[2]], list("y", "z"))
+})
+
+test_that("brapi_get returns the same columns when types differ across pages", {
+  local_mocked_bindings(
+    req_perform = function(req) {
+      q <- httr2::url_parse(req$url)$query
+      expect_match(req$url, "/brapi/v2/observationunits\\?")
+      expect_identical(q[["pageSize"]], "1000")
+      page <- as.integer(q[["page"]])
+      unit <- list(
+        observationUnitDbId = paste0("u", page),
+        plotNumber = if (page == 0L) 1L else "2A",
+        position = list(positionCoordinateX = "1")
+      )
+      httr2::response(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw(jsonlite::toJSON(list(
+          metadata = list(pagination = list(currentPage = page,
+                                            totalPages = 2L)),
+          result = list(data = list(unit))
+        ), auto_unbox = TRUE))
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  res <- brapi_get(con, "/observationunits")
+
+  expect_identical(
+    names(res), c("observationUnitDbId", "plotNumber", "position")
+  )
+  expect_identical(res$plotNumber, c("1", "2A"))
 })
 
 test_that("brapi_post_search returns data on an immediate 200 response", {
@@ -373,9 +436,7 @@ test_that("brapi_post_search fetches every page of an async result", {
   for (q in seen$gets) expect_identical(q[["pageSize"]], "2")
 })
 
-test_that("parse_brapi_result falls back to jsonlite flatten on bad records", {
-  # A record whose element is itself a data.frame will break as_tibble_row's
-  # size-1 assumption and trigger the tryCatch fallback branch.
+test_that("parse_brapi_result keeps a data.frame element as a list-column", {
   bad_data <- list(list(id = "1", nested = data.frame(x = 1:2)))
   result <- parse_brapi_result(bad_data)
 

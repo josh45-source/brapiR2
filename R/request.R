@@ -528,36 +528,89 @@ parse_brapi_result <- function(data) {
     return(tibble())
   }
 
-  tryCatch(
-    {
-      rows <- map(data, function(record) {
-        record <- map(record, function(val) {
-          if (is.null(val)) {
-            return(NA)
-          }
-          if (is.list(val) && length(val) == 0) {
-            return(NA)
-          }
-          # Wrap lists and multi-element vectors as list-columns so
-          # as_tibble_row (which requires size-1 elements) doesn't error.
-          # Named lists have their keys sorted first: JSON object key order
-          # is not significant, and some servers vary it between records,
-          # which would otherwise make identical records compare as distinct.
-          if (is.list(val) || length(val) > 1L) {
-            if (is.list(val) && !is.null(names(val))) {
-              val <- val[order(names(val))]
-            }
-            return(list(val))
-          }
-          val
-        })
-        tibble::as_tibble_row(record, .name_repair = "minimal")
-      })
-      bind_rows(rows)
-    },
-    error = function(e) {
-      json_text <- brapi_to_json(data)
-      as_tibble(fromJSON(json_text, flatten = TRUE))
+  # A collection of bare values rather than objects (`/commoncropnames`
+  # returns its crop names that way) is one `value` column.
+  if (!any(vapply(data, is.list, logical(1)))) {
+    return(tibble(value = unlist(data, use.names = FALSE)))
+  }
+
+  rows <- map(data, function(record) {
+    record <- map(record, function(val) {
+      if (is.null(val)) {
+        return(NA)
+      }
+      if (is.list(val) && length(val) == 0) {
+        return(NA)
+      }
+      # Wrap lists and multi-element vectors as list-columns so
+      # as_tibble_row (which requires size-1 elements) doesn't error.
+      # Named lists have their keys sorted first: JSON object key order
+      # is not significant, and some servers vary it between records,
+      # which would otherwise make identical records compare as distinct.
+      if (is.list(val) || length(val) > 1L) {
+        if (is.list(val) && !is.null(names(val))) {
+          val <- val[order(names(val))]
+        }
+        return(list(val))
+      }
+      val
+    })
+    tibble::as_tibble_row(record, .name_repair = "minimal")
+  })
+  bind_rows(unify_column_types(rows))
+}
+
+
+#' Internal: Make a Column's Type Agree Across Records
+#'
+#' A field can arrive as a different JSON type in different records, such
+#' as a plot number that is `1` in one and `"2A"` in another, or a value that
+#' is a string in one and an array in another. `bind_rows()` cannot combine
+#' those, so before binding, a column holding a list in any record becomes a
+#' list-column in every record, and a column holding a string alongside
+#' other scalar types becomes character. Numbers and logicals combine
+#' without help, and a missing value (`NA`) fits any type.
+#'
+#' @param rows A list of one-row tibbles, one per record.
+#'
+#' @return `rows`, with conflicting columns made consistent.
+#' @keywords internal
+#' @noRd
+unify_column_types <- function(rows) {
+  col_type <- function(col) {
+    if (is.list(col)) {
+      "list"
+    } else if (is.logical(col) && all(is.na(col))) {
+      NA_character_
+    } else {
+      typeof(col)
     }
-  )
+  }
+  types <- list()
+  for (row in rows) {
+    for (nm in names(row)) {
+      types[[nm]] <- union(types[[nm]], col_type(row[[nm]]))
+    }
+  }
+  types <- lapply(types, function(t) t[!is.na(t)])
+
+  to_list <- names(types)[vapply(types, function(t) {
+    "list" %in% t && length(t) > 1L
+  }, logical(1))]
+  to_chr <- names(types)[vapply(types, function(t) {
+    !"list" %in% t && "character" %in% t && length(t) > 1L
+  }, logical(1))]
+  if (length(to_list) == 0L && length(to_chr) == 0L) {
+    return(rows)
+  }
+
+  lapply(rows, function(row) {
+    for (nm in intersect(to_list, names(row))) {
+      if (!is.list(row[[nm]])) row[[nm]] <- list(row[[nm]])
+    }
+    for (nm in intersect(to_chr, names(row))) {
+      row[[nm]] <- as.character(row[[nm]])
+    }
+    row
+  })
 }
