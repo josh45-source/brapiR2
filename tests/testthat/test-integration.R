@@ -1,10 +1,7 @@
 ## Integration tests against https://test-server.brapi.org
-## These tests are skipped on CRAN and when there is no internet connection.
+## These tests are skipped on CRAN, and when the server does not answer
+## /serverinfo with a successful JSON response (see helper-live-server.R).
 ## They validate the full request → parse → tibble pipeline end-to-end.
-
-skip_if_offline_brapi <- function() {
-  testthat::skip_if_offline(host = "test-server.brapi.org")
-}
 
 SERVER <- "https://test-server.brapi.org"
 
@@ -14,7 +11,7 @@ SERVER <- "https://test-server.brapi.org"
 
 test_that("brapi_ping returns TRUE for live server", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   expect_true(brapi_ping(con))
@@ -22,7 +19,7 @@ test_that("brapi_ping returns TRUE for live server", {
 
 test_that("brapi_server_info returns a tibble of supported endpoints", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   info <- brapi_server_info(con)
@@ -35,7 +32,7 @@ test_that("brapi_server_info returns a tibble of supported endpoints", {
 
 test_that("brapi_programs returns a non-empty tibble", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   progs <- brapi_programs(con)
@@ -49,7 +46,7 @@ test_that("brapi_programs returns a non-empty tibble", {
 
 test_that("brapi_trials returns a non-empty tibble", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   trials <- brapi_trials(con)
@@ -61,7 +58,7 @@ test_that("brapi_trials returns a non-empty tibble", {
 
 test_that("brapi_studies returns a tibble with expected columns", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   studies <- brapi_studies(con)
@@ -75,7 +72,7 @@ test_that("brapi_studies returns a tibble with expected columns", {
 
 test_that("brapi_locations and brapi_seasons return tibbles", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
 
@@ -94,7 +91,7 @@ test_that("brapi_locations and brapi_seasons return tibbles", {
 
 test_that("brapi_germplasm returns a non-empty tibble", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   germ <- brapi_germplasm(con)
@@ -107,7 +104,7 @@ test_that("brapi_germplasm returns a non-empty tibble", {
 
 test_that("brapi_germplasm_detail returns one row for a valid ID", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   germ_id <- brapi_germplasm(con)$germplasmDbId[[1L]]
@@ -121,7 +118,7 @@ test_that("brapi_germplasm_detail returns one row for a valid ID", {
 
 test_that("brapi_germplasm_pedigree returns a single-row tibble", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   germ_id <- brapi_germplasm(con)$germplasmDbId[[1L]]
@@ -135,7 +132,7 @@ test_that("brapi_germplasm_pedigree returns a single-row tibble", {
 
 test_that("brapi_pedigree returns pedigree nodes with tidied relative columns", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   ped <- brapi_pedigree(
@@ -162,7 +159,7 @@ test_that("brapi_pedigree returns pedigree nodes with tidied relative columns", 
 
 test_that("brapi_search_pedigree returns the same node shape as brapi_pedigree", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   ped <- brapi_search_pedigree(con, includeParents = TRUE)
@@ -179,7 +176,7 @@ test_that("brapi_search_pedigree returns the same node shape as brapi_pedigree",
 
 test_that("brapi_observation_variables returns a non-empty tibble", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   vars <- brapi_observation_variables(con)
@@ -192,7 +189,7 @@ test_that("brapi_observation_variables returns a non-empty tibble", {
 
 test_that("brapi_observation_units returns a non-empty tibble", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   ou <- brapi_observation_units(con)
@@ -204,7 +201,7 @@ test_that("brapi_observation_units returns a non-empty tibble", {
 
 test_that("brapi_ontologies returns a non-empty tibble", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   onto <- brapi_ontologies(con)
@@ -216,7 +213,7 @@ test_that("brapi_ontologies returns a non-empty tibble", {
 
 test_that("brapi_ontology returns a single-row tibble for a retrievable ID", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   onto <- brapi_ontologies(con)
@@ -251,7 +248,7 @@ test_that("brapi_ontology returns a single-row tibble for a retrievable ID", {
 
 test_that("brapi_study_data returns a wide tibble with trait columns", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
 
@@ -280,7 +277,7 @@ test_that("brapi_study_data returns a wide tibble with trait columns", {
 
 test_that("brapi_variant_sets returns a non-empty tibble", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   vs <- brapi_variant_sets(con)
@@ -292,7 +289,7 @@ test_that("brapi_variant_sets returns a non-empty tibble", {
 
 test_that("brapi_variants returns variants for a given variantSetDbId", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   vs_id <- brapi_variant_sets(con)$variantSetDbId[[1L]]
@@ -306,7 +303,7 @@ test_that("brapi_variants returns variants for a given variantSetDbId", {
 
 test_that("brapi_call_sets returns a non-empty tibble", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   cs <- brapi_call_sets(con)
@@ -318,7 +315,7 @@ test_that("brapi_call_sets returns a non-empty tibble", {
 
 test_that("brapi_allele_matrix returns a tidy tibble with 3 columns", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   vs_id <- brapi_variant_sets(con)$variantSetDbId[[1L]]
@@ -333,7 +330,7 @@ test_that("brapi_allele_matrix returns a tidy tibble with 3 columns", {
 
 test_that("brapi_get_dosage_matrix returns a numeric matrix", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   vs_id <- brapi_variant_sets(con)$variantSetDbId[[1L]]
@@ -351,7 +348,7 @@ test_that("brapi_get_dosage_matrix returns a numeric matrix", {
 
 test_that("brapi_maps returns a non-empty tibble with type and unit", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   maps <- brapi_maps(con)
@@ -363,7 +360,7 @@ test_that("brapi_maps returns a non-empty tibble with type and unit", {
 
 test_that("brapi_map returns a single-row tibble for a valid ID", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   map_id <- brapi_maps(con)$mapDbId[[1L]]
@@ -377,7 +374,7 @@ test_that("brapi_map returns a single-row tibble for a valid ID", {
 
 test_that("brapi_map_linkage_groups returns a non-empty tibble", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   map_id <- brapi_maps(con)$mapDbId[[1L]]
@@ -391,7 +388,7 @@ test_that("brapi_map_linkage_groups returns a non-empty tibble", {
 
 test_that("brapi_marker_positions filtered by mapDbId returns populated positions", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   map_id <- brapi_maps(con)$mapDbId[[1L]]
@@ -409,7 +406,7 @@ test_that("brapi_marker_positions filtered by mapDbId returns populated position
 
 test_that("brapi_search_marker_positions returns positions for given variant IDs", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   map_id <- brapi_maps(con)$mapDbId[[1L]]
@@ -424,7 +421,7 @@ test_that("brapi_search_marker_positions returns positions for given variant IDs
 
 test_that("brapi_get_marker_map(mapDbId=) returns a tibble with type and unit", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   map_id <- brapi_maps(con)$mapDbId[[1L]]
@@ -439,7 +436,7 @@ test_that("brapi_get_marker_map(mapDbId=) returns a tibble with type and unit", 
 
 test_that("brapi_get_marker_map(variantSetDbId=) returns positions for the set", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   vs_id <- brapi_variant_sets(con)$variantSetDbId[[1L]]
@@ -458,7 +455,7 @@ test_that("brapi_get_marker_map(variantSetDbId=) returns positions for the set",
 
 test_that("brapi_get_marker_map errors when neither identifier is given", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
   expect_error(brapi_get_marker_map(con), "exactly one")
@@ -470,7 +467,7 @@ test_that("brapi_get_marker_map errors when neither identifier is given", {
 
 test_that("full pipeline programs -> trials -> studies -> study_data works", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   con <- brapi_connection(SERVER)
 

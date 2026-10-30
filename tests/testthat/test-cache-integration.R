@@ -1,9 +1,6 @@
 ## Cache integration tests
-## Require network access to test-server.brapi.org; skipped on CRAN and offline.
-
-skip_if_offline_brapi <- function() {
-  testthat::skip_if_offline(host = "test-server.brapi.org")
-}
+## Require a healthy test-server.brapi.org; skipped on CRAN and when the
+## server is unavailable (see helper-live-server.R).
 
 SERVER <- "https://test-server.brapi.org"
 
@@ -13,7 +10,7 @@ SERVER <- "https://test-server.brapi.org"
 
 test_that("cache file is written after a successful brapi_get call", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   tmpdir <- file.path(tempdir(), paste0("brapi_cache_write_", Sys.getpid()))
   con <- brapi_connection(SERVER) |>
@@ -28,7 +25,7 @@ test_that("cache file is written after a successful brapi_get call", {
 
 test_that("second call returns cached result and skips HTTP", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   tmpdir <- file.path(tempdir(), paste0("brapi_cache_hit_", Sys.getpid()))
   con <- brapi_connection(SERVER) |>
@@ -53,7 +50,7 @@ test_that("second call returns cached result and skips HTTP", {
 
 test_that("expired cache entry triggers a fresh HTTP request", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   tmpdir <- file.path(tempdir(), paste0("brapi_cache_expire_", Sys.getpid()))
   con <- brapi_connection(SERVER) |>
@@ -72,7 +69,7 @@ test_that("expired cache entry triggers a fresh HTTP request", {
 
 test_that("different queries produce different cache files", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   tmpdir <- file.path(tempdir(), paste0("brapi_cache_diff_", Sys.getpid()))
   con <- brapi_connection(SERVER) |>
@@ -92,7 +89,7 @@ test_that("different queries produce different cache files", {
 
 test_that("brapi_cache_clear removes all cache files", {
   skip_on_cran()
-  skip_if_offline_brapi()
+  skip_if_brapi_down()
 
   tmpdir <- file.path(tempdir(), paste0("brapi_cache_clear_", Sys.getpid()))
   con <- brapi_connection(SERVER) |>

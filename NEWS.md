@@ -1,3 +1,16 @@
+# brapiR2 (development version)
+
+## Bug fixes
+
+* `brapi_ping()` now returns `TRUE` only when `/serverinfo` answers with a
+  successful JSON response, and attaches the HTTP status as the `"status"`
+  attribute. Live-server tests skip with that status when the test server
+  is down, instead of failing (#42).
+
+## Documentation
+
+## Internal
+
 # brapiR2 0.2.0
 
 ### Breaking changes
