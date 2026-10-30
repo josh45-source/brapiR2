@@ -180,14 +180,18 @@ test_that("brapi_get_dosage_matrix covers every page of a paged matrix", {
   expect_identical(unname(dm["s3", "v4"]), c(0, 1, 2)[(4 + 3) %% 3 + 1])
 })
 
+## The raw genotype matrix, variants in rows and call sets in columns, as
+## fetch_allele_matrix_pages() returns it.
+genotype_matrix <- function(..., variants, callsets) {
+  matrix(c(...), nrow = length(variants), byrow = TRUE,
+         dimnames = list(variants, callsets))
+}
+
 test_that("brapi_get_dosage_matrix converts genotypes into allele dosages", {
   local_mocked_bindings(
-    brapi_allele_matrix = function(con, variantSetDbId = NULL, ...) {
-      tibble::tibble(
-        variantDbId = c("v1", "v1", "v2", "v2"),
-        callSetDbId = c("s1", "s2", "s1", "s2"),
-        genotype    = c("0/0", "0/1", "1/1", ".")
-      )
+    fetch_allele_matrix_pages = function(con, query) {
+      genotype_matrix("0/0", "0/1", "1/1", ".",
+                      variants = c("v1", "v2"), callsets = c("s1", "s2"))
     },
     .package = "brapiR2"
   )
@@ -198,6 +202,7 @@ test_that("brapi_get_dosage_matrix converts genotypes into allele dosages", {
   expect_true(is.matrix(dm))
   expect_identical(dim(dm), c(2L, 2L))
   expect_identical(rownames(dm), c("s1", "s2"))
+  expect_identical(colnames(dm), c("v1", "v2"))
   expect_identical(unname(dm["s1", "v1"]), 0)
   expect_identical(unname(dm["s2", "v1"]), 1)
   expect_identical(unname(dm["s1", "v2"]), 2)
@@ -206,12 +211,8 @@ test_that("brapi_get_dosage_matrix converts genotypes into allele dosages", {
 
 test_that("brapi_get_dosage_matrix handles phased genotype separators", {
   local_mocked_bindings(
-    brapi_allele_matrix = function(con, variantSetDbId = NULL, ...) {
-      tibble::tibble(
-        variantDbId = c("v1", "v1"),
-        callSetDbId = c("s1", "s2"),
-        genotype    = c("0|1", "1|1")
-      )
+    fetch_allele_matrix_pages = function(con, query) {
+      genotype_matrix("0|1", "1|1", variants = "v1", callsets = c("s1", "s2"))
     },
     .package = "brapiR2"
   )
@@ -225,14 +226,95 @@ test_that("brapi_get_dosage_matrix handles phased genotype separators", {
 
 test_that("brapi_get_dosage_matrix errors when no allele matrix is returned", {
   local_mocked_bindings(
-    brapi_allele_matrix = function(con, variantSetDbId = NULL, ...) {
-      tibble::tibble()
+    fetch_allele_matrix_pages = function(con, query) {
+      matrix(character(), 0, 0)
     },
     .package = "brapiR2"
   )
 
   con <- brapi_connection("https://example.org")
   expect_error(brapi_get_dosage_matrix(con, "vs1"), "No allele matrix data")
+})
+
+test_that("brapi_get_dosage_matrix asks for expanded, delimited calls", {
+  server <- mock_allele_matrix_server(function(v, cs) "0|1")
+  local_mocked_bindings(req_perform = server$respond, .package = "brapiR2")
+
+  con <- brapi_connection("https://example.org")
+  dm <- suppressMessages(
+    brapi_get_dosage_matrix(con, "vs1", sep = "|", unknown_string = "N")
+  )
+
+  for (q in server$requests()) {
+    expect_identical(q[["variantSetDbId"]], "vs1")
+    expect_identical(q[["expandHomozygotes"]], "true")
+    expect_identical(q[["sepUnphased"]], "|")
+    expect_identical(q[["unknownString"]], "N")
+  }
+  expect_true(all(dm == 1))
+})
+
+test_that("brapi_get_dosage_matrix treats a partly missing call as NA", {
+  local_mocked_bindings(
+    fetch_allele_matrix_pages = function(con, query) {
+      genotype_matrix("./1", "0/.", "N/1", "1/1",
+                      variants = "v1", callsets = paste0("s", 1:4))
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  dm <- suppressMessages(
+    brapi_get_dosage_matrix(con, "vs1", unknown_string = "N")
+  )
+
+  expect_true(all(is.na(dm[c("s1", "s2", "s3"), "v1"])))
+  expect_identical(unname(dm["s4", "v1"]), 2)
+})
+
+test_that("brapi_get_dosage_matrix expands collapsed homozygotes", {
+  local_mocked_bindings(
+    fetch_allele_matrix_pages = function(con, query) {
+      genotype_matrix("0", "1", "0/1", "1/2",
+                      variants = "v1", callsets = paste0("s", 1:4))
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  dm <- suppressMessages(brapi_get_dosage_matrix(con, "vs1"))
+
+  expect_identical(unname(dm[, "v1"]), c(0, 2, 1, 2))
+})
+
+test_that("brapi_get_dosage_matrix infers ploidy for collapsed calls", {
+  local_mocked_bindings(
+    fetch_allele_matrix_pages = function(con, query) {
+      genotype_matrix("0/0/1/1", "1", "0",
+                      variants = "v1", callsets = paste0("s", 1:3))
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  dm <- suppressMessages(brapi_get_dosage_matrix(con, "vs1"))
+
+  expect_identical(unname(dm[, "v1"]), c(2, 4, 0))
+})
+
+test_that("brapi_get_dosage_matrix rejects non-index allele codes", {
+  local_mocked_bindings(
+    fetch_allele_matrix_pages = function(con, query) {
+      genotype_matrix("A/T", "0/1", variants = "v1", callsets = c("s1", "s2"))
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  expect_error(
+    suppressMessages(brapi_get_dosage_matrix(con, "vs1")),
+    "A/T"
+  )
 })
 
 ## brapi_get_marker_map() sources positions from the Genome Maps entity

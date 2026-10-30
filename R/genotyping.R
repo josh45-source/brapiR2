@@ -448,10 +448,16 @@ brapi_search_calls <- function(con, variantSetDbIds = NULL,
 #' dosage matrix (samples × markers) compatible with genomic selection
 #' packages like `rrBLUP`, `BGLR`, and `sommer`.
 #'
-#' Allele dosage is computed by splitting each genotype string on `sep` (or
-#' `"|"` for phased calls) and counting how many alleles are non-reference
-#' (i.e. not `"0"`). Missing calls (`unknown_string`, `"."`, or `""`) become
-#' `NA`.
+#' The server is asked for expanded homozygotes, `sep` as the unphased
+#' separator and `unknown_string` for missing data. Allele dosage is then
+#' computed by splitting each genotype string on `sep` (or `"|"` for phased
+#' calls) and counting how many alleles are non-reference (i.e. not `"0"`).
+#' A call with any missing allele (`unknown_string`, `"."` or `""`), such as
+#' `"./1"`, becomes `NA`. A server that still collapses a homozygote to a
+#' single allele (`"1"`) gets it expanded to the ploidy seen in the rest of
+#' the data, or to 2 if every call is collapsed. Alleles must be numeric
+#' indices (`"0"`, `"1"`, ...); nucleotide calls such as `"A/T"` are an
+#' error.
 #'
 #' @inheritParams brapi_shared_params
 #' @param variantSetDbId Character. The variant set to retrieve.
@@ -460,9 +466,9 @@ brapi_search_calls <- function(con, variantSetDbIds = NULL,
 #' @param unknown_string Character. String representing missing data.
 #'   Default `"."`.
 #'
-#' @return A numeric matrix: rows = samples (callSetDbIds), columns = markers
-#'   (variantDbIds). Values are integer dosages (0, 1, 2 for diploids; 0–N
-#'   for polyploids). Missing calls are `NA`.
+#' @return A numeric (double) matrix: rows = samples (callSetDbIds),
+#'   columns = markers (variantDbIds). Values are whole-number dosages
+#'   (0, 1, 2 for diploids; 0–N for polyploids). Missing calls are `NA`.
 #'
 #' @examples
 #' \donttest{
@@ -483,50 +489,95 @@ brapi_get_dosage_matrix <- function(con, variantSetDbId,
     "Fetching allele matrix for variant set {.val {variantSetDbId}}..."
   )
 
-  tidy <- brapi_allele_matrix(con, variantSetDbId = variantSetDbId)
+  validate_con(con)
+  # Variants in rows, call sets in columns.
+  gt <- fetch_allele_matrix_pages(con, list(
+    variantSetDbId = variantSetDbId,
+    expandHomozygotes = "true",
+    sepUnphased = sep,
+    unknownString = unknown_string
+  ))
 
-  if (nrow(tidy) == 0L) {
+  if (length(gt) == 0L) {
     cli_abort("No allele matrix data returned for {.val {variantSetDbId}}.")
   }
 
   cli_alert_info(
-    "Encoding {nrow(tidy)} genotype calls as allele dosages..."
+    "Encoding {length(gt)} genotype calls as allele dosages..."
   )
 
-  geno_to_dosage <- function(geno) {
-    if (is.na(geno) || geno == unknown_string ||
-          geno == "." || geno == "") {
-      return(NA_real_)
-    }
-    alleles <- strsplit(geno, sep, fixed = TRUE)[[1]]
-    # Fall back to phased separator
-    if (length(alleles) < 2L) {
-      alleles <- strsplit(geno, "|", fixed = TRUE)[[1]]
-    }
-    if (length(alleles) < 2L) {
-      return(NA_real_)
-    }
-    # Count non-reference alleles (anything other than "0")
-    sum(alleles != "0", na.rm = TRUE)
-  }
-
-  tidy$dosage <- vapply(tidy$genotype, geno_to_dosage, numeric(1L))
-
-  # Pivot to wide: rows = samples (callSets), cols = markers (variants)
-  wide <- pivot_wider(
-    tidy[, c("callSetDbId", "variantDbId", "dosage")],
-    names_from  = "variantDbId",
-    values_from = "dosage"
+  # Each distinct genotype string is decoded once, then mapped back.
+  calls <- unique(as.vector(gt))
+  dosage <- genotype_dosages(calls, sep, unknown_string)
+  mat <- matrix(
+    dosage[match(t(gt), calls)],
+    nrow = ncol(gt),
+    dimnames = list(colnames(gt), rownames(gt))
   )
-
-  sample_ids <- wide$callSetDbId
-  mat <- as.matrix(wide[, -1L, drop = FALSE])
-  rownames(mat) <- sample_ids
 
   cli_alert_success(
     "Dosage matrix ready: {nrow(mat)} samples x {ncol(mat)} markers."
   )
   mat
+}
+
+
+#' Internal: Allele Dosages for a Set of Genotype Strings
+#'
+#' @param calls Character vector of distinct genotype strings.
+#' @param sep Character. Unphased allele separator; `"|"` is also accepted.
+#' @param unknown_string Character. The server's missing-data string.
+#'
+#' @return A double vector the length of `calls`: the number of
+#'   non-reference alleles in each, or `NA` for a call with any missing
+#'   allele. A single-allele (collapsed homozygous) call is expanded to the
+#'   most common ploidy among the multi-allele calls, or 2 if there are none.
+#' @keywords internal
+#' @noRd
+genotype_dosages <- function(calls, sep, unknown_string) {
+  missing_allele <- c(unknown_string, ".", "")
+  alleles <- lapply(calls, function(call) {
+    if (is.na(call) || call %in% missing_allele) {
+      return(NULL)
+    }
+    a <- strsplit(call, sep, fixed = TRUE)[[1]]
+    if (length(a) < 2L) {
+      a <- strsplit(call, "|", fixed = TRUE)[[1]]
+    }
+    if (length(a) == 0L || any(a %in% missing_allele)) {
+      return(NULL)
+    }
+    a
+  })
+
+  present <- !vapply(alleles, is.null, logical(1))
+  bad <- calls[present][!vapply(alleles[present], function(a) {
+    all(grepl("^[0-9]+$", a))
+  }, logical(1))]
+  if (length(bad)) {
+    cli_abort(c(
+      "Genotype calls must be numeric allele indices such as {.val 0/1}.",
+      "x" = "Got {.val {utils::head(bad, 5)}}."
+    ))
+  }
+
+  n_alleles <- lengths(alleles)
+  multi <- n_alleles[n_alleles > 1L]
+  ploidy <- if (length(multi)) {
+    as.integer(names(which.max(table(multi))))
+  } else {
+    2L
+  }
+
+  vapply(alleles, function(a) {
+    if (is.null(a)) {
+      return(NA_real_)
+    }
+    if (length(a) == 1L) {
+      return(if (a == "0") 0 else as.numeric(ploidy))
+    }
+    as.numeric(sum(a != "0"))
+  }, numeric(1))
 }
 
 
