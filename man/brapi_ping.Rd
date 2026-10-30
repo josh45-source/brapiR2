@@ -11,11 +11,16 @@ brapi_ping(con)
 }
 \value{
 Logical, invisibly. \code{TRUE} if \verb{/serverinfo} answers with HTTP 200
-and a JSON body, \code{FALSE} otherwise. The HTTP status is attached as the
+and a JSON body, or with 401/403 (the server is up but needs
+authentication); \code{FALSE} otherwise. The HTTP status is attached as the
 \code{"status"} attribute (\code{NA} if the server could not be reached).
 }
 \description{
 Tests whether the BrAPI server is reachable and responding.
+}
+\details{
+A ping uses a timeout of at most 10 seconds and doesn't retry, so an
+unreachable server is reported quickly.
 }
 \section{BrAPI endpoint}{
 

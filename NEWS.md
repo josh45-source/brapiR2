@@ -101,6 +101,13 @@
   `sepUnphased`, `unknownString` and `observationTimeStampRangeStart`, are
   no longer wrapped in an array (#19).
 
+* `brapi_ping()` uses a timeout of at most 10 seconds and doesn't retry, so
+  an unreachable server is reported in under a second instead of after
+  retries (about 5 seconds per call with httr2 1.0.0, and every example
+  pings first). A server that answers `/serverinfo` with 401 or 403 is now
+  reported as reachable but needing authentication, rather than as down
+  (#20).
+
 ## Documentation
 
 ## Internal
