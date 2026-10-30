@@ -65,7 +65,9 @@
   form-encoded, as RFC 6749 requires, rather than as JSON, which most OAuth
   servers reject. The unused `authorize_url` argument is optional and
   deprecated; supplying it gives a warning. The docs and README no longer
-  describe an authorization-code flow or imply EBS has been tested (#15).
+  describe an authorization-code flow or imply EBS has been tested, and the
+  example no longer posts to the test server's legacy `/token` endpoint,
+  which is not an OAuth server (#15).
 
 ## Documentation
 

@@ -34,17 +34,17 @@ connection object with the Bearer token set. Interactive
 (authorization-code) login is not supported.
 }
 \examples{
-\donttest{
-con <- brapi_connection("https://test-server.brapi.org")
-if (brapi_ping(con)) {
-  con <- brapi_login_oauth2(
-    con,
-    client_id = "brapi_client",
-    client_secret = "brapi_secret",
-    access_url = "https://test-server.brapi.org/brapi/v2/token"
-  )
-  con
-}
+\dontrun{
+# Needs an OAuth 2.0 token endpoint and client credentials of your own;
+# the public BrAPI test server has no OAuth server to run this against.
+con <- brapi_connection("https://my-brapi-server.org")
+con <- brapi_login_oauth2(
+  con,
+  client_id = Sys.getenv("BRAPI_CLIENT_ID"),
+  client_secret = Sys.getenv("BRAPI_CLIENT_SECRET"),
+  access_url = "https://auth.my-brapi-server.org/token"
+)
+con
 }
 
 }
