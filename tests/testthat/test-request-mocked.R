@@ -759,3 +759,108 @@ test_that("brapi_post_search derives the page count from totalCount", {
   res <- brapi_post_search(con, "/search/programs")
   expect_identical(res$programDbId, paste0("p", 1:6))
 })
+
+## The JSON a request body is sent as (req_body_json() serialises it with
+## auto_unbox = TRUE).
+sent_json <- function(req) {
+  as.character(jsonlite::toJSON(req$body$data, auto_unbox = TRUE))
+}
+
+empty_result <- function() {
+  httr2::response(
+    status_code = 200L,
+    headers = list(`Content-Type` = "application/json"),
+    body = charToRaw('{"result": {"data": []}}')
+  )
+}
+
+test_that("search bodies send plural filters as arrays, the rest as scalars", {
+  seen <- new.env(parent = emptyenv())
+  local_mocked_bindings(
+    req_perform = function(req) {
+      expect_match(req$url, "/brapi/v2/search/calls$")
+      seen$json <- sent_json(req)
+      empty_result()
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  brapi_search_calls(
+    con,
+    variantSetDbIds = "vs1",
+    sepUnphased = "/",
+    unknownString = ".",
+    expandHomozygotes = TRUE
+  )
+
+  expect_match(seen$json, '"variantSetDbIds":["vs1"]', fixed = TRUE)
+  expect_match(seen$json, '"sepUnphased":"/"', fixed = TRUE)
+  expect_match(seen$json, '"unknownString":"."', fixed = TRUE)
+  expect_match(seen$json, '"expandHomozygotes":true', fixed = TRUE)
+})
+
+test_that("the deprecated array field studyDbId is still sent as an array", {
+  seen <- new.env(parent = emptyenv())
+  local_mocked_bindings(
+    req_perform = function(req) {
+      expect_match(req$url, "/brapi/v2/search/variables$")
+      seen$json <- sent_json(req)
+      empty_result()
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  brapi_search_variables(con, studyDbId = "s1", sortBy = "name")
+
+  expect_match(seen$json, '"studyDbId":["s1"]', fixed = TRUE)
+  expect_match(seen$json, '"sortBy":"name"', fixed = TRUE)
+})
+
+test_that("logical query parameters are sent as true/false", {
+  seen <- new.env(parent = emptyenv())
+  local_mocked_bindings(
+    req_perform = function(req) {
+      seen$query <- httr2::url_parse(req$url)$query
+      httr2::response(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw(paste0(
+          '{"metadata": {"pagination": {"totalPages": 1}},',
+          ' "result": {"data": []}}'
+        ))
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  brapi_pedigree(con, germplasmDbId = "g1",
+                 includeParents = TRUE, includeSiblings = FALSE)
+
+  expect_identical(seen$query[["germplasmDbId"]], "g1")
+  expect_identical(seen$query[["includeParents"]], "true")
+  expect_identical(seen$query[["includeSiblings"]], "false")
+})
+
+test_that("brapi_allele_matrix sends logical parameters as true/false", {
+  seen <- new.env(parent = emptyenv())
+  local_mocked_bindings(
+    req_perform = function(req) {
+      seen$query <- httr2::url_parse(req$url)$query
+      httr2::response(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw('{"result": {"variantDbIds": [], "callSetDbIds": []}}')
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  brapi_allele_matrix(con, variantSetDbId = "vs1", expandHomozygotes = TRUE)
+
+  expect_identical(seen$query[["variantSetDbId"]], "vs1")
+  expect_identical(seen$query[["expandHomozygotes"]], "true")
+})

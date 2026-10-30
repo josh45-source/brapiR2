@@ -306,6 +306,7 @@ fetch_allele_matrix_pages <- function(con, query) {
     query[["dimensionCallSetPageSize"]] %||% con$page_size
   pinned_v <- query[["dimensionVariantPage"]]
   pinned_cs <- query[["dimensionCallSetPage"]]
+  query <- brapi_query_values(query)
 
   blocks <- list()
   totals <- c(VARIANTS = 1L, CALLSETS = 1L)

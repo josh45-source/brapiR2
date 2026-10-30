@@ -106,6 +106,7 @@ brapi_get <- function(con, endpoint, query = list(), max_pages = Inf) {
       )
     ))
   }
+  query <- brapi_query_values(query)
 
   query$pageSize <- query$pageSize %||% con$page_size
   query$page <- 0L
@@ -337,6 +338,23 @@ brapi_get_pages <- function(con, endpoint, query, max_pages = Inf) {
 }
 
 
+#' Internal: Encode Query Values the Way BrAPI Servers Expect
+#'
+#' httr2 writes a logical as `TRUE`/`FALSE`; the specification's examples,
+#' and servers that compare the string, use `true`/`false`.
+#'
+#' @param query Named list of query parameters.
+#'
+#' @return `query`, with logical values as lowercase strings.
+#' @keywords internal
+#' @noRd
+brapi_query_values <- function(query) {
+  lapply(query, function(val) {
+    if (is.logical(val)) tolower(as.character(val)) else val
+  })
+}
+
+
 #' Internal: Number of Pages a Paginated Response Reports
 #'
 #' Uses `totalPages` when the server gives it, and otherwise derives it from
@@ -409,12 +427,15 @@ brapi_post_search <- function(con, endpoint, body = list(),
 
   body$pageSize <- body$pageSize %||% con$page_size
 
-  # BrAPI search bodies expect filter fields as JSON arrays, even when the
-  # caller supplies a single value.  Wrap every character vector with I() so
-  # jsonlite does not auto-unbox ["name"] → "name" (which causes HTTP 400).
-  body <- lapply(body, function(val) {
-    if (is.character(val)) I(val) else val
-  })
+  # BrAPI search filters are JSON arrays, even when the caller supplies a
+  # single value, so wrap them with I() to stop jsonlite auto-unboxing
+  # ["name"] to "name" (which causes HTTP 400). Array filters have plural
+  # names (germplasmDbIds); the deprecated studyDbId is the one exception.
+  # Other string fields (sepUnphased, sortBy, ...) are scalars.
+  body <- Map(function(val, name) {
+    is_array <- grepl("s$", name) || name == "studyDbId"
+    if (is.character(val) && is_array) I(val) else val
+  }, body, names(body))
 
   # Later pages of an immediate result are requested by re-posting the
   # same body with `page` set. `[[` rather than `$`, which would partially
