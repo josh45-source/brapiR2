@@ -109,7 +109,11 @@ brapi_cache_clear <- function(con) {
 #'   otherwise has no effect.
 #' @param ... Additional arguments passed to `.fn`.
 #'
-#' @return A tibble with results from all IDs combined.
+#' @return A tibble with results from all IDs combined. A column whose type
+#'   differs between IDs becomes character, or a list-column. IDs whose call
+#'   failed are listed, with their error messages, in a tibble in the
+#'   `"failed"` attribute (zero rows if none failed), and a warning names
+#'   them.
 #'
 #' @examples
 #' \donttest{
@@ -144,16 +148,30 @@ brapi_fetch_parallel <- function(con, .fn, ids, .workers = NULL, ...) {
 
   cli_alert_info("Fetching {length(ids)} items...")
 
-  results <- furrr::future_map_dfr(ids, function(id) {
+  # Each worker returns its result or its error, so one failure doesn't
+  # stop the batch and the caller can see which IDs it lost.
+  outcomes <- furrr::future_map(ids, function(id) {
     tryCatch(
-      .fn(con, id, ...),
-      error = function(e) {
-        warn(glue("Failed for ID '{id}': {e$message}"))
-        tibble()
-      }
+      list(data = .fn(con, id, ...), error = NA_character_),
+      error = function(e) list(data = NULL, error = conditionMessage(e))
     )
   })
+  errors <- vapply(outcomes, `[[`, character(1), "error")
+  ok <- is.na(errors)
 
-  cli_alert_success("Fetched {nrow(results)} rows from {length(ids)} sources.")
+  # Results from different IDs may disagree on a column's type.
+  results <- bind_rows(unify_column_types(lapply(outcomes[ok], `[[`, "data")))
+  failed <- tibble(id = as.character(ids[!ok]), error = errors[!ok])
+  attr(results, "failed") <- failed
+
+  cli_alert_success(
+    "Fetched {nrow(results)} rows from {sum(ok)} of {length(ids)} IDs."
+  )
+  if (nrow(failed)) {
+    cli_warn(c(
+      "{nrow(failed)} of {length(ids)} IDs failed: {.val {failed$id}}.",
+      "i" = "See {.code attr(result, \"failed\")} for each error."
+    ))
+  }
   results
 }

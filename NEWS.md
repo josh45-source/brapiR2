@@ -108,6 +108,13 @@
   reported as reachable but needing authentication, rather than as down
   (#20).
 
+* `brapi_fetch_parallel()` now records which IDs failed: the result carries
+  a `"failed"` attribute listing each ID and its error, one warning names
+  them, and the summary says how many of the IDs succeeded instead of
+  claiming every source was fetched. Results whose column types differ
+  between IDs are combined (as character, or a list-column) instead of
+  aborting the whole batch (#21).
+
 ## Documentation
 
 ## Internal

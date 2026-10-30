@@ -22,7 +22,11 @@ otherwise has no effect.}
 \item{...}{Additional arguments passed to \code{.fn}.}
 }
 \value{
-A tibble with results from all IDs combined.
+A tibble with results from all IDs combined. A column whose type
+differs between IDs becomes character, or a list-column. IDs whose call
+failed are listed, with their error messages, in a tibble in the
+\code{"failed"} attribute (zero rows if none failed), and a warning names
+them.
 }
 \description{
 Fetches data from multiple BrAPI endpoints or IDs in parallel using

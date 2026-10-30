@@ -607,7 +607,8 @@ parse_brapi_result <- function(data) {
 #' other scalar types becomes character. Numbers and logicals combine
 #' without help, and a missing value (`NA`) fits any type.
 #'
-#' @param rows A list of one-row tibbles, one per record.
+#' @param rows A list of tibbles: one row per record, or (from
+#'   [brapi_fetch_parallel()]) one per call.
 #'
 #' @return `rows`, with conflicting columns made consistent.
 #' @keywords internal
@@ -642,7 +643,7 @@ unify_column_types <- function(rows) {
 
   lapply(rows, function(row) {
     for (nm in intersect(to_list, names(row))) {
-      if (!is.list(row[[nm]])) row[[nm]] <- list(row[[nm]])
+      if (!is.list(row[[nm]])) row[[nm]] <- as.list(row[[nm]])
     }
     for (nm in intersect(to_chr, names(row))) {
       row[[nm]] <- as.character(row[[nm]])
