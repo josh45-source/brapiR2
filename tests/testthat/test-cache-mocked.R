@@ -104,81 +104,121 @@ test_that("cache entries are not shared between different tokens", {
   expect_false(any(grepl("token", list.files(tmpdir))))
 })
 
-test_that("brapi_fetch_parallel calls future_map_dfr() and combines results", {
-  # brapi_fetch_parallel() no longer sets a future::plan() itself - it uses
-  # whatever plan is already active (sequential, absent a caller-set one),
-  # so there is nothing to mock on the future side any more. Mocking
-  # furrr::future_map_dfr() still avoids actually spinning up workers.
+## brapi_fetch_parallel() runs under whatever future plan is active; these
+## tests use a sequential one, so no workers start and the mocks apply.
+local_sequential_plan <- function(env = parent.frame()) {
+  old <- future::plan(future::sequential)
+  withr::defer(future::plan(old), envir = env)
+}
+
+test_that("brapi_fetch_parallel fetches every ID and combines the results", {
   skip_if_not_installed("future")
   skip_if_not_installed("furrr")
-
-  called <- new.env()
-  called$n <- 0L
-  local_mocked_bindings(
-    future_map_dfr = function(.x, .f, ...) {
-      called$n <- called$n + 1L
-      purrr::map_dfr(.x, .f)
-    },
-    .package = "furrr"
-  )
+  local_sequential_plan()
 
   con <- brapi_connection("https://example.org")
   fn <- function(con, id) tibble::tibble(id = id)
-  result <- brapi_fetch_parallel(con, fn, c("a", "b"))
+  expect_message(
+    result <- brapi_fetch_parallel(con, fn, c("a", "b")),
+    "2 of 2 IDs"
+  )
 
-  expect_identical(called$n, 1L)
   expect_identical(result$id, c("a", "b"))
+  expect_identical(nrow(attr(result, "failed")), 0L)
 })
 
-test_that("brapi_fetch_parallel warns and continues when .fn errors", {
+test_that("brapi_fetch_parallel records which IDs failed and why", {
   skip_if_not_installed("future")
   skip_if_not_installed("furrr")
+  local_sequential_plan()
+  # Expectations can't run inside future's evaluation, so the mock only
+  # records each request; the checks come afterwards.
+  seen <- new.env(parent = emptyenv())
+  seen$requests <- list()
   local_mocked_bindings(
-    future_map_dfr = function(.x, .f, ...) purrr::map_dfr(.x, .f),
-    .package = "furrr"
+    req_perform = function(req) {
+      id <- sub(".*/studies/", "", sub("\\?.*$", "", req$url))
+      seen$requests[[length(seen$requests) + 1L]] <- list(
+        id = id, query = httr2::url_parse(req$url)$query
+      )
+      if (id == "bad") {
+        return(httr2::response(
+          status_code = 404L,
+          headers = list(`Content-Type` = "application/json"),
+          body = charToRaw('{"Message": "No such study"}')
+        ))
+      }
+      httr2::response(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw(paste0(
+          '{"result": {"studyDbId": "', id, '", "studyName": "S"}}'
+        ))
+      )
+    },
+    .package = "brapiR2"
   )
 
   con <- brapi_connection("https://example.org")
-  bad_fn <- function(con, id) {
-    if (identical(id, "bad")) stop("boom")
-    tibble::tibble(id = id)
-  }
-
   expect_warning(
-    result <- brapi_fetch_parallel(con, bad_fn, c("good", "bad")),
-    "Failed for ID"
+    expect_message(
+      result <- brapi_fetch_parallel(con, brapi_study, c("s1", "bad", "s3")),
+      "2 of 3 IDs"
+    ),
+    "1 of 3 IDs failed"
   )
-  expect_identical(result$id, "good")
+
+  expect_identical(
+    vapply(seen$requests, `[[`, character(1), "id"), c("s1", "bad", "s3")
+  )
+  for (r in seen$requests) expect_identical(r$query[["page"]], "0")
+  expect_identical(result$studyDbId, c("s1", "s3"))
+  failed <- attr(result, "failed")
+  expect_identical(failed$id, "bad")
+  expect_match(failed$error, "HTTP 404")
+})
+
+test_that("brapi_fetch_parallel combines results whose column types differ", {
+  skip_if_not_installed("future")
+  skip_if_not_installed("furrr")
+  local_sequential_plan()
+
+  con <- brapi_connection("https://example.org")
+  fn <- function(con, id) {
+    tibble::tibble(id = id, value = if (id == "a") 1 else "x")
+  }
+  result <- suppressMessages(brapi_fetch_parallel(con, fn, c("a", "b")))
+
+  expect_identical(result$id, c("a", "b"))
+  expect_identical(result$value, c("1", "x"))
 })
 
 test_that("brapi_fetch_parallel warns that .workers is deprecated", {
   skip_if_not_installed("future")
   skip_if_not_installed("furrr")
-  local_mocked_bindings(
-    future_map_dfr = function(.x, .f, ...) purrr::map_dfr(.x, .f),
-    .package = "furrr"
-  )
+  local_sequential_plan()
 
   con <- brapi_connection("https://example.org")
   fn <- function(con, id) tibble::tibble(id = id)
 
   expect_warning(
-    result <- brapi_fetch_parallel(con, fn, c("a", "b"), .workers = 2),
+    result <- suppressMessages(
+      brapi_fetch_parallel(con, fn, c("a", "b"), .workers = 2)
+    ),
     "deprecated"
   )
   expect_identical(result$id, c("a", "b"))
 })
 
-test_that("brapi_fetch_parallel does not warn when .workers is omitted", {
+test_that("brapi_fetch_parallel does not warn when nothing fails", {
   skip_if_not_installed("future")
   skip_if_not_installed("furrr")
-  local_mocked_bindings(
-    future_map_dfr = function(.x, .f, ...) purrr::map_dfr(.x, .f),
-    .package = "furrr"
-  )
+  local_sequential_plan()
 
   con <- brapi_connection("https://example.org")
   fn <- function(con, id) tibble::tibble(id = id)
 
-  expect_no_warning(brapi_fetch_parallel(con, fn, c("a", "b")))
+  expect_no_warning(
+    suppressMessages(brapi_fetch_parallel(con, fn, c("a", "b")))
+  )
 })
