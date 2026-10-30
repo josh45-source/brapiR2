@@ -44,6 +44,19 @@ test_that("brapi_cache_clear leaves files that aren't cache entries", {
   )
 })
 
+## The bearer token a request carries, or NULL. httr2 >= 1.1.0 redacts the
+## Authorization header in `req$headers`, so read it back with
+## req_get_headers(); DESCRIPTION still allows httr2 1.0.0, which lacks it.
+request_token <- function(req) {
+  headers <- if (utils::packageVersion("httr2") >= "1.1.0") {
+    httr2::req_get_headers(req, "reveal")
+  } else {
+    req$headers
+  }
+  auth <- headers$Authorization
+  if (is.null(auth)) NULL else sub("^Bearer ", "", auth)
+}
+
 test_that("cache entries are not shared between different tokens", {
   tmpdir <- tempfile("brapi_cache_tokens_")
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
@@ -54,8 +67,7 @@ test_that("cache entries are not shared between different tokens", {
       expect_match(req$url, "/brapi/v2/programs\\?")
       expect_identical(q[["page"]], "0")
       expect_identical(q[["pageSize"]], "1000")
-      token <- req$headers$Authorization
-      id <- if (is.null(token)) "public" else sub("^Bearer ", "", token)
+      id <- request_token(req) %||% "public"
       httr2::response(
         status_code = 200L,
         headers = list(`Content-Type` = "application/json"),
