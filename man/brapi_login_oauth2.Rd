@@ -4,7 +4,13 @@
 \alias{brapi_login_oauth2}
 \title{Login to a BrAPI Server with OAuth 2.0}
 \usage{
-brapi_login_oauth2(con, client_id, client_secret, authorize_url, access_url)
+brapi_login_oauth2(
+  con,
+  client_id,
+  client_secret,
+  authorize_url = NULL,
+  access_url
+)
 }
 \arguments{
 \item{con}{A \code{\link[=brapi_connection]{brapi_connection()}} object.}
@@ -13,7 +19,8 @@ brapi_login_oauth2(con, client_id, client_secret, authorize_url, access_url)
 
 \item{client_secret}{Character. OAuth client secret.}
 
-\item{authorize_url}{Character. The authorization endpoint URL.}
+\item{authorize_url}{Deprecated and unused: the client-credentials grant
+only needs \code{access_url}. Supplying it gives a warning.}
 
 \item{access_url}{Character. The token endpoint URL.}
 }
@@ -21,22 +28,23 @@ brapi_login_oauth2(con, client_id, client_secret, authorize_url, access_url)
 A new \code{brapi_con} object with the token populated.
 }
 \description{
-Performs an OAuth 2.0 authorization code flow or client credentials flow.
-Returns an updated connection object with the Bearer token set.
+Performs the OAuth 2.0 client-credentials grant: posts the client ID and
+secret, form-encoded, to the token endpoint and returns an updated
+connection object with the Bearer token set. Interactive
+(authorization-code) login is not supported.
 }
 \examples{
-\donttest{
-con <- brapi_connection("https://test-server.brapi.org")
-if (brapi_ping(con)) {
-  con <- brapi_login_oauth2(
-    con,
-    client_id = "brapi_client",
-    client_secret = "brapi_secret",
-    authorize_url = "https://test-server.brapi.org/brapi/v2/authorize",
-    access_url = "https://test-server.brapi.org/brapi/v2/token"
-  )
-  con
-}
+\dontrun{
+# Needs an OAuth 2.0 token endpoint and client credentials of your own;
+# the public BrAPI test server has no OAuth server to run this against.
+con <- brapi_connection("https://my-brapi-server.org")
+con <- brapi_login_oauth2(
+  con,
+  client_id = Sys.getenv("BRAPI_CLIENT_ID"),
+  client_secret = Sys.getenv("BRAPI_CLIENT_SECRET"),
+  access_url = "https://auth.my-brapi-server.org/token"
+)
+con
 }
 
 }

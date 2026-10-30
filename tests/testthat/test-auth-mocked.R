@@ -62,7 +62,6 @@ test_that("brapi_login_oauth2 stores the access_token via client credentials", {
     con,
     client_id = "id",
     client_secret = "secret",
-    authorize_url = "https://example.org/authorize",
     access_url = "https://example.org/token"
   )
 
@@ -82,11 +81,69 @@ test_that("brapi_login_oauth2 errors when no access token is returned", {
       con,
       client_id = "id",
       client_secret = "secret",
-      authorize_url = "https://example.org/authorize",
       access_url = "https://example.org/token"
     ),
     "OAuth2 login failed"
   )
+})
+
+test_that("brapi_login_oauth2 form-encodes the client-credentials request", {
+  seen <- new.env(parent = emptyenv())
+  local_mocked_bindings(
+    req_perform = function(req) {
+      seen$req <- req
+      httr2::response(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw('{"access_token": "oauth_tok"}')
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  con2 <- expect_no_warning(brapi_login_oauth2(
+    con,
+    client_id = "id",
+    client_secret = "s3cret",
+    access_url = "https://auth.example.org/token"
+  ))
+
+  req <- seen$req
+  expect_identical(req$url, "https://auth.example.org/token")
+  expect_identical(req$method, "POST")
+  expect_identical(req$body$type, "form")
+  expect_identical(
+    unlist(req$body$data),
+    c(grant_type = "client_credentials", client_id = "id",
+      client_secret = "s3cret")
+  )
+  expect_identical(con2$token, "oauth_tok")
+})
+
+test_that("brapi_login_oauth2 warns that authorize_url is deprecated", {
+  local_mocked_bindings(
+    req_perform = function(req) {
+      expect_identical(req$url, "https://auth.example.org/token")
+      httr2::response(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw('{"access_token": "oauth_tok"}')
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  expect_warning(
+    con2 <- brapi_login_oauth2(
+      con, "id", "s3cret",
+      "https://auth.example.org/authorize",
+      "https://auth.example.org/token"
+    ),
+    "authorize_url"
+  )
+  expect_identical(con2$token, "oauth_tok")
 })
 
 test_that("brapi_login honours the connection path and sends a user agent", {
