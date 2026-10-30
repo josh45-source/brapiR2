@@ -55,7 +55,7 @@ test_that("brapi_study_data falls back to client-side filtering", {
   )
 
   con <- brapi_connection("https://example.org")
-  wide <- brapi_study_data(con, "study1")
+  wide <- brapi_study_data(con, "study1", fallback = TRUE)
 
   expect_identical(nrow(wide), 1L)
   expect_identical(wide$Yield, "10")
@@ -87,7 +87,7 @@ test_that("brapi_study_data fallback filters by requested study, not itself", {
 
   # A study genuinely absent from the unfiltered data must come back empty,
   # not silently return study1's rows.
-  wide <- suppressMessages(brapi_study_data(con, "study2"))
+  wide <- suppressMessages(brapi_study_data(con, "study2", fallback = TRUE))
   expect_identical(nrow(wide), 0L)
 })
 
@@ -177,4 +177,115 @@ test_that("brapi_study_data filters when the server ignores studyDbId", {
   out <- brapi_study_data(brapi_connection("https://example.org"), "s1")
   expect_identical(nrow(out), 1L)
   expect_identical(out$studyDbId, "s1")
+})
+
+test_that("brapi_study_data keeps repeated measurements with equal values", {
+  local_mocked_bindings(
+    brapi_observations = function(con, ...) {
+      tibble::tibble(
+        observationDbId = c("o1", "o2"),
+        observationUnitDbId = "u1",
+        studyDbId = "s1",
+        observationVariableName = "height",
+        value = c("10", "10"),
+        observationTimeStamp = c("2024-06-01", "2024-07-01")
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  out <- brapi_study_data(brapi_connection("https://example.org"), "s1")
+  expect_identical(out$height, list(c("10", "10")))
+})
+
+test_that("brapi_study_data drops a record the server sent twice", {
+  local_mocked_bindings(
+    brapi_observations = function(con, ...) {
+      tibble::tibble(
+        observationDbId = c("o1", "o1", "o2"),
+        observationUnitDbId = c("u1", "u1", "u2"),
+        studyDbId = "s1",
+        observationVariableName = "height",
+        value = c("10", "10", "12")
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  expect_message(
+    out <- brapi_study_data(brapi_connection("https://example.org"), "s1"),
+    "Dropped 1 duplicate"
+  )
+  expect_identical(out$height[out$observationUnitDbId == "u1"], "10")
+})
+
+## /observations on a server that ignores nothing: the filtered request
+## returns the study's records, here none. Records each request's query.
+mock_observations_server <- function() {
+  seen <- new.env(parent = emptyenv())
+  seen$queries <- list()
+  respond <- function(req) {
+    expect_match(req$url, "/brapi/v2/observations\\?")
+    q <- httr2::url_parse(req$url)$query
+    seen$queries[[length(seen$queries) + 1L]] <- q
+    data <- if (is.null(q[["studyDbId"]])) {
+      list(list(observationDbId = "o1", observationUnitDbId = "u1",
+                studyDbId = "s1", observationVariableName = "height",
+                value = "10"))
+    } else {
+      list()
+    }
+    httr2::response(
+      status_code = 200L,
+      headers = list(`Content-Type` = "application/json"),
+      body = charToRaw(jsonlite::toJSON(list(
+        metadata = list(pagination = list(totalPages = 1L)),
+        result = list(data = data)
+      ), auto_unbox = TRUE))
+    )
+  }
+  list(respond = respond, queries = function() seen$queries)
+}
+
+test_that("brapi_study_data doesn't fetch the whole server by default", {
+  server <- mock_observations_server()
+  local_mocked_bindings(req_perform = server$respond, .package = "brapiR2")
+
+  con <- brapi_connection("https://example.org")
+  expect_message(
+    out <- brapi_study_data(con, "s1"),
+    "fallback = TRUE"
+  )
+
+  expect_identical(nrow(out), 0L)
+  queries <- server$queries()
+  expect_length(queries, 1L)
+  expect_identical(queries[[1]][["studyDbId"]], "s1")
+})
+
+test_that("brapi_study_data's empty-study message names the test server", {
+  server <- mock_observations_server()
+  local_mocked_bindings(req_perform = server$respond, .package = "brapiR2")
+
+  con <- brapi_connection("https://example.org")
+  expect_message(brapi_study_data(con, "s1"), "test-server.brapi.org")
+})
+
+test_that("brapi_study_data(fallback = TRUE) filters an unfiltered fetch", {
+  server <- mock_observations_server()
+  local_mocked_bindings(req_perform = server$respond, .package = "brapiR2")
+
+  con <- brapi_connection("https://example.org")
+  out <- brapi_study_data(con, "s1", fallback = TRUE)
+
+  expect_identical(out$height, "10")
+  queries <- server$queries()
+  expect_length(queries, 2L)
+  expect_identical(queries[[1]][["studyDbId"]], "s1")
+  expect_null(queries[[2]][["studyDbId"]])
+})
+
+test_that("brapi_study_data rejects a non-logical fallback", {
+  con <- brapi_connection("https://example.org")
+  expect_error(brapi_study_data(con, "s1", fallback = "yes"), "fallback")
 })

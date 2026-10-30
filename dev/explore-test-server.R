@@ -96,12 +96,15 @@ germplasm_pheno_ids <- character(0)
 # IMPORTANT: this server does not reliably implement the studyDbId filter on
 # the raw /observations endpoint, so study_summary$n_obs (from
 # brapi_observations(con, studyDbId = sid) above) reads as 0 even for
-# studies that do have data. brapi_study_data() has its own fallback for
+# studies that do have data. brapi_study_data(fallback = TRUE) handles
 # exactly this case (it retries unfiltered and filters client-side), so we
 # call it for every previewed study directly rather than gating on n_obs.
 if (!is.null(study_summary) && nrow(study_summary) > 0L) {
   all_study_data <- lapply(study_summary$studyDbId, function(sid) {
-    safely(brapi_study_data(con, sid), sprintf("brapi_study_data(%s)", sid))
+    safely(
+      brapi_study_data(con, sid, fallback = TRUE),
+      sprintf("brapi_study_data(%s)", sid)
+    )
   })
   names(all_study_data) <- study_summary$studyDbId
 

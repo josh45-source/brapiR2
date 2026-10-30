@@ -56,11 +56,13 @@ library(dplyr)
 studies <- brapi_studies(con)
 studies
 
-# brapi_study_data() falls back to fetching all observations and filtering
-# client-side when a server (like this one) doesn't honour the studyDbId
-# filter on /observations - so it succeeds even though a direct
-# brapi_observations(con, studyDbId = ...) call would come back empty.
-pheno_by_study <- lapply(studies$studyDbId, brapi_study_data, con = con)
+# This server doesn't honour the studyDbId filter on /observations, so
+# fallback = TRUE fetches all observations and filters them client-side -
+# it succeeds even though a direct brapi_observations(con, studyDbId = ...)
+# call would come back empty.
+pheno_by_study <- lapply(
+  studies$studyDbId, brapi_study_data, con = con, fallback = TRUE
+)
 names(pheno_by_study) <- studies$studyDbId
 pheno_by_study[["study1"]]
 ```
