@@ -94,6 +94,13 @@
   `timeout`, and `brapi_study_data()` says when records have no value
   field. HTTP errors now name the server as well as the endpoint (#18).
 
+* Logical query parameters, such as `includeParents = TRUE`, are now sent
+  as `true`/`false` rather than `TRUE`/`FALSE`. In search request bodies
+  only the plural array filters (`germplasmDbIds`, ...) are sent as JSON
+  arrays; string fields the specification defines as single values, such as
+  `sepUnphased`, `unknownString` and `observationTimeStampRangeStart`, are
+  no longer wrapped in an array (#19).
+
 ## Documentation
 
 ## Internal
