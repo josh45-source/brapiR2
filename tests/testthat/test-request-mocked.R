@@ -570,11 +570,14 @@ test_that("a truncated result is not cached", {
   on.exit(unlink(dir, recursive = TRUE), add = TRUE)
 
   local_mocked_bindings(
-    req_perform = function(req) structure(list(), class = "httr2_response"),
+    req_perform = function(req) {
+      page <- httr2::url_parse(req$url)$query[["page"]]
+      structure(list(page = page), class = "httr2_response")
+    },
     resp_body_json = function(resp, ...) {
       list(
         metadata = list(pagination = list(totalPages = 5L)),
-        result = list(data = list(list(id = "1")))
+        result = list(data = list(list(id = resp$page)))
       )
     },
     .package = "brapiR2"
@@ -587,4 +590,111 @@ test_that("a truncated result is not cached", {
 
   suppressMessages(brapi_get(con, "/studies"))
   expect_length(list.files(dir), 1L)
+})
+
+## A /programs server holding 6 records, 2 per page. `pagination` builds
+## the metadata for a requested page; `honour_page = FALSE` makes the
+## server serve page 0 whatever was asked for. Records each query.
+mock_paged_server <- function(pagination, honour_page = TRUE) {
+  seen <- new.env(parent = emptyenv())
+  seen$queries <- list()
+  respond <- function(req) {
+    expect_match(req$url, "/brapi/v2/programs\\?")
+    q <- httr2::url_parse(req$url)$query
+    seen$queries[[length(seen$queries) + 1L]] <- q
+    asked <- as.integer(q[["page"]])
+    served <- if (honour_page) asked else 0L
+    ids <- paste0("p", 2L * served + 1:2)
+    body <- list(
+      metadata = list(pagination = pagination(served)),
+      result = list(data = lapply(ids, function(id) list(programDbId = id)))
+    )
+    httr2::response(
+      status_code = 200L,
+      headers = list(`Content-Type` = "application/json"),
+      body = charToRaw(jsonlite::toJSON(body, auto_unbox = TRUE))
+    )
+  }
+  list(respond = respond, queries = function() seen$queries)
+}
+
+test_that("brapi_get derives the page count from totalCount", {
+  server <- mock_paged_server(function(page) {
+    list(currentPage = page, pageSize = 2L, totalCount = 6L)
+  })
+  local_mocked_bindings(req_perform = server$respond, .package = "brapiR2")
+
+  con <- brapi_connection("https://example.org", page_size = 2L)
+  res <- brapi_get(con, "/programs")
+
+  expect_identical(res$programDbId, paste0("p", 1:6))
+  pages <- vapply(server$queries(), function(q) q[["page"]], character(1))
+  expect_identical(pages, c("0", "1", "2"))
+  for (q in server$queries()) expect_identical(q[["pageSize"]], "2")
+})
+
+test_that("brapi_get stops when a server ignores page", {
+  server <- mock_paged_server(
+    function(page) list(currentPage = page, pageSize = 2L, totalPages = 3L),
+    honour_page = FALSE
+  )
+  local_mocked_bindings(req_perform = server$respond, .package = "brapiR2")
+
+  dir <- withr::local_tempdir()
+  con <- brapi_connection("https://example.org", page_size = 2L) |>
+    brapi_cache_enable(dir = dir)
+  expect_warning(res <- brapi_get(con, "/programs"), "ignore")
+
+  expect_identical(res$programDbId, c("p1", "p2"))
+  pages <- vapply(server$queries(), function(q) q[["page"]], character(1))
+  expect_identical(pages, c("0", "1"))
+  # An incomplete result is never cached.
+  expect_length(list.files(dir), 0L)
+})
+
+test_that("brapi_get stops on a repeated page without currentPage", {
+  server <- mock_paged_server(
+    function(page) list(pageSize = 2L, totalPages = 3L),
+    honour_page = FALSE
+  )
+  local_mocked_bindings(req_perform = server$respond, .package = "brapiR2")
+
+  con <- brapi_connection("https://example.org", page_size = 2L)
+  expect_warning(res <- brapi_get(con, "/programs"), "ignore")
+  expect_identical(res$programDbId, c("p1", "p2"))
+})
+
+test_that("brapi_get validates max_pages", {
+  con <- brapi_connection("https://example.org")
+  for (bad in list(NA, 0, -1, 1.5, "2", c(1, 2), NULL)) {
+    expect_error(brapi_get(con, "/programs", max_pages = bad), "max_pages")
+  }
+})
+
+test_that("brapi_post_search derives the page count from totalCount", {
+  local_mocked_bindings(
+    req_perform = function(req) {
+      expect_match(req$url, "/brapi/v2/search/programs$")
+      page <- req$body$data[["page"]] %||% 0L
+      expect_identical(req$body$data[["pageSize"]], 2L)
+      ids <- paste0("p", 2L * page + 1:2)
+      httr2::response(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw(jsonlite::toJSON(list(
+          metadata = list(pagination = list(
+            currentPage = page, pageSize = 2L, totalCount = 6L
+          )),
+          result = list(data = lapply(ids, function(id) {
+            list(programDbId = id)
+          }))
+        ), auto_unbox = TRUE))
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org", page_size = 2L)
+  res <- brapi_post_search(con, "/search/programs")
+  expect_identical(res$programDbId, paste0("p", 1:6))
 })

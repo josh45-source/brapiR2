@@ -83,6 +83,14 @@ brapi_req <- function(con, endpoint) {
 #' @export
 brapi_get <- function(con, endpoint, query = list(), max_pages = Inf) {
   validate_con(con)
+  ok_max_pages <- is.numeric(max_pages) && length(max_pages) == 1L &&
+    !is.na(max_pages) && max_pages >= 1 &&
+    (is.infinite(max_pages) || max_pages == round(max_pages))
+  if (!ok_max_pages) {
+    cli_abort(
+      "{.arg max_pages} must be a whole number of at least 1, or {.code Inf}."
+    )
+  }
 
   query$pageSize <- query$pageSize %||% con$page_size
   query$page <- 0L
@@ -105,7 +113,7 @@ brapi_get <- function(con, endpoint, query = list(), max_pages = Inf) {
   # A truncated result must never be cached: a later call would read it
   # back as if it were the whole set.
   cacheable <- !is.null(cache_file) && length(all_data) > 0L &&
-    is.infinite(max_pages)
+    pages$complete
   if (cacheable) {
     brapi_cache_write(all_data, cache_file)
   }
@@ -240,6 +248,9 @@ brapi_get_pages <- function(con, endpoint, query, max_pages = Inf) {
   all_data <- list()
   total_pages <- 1L
   current_page <- 0L
+  complete <- TRUE
+  prev_data <- NULL
+  prev_reported <- NULL
 
   repeat {
     query$page <- current_page
@@ -253,9 +264,7 @@ brapi_get_pages <- function(con, endpoint, query, max_pages = Inf) {
     body <- resp_body_json(resp, simplifyVector = FALSE)
 
     pagination <- body$metadata$pagination
-    if (!is.null(pagination)) {
-      total_pages <- pagination$totalPages %||% 1L
-    }
+    total_pages <- brapi_total_pages(pagination)
 
     data <- body$result$data %||% list()
 
@@ -272,8 +281,26 @@ brapi_get_pages <- function(con, endpoint, query, max_pages = Inf) {
         all(vapply(data, is.list, logical(1))) ||
         identical(names(body$result), "data"))
     if (!is.null(body$result) && !is_envelope) {
-      return(list(data = list(body$result), single = TRUE))
+      return(list(data = list(body$result), single = TRUE, complete = TRUE))
     }
+
+    # A server that ignores `page` serves the same page again: the same
+    # reported currentPage, or the same records. Keep what is already in
+    # hand rather than duplicating it on every remaining page.
+    reported <- pagination$currentPage
+    if (current_page > 0L &&
+          ((!is.null(reported) && identical(reported, prev_reported)) ||
+             (length(data) > 0L && identical(data, prev_data)))) {
+      cli_warn(c(
+        "The server seems to ignore {.field page} on {.field {endpoint}}.",
+        "i" = "Page {current_page} repeated the previous page; keeping the
+          {length(all_data)} record{?s} already fetched."
+      ))
+      complete <- FALSE
+      break
+    }
+    prev_reported <- reported
+    prev_data <- data
 
     if (length(data) > 0L) {
       all_data <- c(all_data, data)
@@ -286,11 +313,35 @@ brapi_get_pages <- function(con, endpoint, query, max_pages = Inf) {
         "Stopped after {current_page} page{?s};",
         "the server reports {total_pages}."
       ))
+      complete <- FALSE
       break
     }
   }
 
-  list(data = all_data, single = FALSE)
+  list(data = all_data, single = FALSE, complete = complete)
+}
+
+
+#' Internal: Number of Pages a Paginated Response Reports
+#'
+#' Uses `totalPages` when the server gives it, and otherwise derives it from
+#' `totalCount` and `pageSize`, which some servers send without it.
+#'
+#' @param pagination The `metadata$pagination` element of a response.
+#'
+#' @return The number of pages, or 1 if the response doesn't say.
+#' @keywords internal
+#' @noRd
+brapi_total_pages <- function(pagination) {
+  if (!is.null(pagination$totalPages)) {
+    return(pagination$totalPages)
+  }
+  count <- pagination$totalCount
+  size <- pagination$pageSize
+  if (!is.null(count) && !is.null(size) && size > 0) {
+    return(as.integer(ceiling(count / size)))
+  }
+  1L
 }
 
 
@@ -403,7 +454,7 @@ brapi_post_search <- function(con, endpoint, body = list(),
 #' @noRd
 collect_search_pages <- function(first_body, fetch_page) {
   data <- first_body$result$data %||% list()
-  total_pages <- first_body$metadata$pagination$totalPages %||% 1L
+  total_pages <- brapi_total_pages(first_body$metadata$pagination)
   page <- 1L
   while (page < total_pages) {
     page_body <- fetch_page(page)

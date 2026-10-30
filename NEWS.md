@@ -69,6 +69,13 @@
   example no longer posts to the test server's legacy `/token` endpoint,
   which is not an OAuth server (#15).
 
+* Paginated requests now work out the page count from `totalCount` and
+  `pageSize` when a server omits `totalPages`, instead of stopping after
+  the first page. When a server ignores the `page` parameter and serves the
+  same page again, `brapi_get()` stops with a warning instead of repeating
+  those records for every remaining page, and doesn't cache the result.
+  `max_pages` is validated (#16).
+
 ## Documentation
 
 ## Internal
