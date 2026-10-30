@@ -102,15 +102,12 @@ brapi_get <- function(con, endpoint, query = list(), max_pages = Inf) {
 
   all_data <- pages$data
 
-  # Use auto_unbox = TRUE so R scalars serialise as JSON scalars (not 1-element
-  # arrays).  R lists from simplifyVector = FALSE are never auto-unboxed, so
-  # true array fields remain arrays after the round-trip.
   # A truncated result must never be cached: a later call would read it
   # back as if it were the whole set.
   cacheable <- !is.null(cache_file) && length(all_data) > 0L &&
     is.infinite(max_pages)
   if (cacheable) {
-    writeLines(toJSON(all_data, auto_unbox = TRUE), cache_file)
+    brapi_cache_write(all_data, cache_file)
   }
 
   if (length(all_data) == 0L) {
@@ -154,6 +151,46 @@ brapi_cache_path <- function(con, endpoint, query) {
     )
   }
   file.path(con$cache$dir, paste0(rlang::hash(key_str), ".json"))
+}
+
+
+#' Internal: Serialise Records to JSON Without Losing Precision
+#'
+#' Use auto_unbox = TRUE so R scalars serialise as JSON scalars (not
+#' 1-element arrays). R lists from simplifyVector = FALSE are never
+#' auto-unboxed, so true array fields remain arrays after the round-trip.
+#' `digits = NA` keeps full precision (jsonlite otherwise rounds to four
+#' decimal places), and `always_decimal = TRUE` keeps a double such as 2.0
+#' from coming back as an integer.
+#'
+#' @param data A list of records.
+#'
+#' @return A JSON string.
+#' @keywords internal
+#' @noRd
+brapi_to_json <- function(data) {
+  toJSON(data, auto_unbox = TRUE, digits = NA, always_decimal = TRUE)
+}
+
+
+#' Internal: Write Records to the Cache
+#'
+#' Writes to a temporary file in the cache directory and renames it into
+#' place, so a reader never sees a half-written entry.
+#'
+#' @param data A list of records.
+#' @param cache_file Character. The cache entry's path.
+#'
+#' @return Invisibly `NULL`; called for its side effect.
+#' @keywords internal
+#' @noRd
+brapi_cache_write <- function(data, cache_file) {
+  tmp <- tempfile("brapi_cache_", tmpdir = dirname(cache_file))
+  writeLines(brapi_to_json(data), tmp)
+  if (!file.rename(tmp, cache_file)) {
+    unlink(tmp)
+  }
+  invisible(NULL)
 }
 
 
@@ -463,7 +500,7 @@ parse_brapi_result <- function(data) {
       bind_rows(rows)
     },
     error = function(e) {
-      json_text <- toJSON(data, auto_unbox = TRUE)
+      json_text <- brapi_to_json(data)
       as_tibble(fromJSON(json_text, flatten = TRUE))
     }
   )

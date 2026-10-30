@@ -34,6 +34,12 @@
   alternate alleles. The matrix is built directly from the allele matrix,
   without a long-format pivot (#10).
 
+* Cached responses keep full numeric precision. They were written with
+  jsonlite's default of four decimal places, so a cached call could return
+  different values from a fresh one; the parser's fallback path rounded the
+  same way. Cache entries are now written to a temporary file and renamed
+  into place, so a parallel worker never reads a half-written entry (#11).
+
 ## Documentation
 
 ## Internal
