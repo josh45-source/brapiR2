@@ -33,6 +33,11 @@ through \code{...}:
 
 \code{dimensionVariantPage}, \code{dimensionVariantPageSize},
 \code{dimensionCallSetPage}, \code{dimensionCallSetPageSize}.
+
+Both dimensions are paged automatically, \code{con$page_size} variants by
+\code{con$page_size} call sets at a time, unless a \code{dimension*PageSize} is
+given. Supplying \code{dimensionVariantPage} or \code{dimensionCallSetPage}
+fetches only that page of that dimension.
 }
 
 \examples{
