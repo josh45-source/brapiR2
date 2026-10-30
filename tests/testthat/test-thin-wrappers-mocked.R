@@ -519,6 +519,55 @@ test_that("brapi_ping returns FALSE when the request errors", {
   expect_identical(attr(res, "status"), NA_integer_)
 })
 
+test_that("brapi_ping uses a short timeout and doesn't retry", {
+  seen <- new.env(parent = emptyenv())
+  local_mocked_bindings(
+    req_perform = function(req) {
+      expect_identical(req$url, "https://example.org/brapi/v2/serverinfo")
+      seen$req <- req
+      ping_response(200L, "application/json", '{"result": {"calls": []}}')
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org", timeout = 120)
+  brapi_ping(con)
+
+  expect_identical(seen$req$policies$retry_max_tries, 1)
+  expect_lte(seen$req$options$timeout_ms, 10000)
+})
+
+test_that("brapi_ping keeps a shorter connection timeout", {
+  seen <- new.env(parent = emptyenv())
+  local_mocked_bindings(
+    req_perform = function(req) {
+      seen$req <- req
+      ping_response(200L, "application/json", '{"result": {"calls": []}}')
+    },
+    .package = "brapiR2"
+  )
+
+  brapi_ping(brapi_connection("https://example.org", timeout = 3))
+  expect_identical(seen$req$options$timeout_ms, 3000)
+})
+
+test_that("brapi_ping treats an authentication challenge as reachable", {
+  for (status in c(401L, 403L)) {
+    local_mocked_bindings(
+      req_perform = function(req) {
+        expect_identical(req$url, "https://example.org/brapi/v2/serverinfo")
+        ping_response(status, "text/html", "<html>Login required</html>")
+      },
+      .package = "brapiR2"
+    )
+
+    con <- brapi_connection("https://example.org")
+    expect_message(res <- brapi_ping(con), "authentication")
+    expect_true(isTRUE(res))
+    expect_identical(attr(res, "status"), status)
+  }
+})
+
 test_that("brapi_location hits the by-ID endpoint", {
   captured <- new.env()
   canned <- tibble::tibble(id = "x")

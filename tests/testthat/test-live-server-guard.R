@@ -13,6 +13,15 @@ test_that("skip_if_brapi_down names the HTTP status in the skip message", {
   )
 })
 
+test_that("skip_if_brapi_down skips a server that wants authentication", {
+  # brapi_ping() counts a 401 as reachable, but the live tests need data.
+  expect_condition(
+    skip_if_brapi_down(structure(TRUE, status = 401L)),
+    "HTTP 401 from /serverinfo",
+    class = "skip"
+  )
+})
+
 test_that("skip_if_brapi_down reports a missing response", {
   expect_condition(
     skip_if_brapi_down(structure(FALSE, status = NA_integer_)),

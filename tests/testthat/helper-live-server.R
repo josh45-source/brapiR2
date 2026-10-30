@@ -16,7 +16,8 @@ live_server_ping <- function() {
 }
 
 skip_if_brapi_down <- function(ping = live_server_ping()) {
-  if (isTRUE(ping)) {
+  # brapi_ping() also counts a 401/403 as reachable; the tests need data.
+  if (isTRUE(ping) && identical(attr(ping, "status"), 200L)) {
     return(invisible(TRUE))
   }
   status <- attr(ping, "status")

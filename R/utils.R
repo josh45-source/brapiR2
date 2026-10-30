@@ -5,10 +5,14 @@
 #'
 #' Tests whether the BrAPI server is reachable and responding.
 #'
+#' A ping uses a timeout of at most 10 seconds and doesn't retry, so an
+#' unreachable server is reported quickly.
+#'
 #' @inheritParams brapi_shared_params
 #'
 #' @return Logical, invisibly. `TRUE` if `/serverinfo` answers with HTTP 200
-#'   and a JSON body, `FALSE` otherwise. The HTTP status is attached as the
+#'   and a JSON body, or with 401/403 (the server is up but needs
+#'   authentication); `FALSE` otherwise. The HTTP status is attached as the
 #'   `"status"` attribute (`NA` if the server could not be reached).
 #'
 #' @section BrAPI endpoint:
@@ -32,8 +36,17 @@ brapi_ping <- function(con) {
   tryCatch(
     {
       resp <- brapi_req(con, "/serverinfo") |>
+        req_retry(max_tries = 1) |>
+        req_timeout(min(con$timeout %||% 10, 10)) |>
         req_perform()
       status <- resp_status(resp)
+      if (status %in% c(401L, 403L)) {
+        cli_alert_success(paste(
+          "Server {.url {con$base_url}} is reachable but requires",
+          "authentication (HTTP {status})."
+        ))
+        return(invisible(structure(TRUE, status = status)))
+      }
       if (status != 200L) {
         cli_alert_warning("Server returned status {status}.")
         return(invisible(structure(FALSE, status = status)))
