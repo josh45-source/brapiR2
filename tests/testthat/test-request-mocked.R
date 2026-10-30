@@ -122,6 +122,53 @@ test_that("brapi_get refetches when the cache entry has expired", {
   expect_identical(call_count$n, 2)
 })
 
+test_that("a cached response returns the same values as a fresh one", {
+  tmpdir <- tempfile("brapi_cache_precision_")
+  on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
+
+  local_mocked_bindings(
+    req_perform = function(req) {
+      q <- httr2::url_parse(req$url)$query
+      expect_match(req$url, "/brapi/v2/locations\\?")
+      expect_identical(q[["page"]], "0")
+      expect_identical(q[["pageSize"]], "1000")
+      httr2::response(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw(paste0(
+          '{"metadata": {"pagination": {"totalPages": 1}},',
+          ' "result": {"data": [{"locationDbId": "L1",',
+          ' "latitude": 12.3456789, "altitude": 2.0, "plots": 3}]}}'
+        ))
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org") |>
+    brapi_cache_enable(dir = tmpdir)
+  fresh <- brapi_get(con, "/locations")
+  cached <- suppressMessages(brapi_get(con, "/locations"))
+
+  expect_identical(fresh$latitude, 12.3456789)
+  expect_identical(cached, fresh)
+  # Written via a temporary file and renamed: nothing else is left behind.
+  expect_identical(list.files(tmpdir), basename(
+    brapi_cache_path(con, "/locations", list(pageSize = 1000L, page = 0L))
+  ))
+})
+
+test_that("the parser fallback keeps full numeric precision", {
+  # A column that changes type between records sends the parser down its
+  # jsonlite fallback.
+  data <- list(
+    list(plotNumber = 1L, latitude = 0.123456789),
+    list(plotNumber = "2A", latitude = 1.5)
+  )
+  res <- parse_brapi_result(data)
+  expect_identical(res$latitude, c(0.123456789, 1.5))
+})
+
 test_that("brapi_post_search returns data on an immediate 200 response", {
   local_mocked_bindings(
     req_perform = function(req) structure(list(), class = "httr2_response"),
