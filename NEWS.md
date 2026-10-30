@@ -21,6 +21,11 @@
   longer reports variants as having no position when their positions were
   on a later page (#8).
 
+* `brapi_allele_matrix()`, `brapi_get_dosage_matrix()`, `brapi_server_info()`
+  and `brapi_endpoints()` now report HTTP errors with the server's own
+  message, like every other function. A 401 used to come back as an empty
+  tibble, and an HTML error page as an httr2 content-type error (#9).
+
 ## Documentation
 
 ## Internal

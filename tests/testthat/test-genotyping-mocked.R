@@ -137,6 +137,33 @@ test_that("brapi_allele_matrix fetches only a page the caller pins", {
   expect_setequal(result$variantDbId, paste0("v", 1:4))
 })
 
+test_that("brapi_allele_matrix reports HTTP errors with the server's message", {
+  local_mocked_bindings(
+    req_perform = function(req) {
+      q <- httr2::url_parse(req$url)$query
+      expect_identical(q[["variantSetDbId"]], "vs1")
+      expect_identical(q[["dimensionVariantPage"]], "0")
+      expect_identical(q[["dimensionCallSetPage"]], "0")
+      httr2::response(
+        status_code = 401L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw(
+          '{"metadata": {"status": [{"messageType": "ERROR",
+            "message": "You must login"}]}}'
+        )
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  err <- expect_error(
+    brapi_allele_matrix(con, variantSetDbId = "vs1"), "HTTP 401"
+  )
+  expect_match(conditionMessage(err), "You must login")
+  expect_match(conditionMessage(err), "/allelematrix")
+})
+
 test_that("brapi_get_dosage_matrix covers every page of a paged matrix", {
   server <- mock_allele_matrix_server(function(v, cs) {
     c("0/0", "0/1", "1/1")[(v + cs) %% 3L + 1L]

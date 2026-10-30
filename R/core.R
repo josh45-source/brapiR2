@@ -407,6 +407,7 @@ brapi_server_info <- function(con) {
   # Use simplifyVector = TRUE so jsonlite flattens single-element arrays
   # into scalars and multi-element arrays into list-columns automatically.
   resp <- brapi_req(con, "/serverinfo") |> req_perform()
+  brapi_stop_for_status(resp, con, "/serverinfo")
   body <- resp_body_json(resp, simplifyVector = TRUE)
   calls <- body$result$calls
   if (is.null(calls) || length(calls) == 0L) {
