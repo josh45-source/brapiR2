@@ -26,6 +26,14 @@
   message, like every other function. A 401 used to come back as an empty
   tibble, and an HTML error page as an httr2 content-type error (#9).
 
+* `brapi_get_dosage_matrix()` now asks the server for expanded homozygotes,
+  its `sep` and its `unknown_string`, and decodes calls more strictly. A call
+  with any missing allele (`"./1"`) is `NA` rather than a dosage, a
+  collapsed homozygote (`"1"`) is expanded instead of becoming `NA`, and
+  nucleotide calls (`"A/T"`) are an error rather than being counted as
+  alternate alleles. The matrix is built directly from the allele matrix,
+  without a long-format pivot (#10).
+
 ## Documentation
 
 ## Internal

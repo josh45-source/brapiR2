@@ -18,9 +18,9 @@ brapi_get_dosage_matrix(con, variantSetDbId, sep = "/", unknown_string = ".")
 Default \code{"."}.}
 }
 \value{
-A numeric matrix: rows = samples (callSetDbIds), columns = markers
-(variantDbIds). Values are integer dosages (0, 1, 2 for diploids; 0–N
-for polyploids). Missing calls are \code{NA}.
+A numeric (double) matrix: rows = samples (callSetDbIds),
+columns = markers (variantDbIds). Values are whole-number dosages
+(0, 1, 2 for diploids; 0–N for polyploids). Missing calls are \code{NA}.
 }
 \description{
 Fetches genotype data from a BrAPI server and converts it into a numeric
@@ -28,10 +28,16 @@ dosage matrix (samples × markers) compatible with genomic selection
 packages like \code{rrBLUP}, \code{BGLR}, and \code{sommer}.
 }
 \details{
-Allele dosage is computed by splitting each genotype string on \code{sep} (or
-\code{"|"} for phased calls) and counting how many alleles are non-reference
-(i.e. not \code{"0"}). Missing calls (\code{unknown_string}, \code{"."}, or \code{""}) become
-\code{NA}.
+The server is asked for expanded homozygotes, \code{sep} as the unphased
+separator and \code{unknown_string} for missing data. Allele dosage is then
+computed by splitting each genotype string on \code{sep} (or \code{"|"} for phased
+calls) and counting how many alleles are non-reference (i.e. not \code{"0"}).
+A call with any missing allele (\code{unknown_string}, \code{"."} or \code{""}), such as
+\code{"./1"}, becomes \code{NA}. A server that still collapses a homozygote to a
+single allele (\code{"1"}) gets it expanded to the ploidy seen in the rest of
+the data, or to 2 if every call is collapsed. Alleles must be numeric
+indices (\code{"0"}, \code{"1"}, ...); nucleotide calls such as \code{"A/T"} are an
+error.
 }
 \examples{
 \donttest{
