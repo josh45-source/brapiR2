@@ -38,7 +38,7 @@ Thank you for your interest in contributing to brapiR2!
 - Mocked tests use `testthat::local_mocked_bindings()` and run fully offline.
 - Some tests exercise optional integrations and require their packages to be
   installed for the full suite to run: `furrr` and `future` (parallel batch
-  fetching), `rappdirs` (response caching), and `AGHmatrix`, `BGLR`, `lme4`,
+  fetching), and `AGHmatrix`, `BGLR`, `lme4`,
   `metan`, `rrBLUP`, and `sommer` (genomic selection workflows). Tests that
   depend on a missing package are skipped rather than failed.
 

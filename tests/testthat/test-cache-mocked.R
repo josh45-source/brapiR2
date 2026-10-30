@@ -1,13 +1,19 @@
 ## Mocked tests for cache.R paths that don't need network: default cache
 ## dir, clearing populated files, and parallel fetching.
 
-test_that("brapi_cache_enable uses a rappdirs default dir when unspecified", {
-  con <- brapi_connection("https://example.org")
-  con2 <- brapi_cache_enable(con)
-  on.exit(unlink(con2$cache$dir, recursive = TRUE), add = TRUE)
+test_that("brapi_cache_enable defaults to tools::R_user_dir()", {
+  # Point R's user cache location at a temporary directory, so the test
+  # never writes to the real one in the user's home.
+  user_cache <- withr::local_tempdir()
+  withr::local_envvar(R_USER_CACHE_DIR = user_cache)
 
-  expect_true(grepl("brapiR2", con2$cache$dir, fixed = TRUE))
-  expect_true(dir.exists(con2$cache$dir))
+  con <- brapi_cache_enable(brapi_connection("https://example.org"))
+
+  expect_identical(
+    normalizePath(con$cache$dir),
+    normalizePath(file.path(user_cache, "R", "brapiR2"))
+  )
+  expect_true(dir.exists(con$cache$dir))
 })
 
 test_that("brapi_cache_clear removes populated cache files", {

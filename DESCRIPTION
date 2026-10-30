@@ -51,7 +51,6 @@ Suggests:
     httptest2,
     keyring,
     knitr,
-    rappdirs,
     rmarkdown,
     testthat (>= 3.0.0),
     withr

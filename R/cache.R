@@ -10,7 +10,8 @@
 #'
 #' @inheritParams brapi_shared_params
 #' @param dir Character. Directory to store cached responses.
-#'   Defaults to a user cache directory via `rappdirs::user_cache_dir()`.
+#'   Defaults to R's per-user cache directory for brapiR2,
+#'   `tools::R_user_dir("brapiR2", "cache")`.
 #' @param ttl Numeric. Time-to-live for cached entries in seconds.
 #'   Default 3600 (1 hour).
 #'
@@ -26,13 +27,7 @@ brapi_cache_enable <- function(con, dir = NULL, ttl = 3600) {
   validate_con(con)
 
   if (is.null(dir)) {
-    if (!requireNamespace("rappdirs", quietly = TRUE)) {
-      cli_abort(c(
-        "Install {.pkg rappdirs} to use the default cache dir,",
-        "i" = "or specify {.arg dir} directly."
-      ))
-    }
-    dir <- rappdirs::user_cache_dir("brapiR2")
+    dir <- tools::R_user_dir("brapiR2", which = "cache")
   }
 
   if (!dir.exists(dir)) {
