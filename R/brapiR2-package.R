@@ -14,6 +14,7 @@
 #' @importFrom httr2 req_perform req_body_json resp_body_json resp_status
 #' @importFrom httr2 resp_content_type resp_body_string req_error
 #' @importFrom httr2 req_retry req_auth_bearer_token req_method req_timeout
+#' @importFrom httr2 req_body_form
 #' @importFrom tidyr pivot_wider unnest
 NULL
 

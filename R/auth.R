@@ -64,13 +64,16 @@ brapi_login <- function(con, username, password) {
 
 #' Login to a BrAPI Server with OAuth 2.0
 #'
-#' Performs an OAuth 2.0 authorization code flow or client credentials flow.
-#' Returns an updated connection object with the Bearer token set.
+#' Performs the OAuth 2.0 client-credentials grant: posts the client ID and
+#' secret, form-encoded, to the token endpoint and returns an updated
+#' connection object with the Bearer token set. Interactive
+#' (authorization-code) login is not supported.
 #'
 #' @inheritParams brapi_shared_params
 #' @param client_id Character. OAuth client ID.
 #' @param client_secret Character. OAuth client secret.
-#' @param authorize_url Character. The authorization endpoint URL.
+#' @param authorize_url Deprecated and unused: the client-credentials grant
+#'   only needs `access_url`. Supplying it gives a warning.
 #' @param access_url Character. The token endpoint URL.
 #'
 #' @return A new `brapi_con` object with the token populated.
@@ -83,7 +86,6 @@ brapi_login <- function(con, username, password) {
 #'     con,
 #'     client_id = "brapi_client",
 #'     client_secret = "brapi_secret",
-#'     authorize_url = "https://test-server.brapi.org/brapi/v2/authorize",
 #'     access_url = "https://test-server.brapi.org/brapi/v2/token"
 #'   )
 #'   con
@@ -92,20 +94,26 @@ brapi_login <- function(con, username, password) {
 #'
 #' @export
 brapi_login_oauth2 <- function(con, client_id, client_secret,
-                               authorize_url, access_url) {
+                               authorize_url = NULL, access_url) {
   validate_con(con)
 
-  # Client credentials grant (non-interactive)
-  body <- list(
-    grant_type    = "client_credentials",
-    client_id     = client_id,
-    client_secret = client_secret
-  )
+  if (!is.null(authorize_url)) {
+    cli_warn(c(
+      "{.arg authorize_url} is deprecated and has no effect.",
+      "i" = "The client-credentials grant only needs {.arg access_url}."
+    ))
+  }
 
+  # Client credentials grant (non-interactive). RFC 6749 section 4.4 sends
+  # the token request form-encoded, not as JSON.
   resp <- request(access_url) |>
     req_headers("User-Agent" = con$user_agent %||% brapi_user_agent()) |>
     req_timeout(con$timeout %||% 120) |>
-    req_body_json(body) |>
+    req_body_form(
+      grant_type    = "client_credentials",
+      client_id     = client_id,
+      client_secret = client_secret
+    ) |>
     req_method("POST") |>
     req_retry(max_tries = 3) |>
     req_perform()

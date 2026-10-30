@@ -137,12 +137,12 @@ future::plan(future::sequential) # shut the workers back down when done
 con <- brapi_connection("https://my-breedbase.org")
 con <- brapi_login(con, "username", "password")
 
-# OAuth 2.0 (EBS and similar)
+# OAuth 2.0 client-credentials grant (not yet tested against a
+# production BrAPI server)
 con <- brapi_login_oauth2(
   con,
   client_id = "my_id",
   client_secret = "my_secret",
-  authorize_url = "https://auth.example.org/authorize",
   access_url = "https://auth.example.org/token"
 )
 

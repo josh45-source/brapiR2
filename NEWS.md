@@ -61,6 +61,12 @@
   the empty-study message says so. Code that relied on the fallback needs
   to set it (#14).
 
+* `brapi_login_oauth2()` now sends its client-credentials token request
+  form-encoded, as RFC 6749 requires, rather than as JSON, which most OAuth
+  servers reject. The unused `authorize_url` argument is optional and
+  deprecated; supplying it gives a warning. The docs and README no longer
+  describe an authorization-code flow or imply EBS has been tested (#15).
+
 ## Documentation
 
 ## Internal
