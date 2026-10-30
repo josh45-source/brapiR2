@@ -10,7 +10,8 @@ brapi_cache_enable(con, dir = NULL, ttl = 3600)
 \item{con}{A \code{\link[=brapi_connection]{brapi_connection()}} object.}
 
 \item{dir}{Character. Directory to store cached responses.
-Defaults to a user cache directory via \code{rappdirs::user_cache_dir()}.}
+Defaults to R's per-user cache directory for brapiR2,
+\code{tools::R_user_dir("brapiR2", "cache")}.}
 
 \item{ttl}{Numeric. Time-to-live for cached entries in seconds.
 Default 3600 (1 hour).}

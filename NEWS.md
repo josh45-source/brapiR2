@@ -46,6 +46,12 @@
   cache files rather than everything in the directory, and its examples no
   longer point the cache at `tempdir()` (#12).
 
+* `brapi_cache_enable()` now defaults to `tools::R_user_dir("brapiR2",
+  "cache")`, R's standard per-user cache location, instead of
+  `rappdirs::user_cache_dir()`, and `rappdirs` is no longer a suggested
+  package. The test for the default directory no longer writes to the
+  user's home directory (#13).
+
 ## Documentation
 
 ## Internal
