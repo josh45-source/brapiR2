@@ -176,6 +176,47 @@ brapi_server_message <- function(resp) {
 }
 
 
+#' Internal: Check and Encode an Identifier for a URL Path
+#'
+#' By-ID functions put the identifier into the request path, so it must be
+#' one value, and characters such as `?` and spaces must be percent-encoded
+#' or they change the URL. A `/` cannot be sent at all: httr2 (>= 1.1)
+#' decodes `%2F` back to a path separator when it adds the query string, so
+#' such an ID is refused rather than sent to the wrong endpoint. A whole
+#' number (Breedbase IDs often are) is accepted and written without
+#' scientific notation.
+#'
+#' @param id The identifier the caller passed.
+#' @param arg Character. The argument's name, for the error message.
+#' @param call The caller's environment, for the error message.
+#'
+#' @return `id` as a percent-encoded string.
+#' @keywords internal
+#' @noRd
+brapi_id_segment <- function(id, arg, call = rlang::caller_env()) {
+  if (is.numeric(id) && length(id) == 1L && !is.na(id) && id == round(id)) {
+    id <- format(id, scientific = FALSE, trim = TRUE)
+  }
+  if (!is.character(id) || length(id) != 1L || is.na(id) || !nzchar(id)) {
+    cli_abort(
+      "{.arg {arg}} must be a single non-empty string.",
+      call = call
+    )
+  }
+  if (grepl("/", id, fixed = TRUE)) {
+    cli_abort(
+      c(
+        "{.arg {arg}} {.val {id}} contains {.val /}, which can't be sent in
+          a URL path.",
+        "i" = "Filter the list endpoint by {.arg {arg}} instead."
+      ),
+      call = call
+    )
+  }
+  utils::URLencode(id, reserved = TRUE)
+}
+
+
 #' Internal: Raise an Error for a Failed BrAPI Response
 #'
 #' `brapi_req()` disables httr2's own error handling so the server's
@@ -199,6 +240,9 @@ brapi_stop_for_status <- function(resp, con = NULL, endpoint = NULL) {
   bullets <- c("BrAPI request failed (HTTP {status}).")
   if (length(msgs)) {
     bullets <- c(bullets, stats::setNames(msgs, rep("i", length(msgs))))
+  }
+  if (!is.null(con)) {
+    bullets <- c(bullets, "i" = "Server: {.url {con$base_url}}")
   }
   if (!is.null(endpoint)) {
     bullets <- c(bullets, "i" = "Endpoint: {.field {endpoint}}")

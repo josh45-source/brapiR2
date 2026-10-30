@@ -83,6 +83,17 @@
   `geo.type`); now such a column becomes character, or a list-column if any
   record holds a list (#17).
 
+* Arguments are checked before any request is made. By-ID functions such
+  as `brapi_study()` need a single non-empty ID (a whole number is
+  accepted) and percent-encode it, so an ID with a space or `?` no longer
+  breaks the URL; `NULL` used to request the API root and a vector a
+  nonsense path. An ID containing `/` is refused, since it can't be sent
+  in a path. `NULL` filters passed through `...` are dropped, a vector
+  filter gives an error naming the parameter instead of an internal one,
+  `brapi_connection()` validates `token`, `version`, `page_size` and
+  `timeout`, and `brapi_study_data()` says when records have no value
+  field. HTTP errors now name the server as well as the endpoint (#18).
+
 ## Documentation
 
 ## Internal

@@ -266,7 +266,9 @@ brapi_ontologies <- function(con, ...) {
 #'
 #' @export
 brapi_ontology <- function(con, ontologyDbId) {
-  brapi_get(con, glue("/ontologies/{ontologyDbId}"))
+  brapi_get(con, paste0(
+    "/ontologies/", brapi_id_segment(ontologyDbId, "ontologyDbId")
+  ))
 }
 
 
@@ -487,7 +489,16 @@ brapi_study_data <- function(con, studyDbId, fallback = FALSE) {
     ),
     names(obs)
   )
-  value_col <- if ("value" %in% names(obs)) "value" else "observationValue"
+  value_col <- intersect(c("value", "observationValue"), names(obs))[1]
+  if (is.na(value_col)) {
+    cli_abort(c(
+      "Observations for study {.val {studyDbId}} have no values.",
+      "x" = paste(
+        "The server's records have neither a {.field value} nor an",
+        "{.field observationValue} field."
+      )
+    ))
+  }
   var_col <- if ("observationVariableName" %in% names(obs)) {
     "observationVariableName"
   } else {

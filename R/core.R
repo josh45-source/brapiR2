@@ -58,7 +58,9 @@ brapi_programs <- function(con, ...) {
 #'
 #' @export
 brapi_program <- function(con, programDbId) {
-  brapi_get(con, glue("/programs/{programDbId}"))
+  brapi_get(con, paste0(
+    "/programs/", brapi_id_segment(programDbId, "programDbId")
+  ))
 }
 
 
@@ -118,7 +120,9 @@ brapi_trials <- function(con, programDbId = NULL, ...) {
 #'
 #' @export
 brapi_trial <- function(con, trialDbId) {
-  brapi_get(con, glue("/trials/{trialDbId}"))
+  brapi_get(con, paste0(
+    "/trials/", brapi_id_segment(trialDbId, "trialDbId")
+  ))
 }
 
 
@@ -179,7 +183,9 @@ brapi_studies <- function(con, trialDbId = NULL, ...) {
 #'
 #' @export
 brapi_study <- function(con, studyDbId) {
-  brapi_get(con, glue("/studies/{studyDbId}"))
+  brapi_get(con, paste0(
+    "/studies/", brapi_id_segment(studyDbId, "studyDbId")
+  ))
 }
 
 
@@ -235,7 +241,9 @@ brapi_locations <- function(con, ...) {
 #'
 #' @export
 brapi_location <- function(con, locationDbId) {
-  brapi_get(con, glue("/locations/{locationDbId}"))
+  brapi_get(con, paste0(
+    "/locations/", brapi_id_segment(locationDbId, "locationDbId")
+  ))
 }
 
 
@@ -326,7 +334,9 @@ brapi_lists <- function(con, ...) {
 #'
 #' @export
 brapi_list <- function(con, listDbId) {
-  res <- brapi_get(con, glue("/lists/{listDbId}"))
+  res <- brapi_get(con, paste0(
+    "/lists/", brapi_id_segment(listDbId, "listDbId")
+  ))
   # The members arrive as a list of one-element lists; a character vector
   # is what a caller actually wants to pass to another function.
   if ("data" %in% names(res) && is.list(res$data)) {

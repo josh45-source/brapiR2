@@ -56,7 +56,9 @@ brapi_germplasm <- function(con, ...) {
 #'
 #' @export
 brapi_germplasm_detail <- function(con, germplasmDbId) {
-  brapi_get(con, glue("/germplasm/{germplasmDbId}"))
+  brapi_get(con, paste0(
+    "/germplasm/", brapi_id_segment(germplasmDbId, "germplasmDbId")
+  ))
 }
 
 
@@ -94,6 +96,7 @@ brapi_germplasm_detail <- function(con, germplasmDbId) {
 #'
 #' @export
 brapi_germplasm_pedigree <- function(con, germplasmDbId) {
+  brapi_id_segment(germplasmDbId, "germplasmDbId")
   res <- brapi_pedigree(con, germplasmDbId = germplasmDbId)
   # Some servers do not apply the germplasmDbId filter, returning other
   # nodes alongside the requested one. This function promises a single
@@ -135,6 +138,7 @@ brapi_germplasm_pedigree <- function(con, germplasmDbId) {
 #'
 #' @export
 brapi_germplasm_progeny <- function(con, germplasmDbId) {
+  brapi_id_segment(germplasmDbId, "germplasmDbId")
   res <- brapi_pedigree(
     con,
     germplasmDbId = germplasmDbId,
