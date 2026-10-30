@@ -246,6 +246,11 @@ brapi_reference_sets <- function(con, ...) {
 #' `dimensionVariantPage`, `dimensionVariantPageSize`,
 #' `dimensionCallSetPage`, `dimensionCallSetPageSize`.
 #'
+#' Both dimensions are paged automatically, `con$page_size` variants by
+#' `con$page_size` call sets at a time, unless a `dimension*PageSize` is
+#' given. Supplying `dimensionVariantPage` or `dimensionCallSetPage`
+#' fetches only that page of that dimension.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -260,93 +265,121 @@ brapi_allele_matrix <- function(con, variantSetDbId = NULL, ...) {
 
   query <- list(...)
   if (!is.null(variantSetDbId)) query$variantSetDbId <- variantSetDbId
-  query$pageSize <- query$pageSize %||% con$page_size
 
-  raw <- fetch_allele_matrix_pages(con, query)
+  gt <- fetch_allele_matrix_pages(con, query)
 
-  n_v <- length(raw$variant_ids)
-  n_cs <- length(raw$callset_ids)
-
-  if (n_v == 0L || n_cs == 0L) {
+  if (nrow(gt) == 0L || ncol(gt) == 0L) {
     return(tibble())
   }
 
+  # One row per (variant, call set), all of a variant's call sets together.
   tibble(
-    variantDbId = rep(raw$variant_ids, each = n_cs),
-    callSetDbId = rep(raw$callset_ids, times = n_v),
-    genotype    = unlist(lapply(raw$gt_mat, function(row) row[seq_len(n_cs)]))
+    variantDbId = rep(rownames(gt), each = ncol(gt)),
+    callSetDbId = rep(colnames(gt), times = nrow(gt)),
+    genotype    = as.vector(t(gt))
   )
 }
 
 
 #' Internal: Page Through the Allele Matrix Endpoint
 #'
-#' Accumulates variant IDs, call set IDs, and the genotype data matrix
-#' across all `callSetPage` pages of the `/allelematrix` response.
+#' `/allelematrix` is paged in two dimensions, variants and call sets,
+#' each with its own `dimension*Page`/`dimension*PageSize` parameters and
+#' its own entry in `result$pagination`. This walks every page of both and
+#' assembles the blocks into one genotype matrix.
 #'
 #' @inheritParams brapi_shared_params
-#' @param query Named list. Query parameters, including `pageSize` and any
-#'   user-supplied filters.
+#' @param query Named list. Query parameters, including any user-supplied
+#'   filters. A `dimensionVariantPage` or `dimensionCallSetPage` already in
+#'   `query` pins that dimension to the one page.
 #'
-#' @return A list with elements `variant_ids`, `callset_ids`, and `gt_mat`
-#'   (a list where `gt_mat[[i]]` holds all genotype strings for variant `i`).
+#' @return A character matrix of genotype calls, variants in rows and call
+#'   sets in columns, with the IDs as dimnames.
 #' @keywords internal
 #' @noRd
 fetch_allele_matrix_pages <- function(con, query) {
-  cs_page <- 0L
-  cs_total_pages <- 1L
+  # `[[` rather than `$`: `$` would partially match dimensionVariantPage
+  # to dimensionVariantPageSize.
+  query[["dimensionVariantPageSize"]] <-
+    query[["dimensionVariantPageSize"]] %||% con$page_size
+  query[["dimensionCallSetPageSize"]] <-
+    query[["dimensionCallSetPageSize"]] %||% con$page_size
+  pinned_v <- query[["dimensionVariantPage"]]
+  pinned_cs <- query[["dimensionCallSetPage"]]
 
-  all_variant_ids <- character(0)
-  all_callset_ids <- character(0)
-  # gt_mat[i] will hold all genotype strings for variant i across callset pages
-  gt_mat <- list()
-
+  blocks <- list()
+  totals <- c(VARIANTS = 1L, CALLSETS = 1L)
+  v_page <- 0L
   repeat {
-    query$callSetPage <- cs_page
+    cs_page <- 0L
+    repeat {
+      query[["dimensionVariantPage"]] <- pinned_v %||% v_page
+      query[["dimensionCallSetPage"]] <- pinned_cs %||% cs_page
 
-    resp <- brapi_req(con, "/allelematrix") |>
-      req_url_query(!!!query) |>
-      req_perform()
+      body <- brapi_req(con, "/allelematrix") |>
+        req_url_query(!!!query) |>
+        req_perform() |>
+        resp_body_json(simplifyVector = FALSE)
 
-    body <- resp_body_json(resp, simplifyVector = FALSE)
-
-    # /allelematrix uses an array of pagination objects, one per dimension
-    for (p in body$result$pagination) {
-      if (identical(p$dimension, "CALLSETS")) {
-        cs_total_pages <- p$totalPages %||% 1L
-      }
-    }
-
-    cs_ids <- unlist(body$result$callSetDbIds)
-    v_ids <- unlist(body$result$variantDbIds)
-
-    if (cs_page == 0L) {
-      all_variant_ids <- v_ids
-      gt_mat <- vector("list", length(v_ids))
-    }
-    all_callset_ids <- c(all_callset_ids, cs_ids)
-
-    # Find the Genotype data matrix
-    for (dm in body$result$dataMatrices) {
-      nm <- dm$dataMatrixName %||% ""
-      ab <- dm$dataMatrixAbbreviation %||% ""
-      if (nm == "Genotype" || ab == "GT") {
-        for (i in seq_along(dm$dataMatrix)) {
-          gt_mat[[i]] <- c(gt_mat[[i]], unlist(dm$dataMatrix[[i]]))
+      for (p in body$result$pagination) {
+        if (isTRUE(p$dimension %in% names(totals))) {
+          totals[[p$dimension]] <- p$totalPages %||% 1L
         }
-        break
       }
-    }
+      blocks[[length(blocks) + 1L]] <- allele_matrix_block(body$result)
 
-    cs_page <- cs_page + 1L
-    if (cs_page >= cs_total_pages) break
+      cs_page <- cs_page + 1L
+      if (!is.null(pinned_cs) || cs_page >= totals[["CALLSETS"]]) break
+    }
+    v_page <- v_page + 1L
+    if (!is.null(pinned_v) || v_page >= totals[["VARIANTS"]]) break
   }
 
-  list(
-    variant_ids  = all_variant_ids,
-    callset_ids  = all_callset_ids,
-    gt_mat       = gt_mat
+  variant_ids <- unique(unlist(lapply(blocks, rownames)))
+  callset_ids <- unique(unlist(lapply(blocks, colnames)))
+  gt <- matrix(
+    NA_character_,
+    nrow = length(variant_ids), ncol = length(callset_ids),
+    dimnames = list(variant_ids, callset_ids)
   )
+  for (b in blocks) {
+    if (length(b) > 0L) gt[rownames(b), colnames(b)] <- b
+  }
+  gt
+}
+
+
+#' Internal: Genotype Block From One Allele Matrix Page
+#'
+#' @param result The `result` element of one `/allelematrix` response.
+#'
+#' @return A character matrix, the page's variants in rows and call sets in
+#'   columns, holding its "Genotype"/"GT" data matrix (`NA` where absent).
+#' @keywords internal
+#' @noRd
+allele_matrix_block <- function(result) {
+  v_ids <- as.character(unlist(result$variantDbIds))
+  cs_ids <- as.character(unlist(result$callSetDbIds))
+  block <- matrix(
+    NA_character_,
+    nrow = length(v_ids), ncol = length(cs_ids),
+    dimnames = list(v_ids, cs_ids)
+  )
+
+  for (dm in result$dataMatrices) {
+    nm <- dm$dataMatrixName %||% ""
+    ab <- dm$dataMatrixAbbreviation %||% ""
+    if (nm == "Genotype" || ab == "GT") {
+      rows <- seq_len(min(length(dm$dataMatrix), length(v_ids)))
+      for (i in rows) {
+        row <- unlist(dm$dataMatrix[[i]])
+        cols <- seq_len(min(length(row), length(cs_ids)))
+        block[i, cols] <- row[cols]
+      }
+      break
+    }
+  }
+  block
 }
 
 

@@ -7,6 +7,13 @@
   attribute. Live-server tests skip with that status when the test server
   is down, instead of failing (#42).
 
+* `brapi_allele_matrix()` and `brapi_get_dosage_matrix()` now page
+  `/allelematrix` in both dimensions with the v2.1 parameters
+  `dimensionVariantPage` and `dimensionCallSetPage`. They used to send a
+  `callSetPage` parameter the specification does not define, so a
+  spec-compliant server repeated the first page of call sets and later
+  pages of variants were never fetched (#7).
+
 ## Documentation
 
 ## Internal

@@ -50,6 +50,109 @@ test_that("brapi_allele_matrix returns an empty tibble with no variants", {
   expect_identical(nrow(result), 0L)
 })
 
+## A spec-compliant /allelematrix server: 4 variants x 4 call sets, served 2 x 2
+## per page. It only understands the v2.1 parameter names, so a client paging
+## with anything else gets page 0 back every time. `genotype` builds each cell
+## from its variant and call set indices.
+mock_allele_matrix_server <- function(genotype) {
+  variants <- paste0("v", 1:4)
+  callsets <- paste0("s", 1:4)
+  seen <- new.env(parent = emptyenv())
+  seen$requests <- list()
+  respond <- function(req) {
+    q <- httr2::url_parse(req$url)$query
+    seen$requests[[length(seen$requests) + 1L]] <- q
+    vp <- as.integer(q[["dimensionVariantPage"]] %||% 0L)
+    cp <- as.integer(q[["dimensionCallSetPage"]] %||% 0L)
+    vi <- 2L * vp + 1:2
+    ci <- 2L * cp + 1:2
+    body <- list(result = list(
+      pagination = list(
+        list(dimension = "VARIANTS", page = vp, pageSize = 2L,
+             totalCount = 4L, totalPages = 2L),
+        list(dimension = "CALLSETS", page = cp, pageSize = 2L,
+             totalCount = 4L, totalPages = 2L)
+      ),
+      variantDbIds = as.list(variants[vi]),
+      callSetDbIds = as.list(callsets[ci]),
+      dataMatrices = list(list(
+        dataMatrixName = "Genotype",
+        dataMatrixAbbreviation = "GT",
+        dataMatrix = lapply(vi, function(v) {
+          lapply(ci, function(cs) genotype(v, cs))
+        })
+      ))
+    ))
+    httr2::response(
+      status_code = 200L,
+      headers = list(`Content-Type` = "application/json"),
+      body = charToRaw(jsonlite::toJSON(body, auto_unbox = TRUE))
+    )
+  }
+  list(respond = respond, requests = function() seen$requests)
+}
+
+test_that("brapi_allele_matrix pages both dimensions with the v2.1 names", {
+  server <- mock_allele_matrix_server(function(v, cs) paste0("v", v, ":s", cs))
+  local_mocked_bindings(req_perform = server$respond, .package = "brapiR2")
+
+  con <- brapi_connection("https://example.org", page_size = 2L)
+  result <- brapi_allele_matrix(con, variantSetDbId = "vs1")
+
+  requests <- server$requests()
+  expect_length(requests, 4L)
+  for (q in requests) {
+    expect_identical(q$variantSetDbId, "vs1")
+    expect_identical(q[["dimensionVariantPageSize"]], "2")
+    expect_identical(q[["dimensionCallSetPageSize"]], "2")
+    expect_null(q[["callSetPage"]])
+    expect_null(q[["pageSize"]])
+  }
+  pages <- vapply(requests, function(q) {
+    paste(q[["dimensionVariantPage"]], q[["dimensionCallSetPage"]])
+  }, character(1))
+  expect_setequal(pages, c("0 0", "0 1", "1 0", "1 1"))
+
+  expect_identical(nrow(result), 16L)
+  expect_identical(nrow(unique(result[, c("variantDbId", "callSetDbId")])), 16L)
+  expect_identical(
+    result$genotype,
+    paste0(result$variantDbId, ":", result$callSetDbId)
+  )
+})
+
+test_that("brapi_allele_matrix fetches only a page the caller pins", {
+  server <- mock_allele_matrix_server(function(v, cs) paste0("v", v, ":s", cs))
+  local_mocked_bindings(req_perform = server$respond, .package = "brapiR2")
+
+  con <- brapi_connection("https://example.org", page_size = 2L)
+  result <- brapi_allele_matrix(
+    con, variantSetDbId = "vs1", dimensionCallSetPage = 1L
+  )
+
+  requests <- server$requests()
+  expect_length(requests, 2L)
+  for (q in requests) expect_identical(q[["dimensionCallSetPage"]], "1")
+  expect_setequal(result$callSetDbId, c("s3", "s4"))
+  expect_setequal(result$variantDbId, paste0("v", 1:4))
+})
+
+test_that("brapi_get_dosage_matrix covers every page of a paged matrix", {
+  server <- mock_allele_matrix_server(function(v, cs) {
+    c("0/0", "0/1", "1/1")[(v + cs) %% 3L + 1L]
+  })
+  local_mocked_bindings(req_perform = server$respond, .package = "brapiR2")
+
+  con <- brapi_connection("https://example.org", page_size = 2L)
+  dm <- expect_no_warning(suppressMessages(brapi_get_dosage_matrix(con, "vs1")))
+
+  expect_true(is.numeric(dm))
+  expect_identical(dim(dm), c(4L, 4L))
+  expect_setequal(rownames(dm), paste0("s", 1:4))
+  expect_setequal(colnames(dm), paste0("v", 1:4))
+  expect_identical(unname(dm["s3", "v4"]), c(0, 1, 2)[(4 + 3) %% 3 + 1])
+})
+
 test_that("brapi_get_dosage_matrix converts genotypes into allele dosages", {
   local_mocked_bindings(
     brapi_allele_matrix = function(con, variantSetDbId = NULL, ...) {
