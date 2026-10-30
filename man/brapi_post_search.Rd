@@ -41,7 +41,8 @@ wrap, or for filter fields a named search function does not expose.
 A server may answer immediately with the results, or with HTTP 202 and
 a \code{searchResultsDbId} to be polled until the results are ready. Both
 are handled here; the polling happens inside the call and you get the
-finished results either way.
+finished results either way. Results spanning several pages are fetched
+page by page and returned together.
 }
 
 \section{Return shape}{

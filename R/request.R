@@ -263,7 +263,8 @@ brapi_get_pages <- function(con, endpoint, query, max_pages = Inf) {
 #' A server may answer immediately with the results, or with HTTP 202 and
 #' a `searchResultsDbId` to be polled until the results are ready. Both
 #' are handled here; the polling happens inside the call and you get the
-#' finished results either way.
+#' finished results either way. Results spanning several pages are fetched
+#' page by page and returned together.
 #'
 #' @section Return shape:
 #' As with [brapi_get()], the response passes through the same parser the
@@ -307,13 +308,20 @@ brapi_post_search <- function(con, endpoint, body = list(),
     if (is.character(val)) I(val) else val
   })
 
-  resp <- brapi_req(con, endpoint) |>
-    req_body_json(body) |>
-    req_method("POST") |>
-    req_perform()
+  # Later pages of an immediate result are requested by re-posting the
+  # same body with `page` set. `[[` rather than `$`, which would partially
+  # match `page` to `pageSize`.
+  post_page <- function(page) {
+    if (page > 0L) body[["page"]] <- page
+    resp <- brapi_req(con, endpoint) |>
+      req_body_json(body) |>
+      req_method("POST") |>
+      req_perform()
+    brapi_stop_for_status(resp, con, endpoint)
+    resp
+  }
 
-  brapi_stop_for_status(resp, con, endpoint)
-
+  resp <- post_page(0L)
   status <- resp_status(resp)
   resp_body <- resp_body_json(resp, simplifyVector = FALSE)
 
@@ -326,16 +334,41 @@ brapi_post_search <- function(con, endpoint, body = list(),
     }
 
     return(brapi_poll_search(
-      con, endpoint, search_id, poll_interval, max_polls
+      con, endpoint, search_id, poll_interval, max_polls,
+      page_size = body[["pageSize"]]
     ))
   }
 
   # Immediate 200 response
-  data <- resp_body$result$data %||% list()
+  data <- collect_search_pages(resp_body, function(page) {
+    resp_body_json(post_page(page), simplifyVector = FALSE)
+  })
   if (length(data) == 0) {
     return(tibble())
   }
   parse_brapi_result(data)
+}
+
+
+#' Internal: Gather the Records From Every Page of a Search Result
+#'
+#' @param first_body The parsed body of the first page.
+#' @param fetch_page A function taking a zero-based page number and
+#'   returning that page's parsed body.
+#'
+#' @return A list of records from all pages, in page order.
+#' @keywords internal
+#' @noRd
+collect_search_pages <- function(first_body, fetch_page) {
+  data <- first_body$result$data %||% list()
+  total_pages <- first_body$metadata$pagination$totalPages %||% 1L
+  page <- 1L
+  while (page < total_pages) {
+    page_body <- fetch_page(page)
+    data <- c(data, page_body$result$data %||% list())
+    page <- page + 1L
+  }
+  data
 }
 
 
@@ -346,28 +379,36 @@ brapi_post_search <- function(con, endpoint, body = list(),
 #' @param search_id Character. The `searchResultsDbId` from the initial POST.
 #' @param poll_interval Numeric. Seconds between polling attempts.
 #' @param max_polls Integer. Maximum polling attempts before giving up.
+#' @param page_size Integer. Records per page of the finished result.
 #'
-#' @return A tibble of search results.
+#' @return A tibble of search results, from every page.
 #' @keywords internal
 #' @noRd
 brapi_poll_search <- function(con, endpoint, search_id,
-                              poll_interval, max_polls) {
+                              poll_interval, max_polls,
+                              page_size = con$page_size) {
   cli_alert_info("Async search started (ID: {search_id}). Polling...")
 
   poll_endpoint <- paste0(endpoint, "/", search_id)
+  get_page <- function(page) {
+    resp <- brapi_req(con, poll_endpoint) |>
+      req_url_query(page = page, pageSize = page_size) |>
+      req_perform()
+    brapi_stop_for_status(resp, con, poll_endpoint)
+    resp
+  }
+
   for (i in seq_len(max_polls)) {
     Sys.sleep(poll_interval)
 
-    poll_resp <- brapi_req(con, poll_endpoint) |>
-      req_url_query(pageSize = con$page_size) |>
-      req_perform()
-
-    brapi_stop_for_status(poll_resp, con, poll_endpoint)
+    poll_resp <- get_page(0L)
 
     poll_status <- resp_status(poll_resp)
     if (poll_status == 200L) {
       poll_body <- resp_body_json(poll_resp, simplifyVector = FALSE)
-      data <- poll_body$result$data %||% list()
+      data <- collect_search_pages(poll_body, function(page) {
+        resp_body_json(get_page(page), simplifyVector = FALSE)
+      })
       if (length(data) == 0) {
         return(tibble())
       }

@@ -14,6 +14,13 @@
   spec-compliant server repeated the first page of call sets and later
   pages of variants were never fetched (#7).
 
+* `brapi_post_search()` and the `brapi_search_*()` functions now return
+  every page of a search result, whether the server answers immediately or
+  after an asynchronous (HTTP 202) search. They used to return only the
+  first `page_size` records. `brapi_get_marker_map(variantSetDbId = )` no
+  longer reports variants as having no position when their positions were
+  on a later page (#8).
+
 ## Documentation
 
 ## Internal

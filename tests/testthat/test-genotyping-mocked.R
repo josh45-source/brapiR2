@@ -312,6 +312,59 @@ test_that("brapi_get_marker_map warns when some variants lack positions", {
   expect_identical(nrow(markers), 1L)
 })
 
+test_that("brapi_get_marker_map(variantSetDbId=) reads every search page", {
+  # 5 variants, all positioned; /search/markerpositions serves 2 per page.
+  ids <- paste0("v", 1:5)
+  respond <- function(body) {
+    httr2::response(
+      status_code = 200L,
+      headers = list(`Content-Type` = "application/json"),
+      body = charToRaw(jsonlite::toJSON(body, auto_unbox = TRUE))
+    )
+  }
+  local_mocked_bindings(
+    req_perform = function(req) {
+      if (grepl("/search/markerpositions$", req$url)) {
+        expect_identical(unclass(req$body$data[["variantDbIds"]]), ids)
+        page <- req$body$data[["page"]] %||% 0L
+        expect_identical(req$body$data[["pageSize"]], 2L)
+        on_page <- ids[intersect(2L * page + 1:2, seq_along(ids))]
+        return(respond(list(
+          metadata = list(pagination = list(
+            currentPage = page, pageSize = 2L, totalCount = 5L,
+            totalPages = 3L
+          )),
+          result = list(data = lapply(on_page, function(v) {
+            list(variantDbId = v, mapDbId = "map1",
+                 linkageGroupName = "1", position = 1L)
+          }))
+        )))
+      }
+      q <- httr2::url_parse(req$url)$query
+      expect_identical(q[["page"]], "0")
+      if (grepl("/variants\\?", req$url)) {
+        expect_identical(q[["variantSetDbId"]], "vs1")
+        data <- lapply(ids, function(v) list(variantDbId = v))
+      } else {
+        expect_match(req$url, "/maps\\?")
+        data <- list(list(mapDbId = "map1", mapName = "Map One",
+                          type = "Genetic", unit = "cM"))
+      }
+      respond(list(
+        metadata = list(pagination = list(totalPages = 1L)),
+        result = list(data = data)
+      ))
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org", page_size = 2L)
+  markers <- expect_no_warning(
+    brapi_get_marker_map(con, variantSetDbId = "vs1")
+  )
+  expect_setequal(markers$variantDbId, ids)
+})
+
 test_that("brapi_get_marker_map returns empty tibble with no variants in set", {
   local_mocked_bindings(
     brapi_variants = function(con, variantSetDbId = NULL, ...) tibble::tibble(),

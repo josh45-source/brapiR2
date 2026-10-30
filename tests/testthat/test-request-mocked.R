@@ -246,6 +246,86 @@ test_that("brapi_post_search errors after max_polls without completing", {
   )
 })
 
+## A search with 6 matching records served 2 per page (3 pages). `page`
+## picks the records for one page; anything not on a real page is empty.
+search_page_body <- function(page) {
+  ids <- if (page %in% 0:2) paste0("g", 2L * page + 1:2) else character()
+  list(
+    metadata = list(pagination = list(
+      currentPage = page, pageSize = 2L, totalCount = 6L, totalPages = 3L
+    )),
+    result = list(data = lapply(ids, function(id) list(germplasmDbId = id)))
+  )
+}
+
+json_response <- function(body, status = 200L) {
+  httr2::response(
+    status_code = status,
+    headers = list(`Content-Type` = "application/json"),
+    body = charToRaw(jsonlite::toJSON(body, auto_unbox = TRUE))
+  )
+}
+
+test_that("brapi_post_search fetches every page of an immediate result", {
+  seen <- new.env(parent = emptyenv())
+  seen$bodies <- list()
+  local_mocked_bindings(
+    req_perform = function(req) {
+      expect_identical(req$method, "POST")
+      expect_match(req$url, "/brapi/v2/search/germplasm$")
+      body <- req$body$data
+      seen$bodies[[length(seen$bodies) + 1L]] <- body
+      json_response(search_page_body(body[["page"]] %||% 0L))
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org", page_size = 2L)
+  result <- brapi_post_search(
+    con, "/search/germplasm",
+    body = list(germplasmNames = "x")
+  )
+
+  expect_identical(result$germplasmDbId, paste0("g", 1:6))
+  expect_length(seen$bodies, 3L)
+  pages <- vapply(seen$bodies, function(b) b[["page"]] %||% 0L, numeric(1))
+  expect_identical(pages, c(0, 1, 2))
+  for (b in seen$bodies) {
+    expect_identical(b[["pageSize"]], 2L)
+    expect_identical(unclass(b[["germplasmNames"]]), "x")
+  }
+})
+
+test_that("brapi_post_search fetches every page of an async result", {
+  seen <- new.env(parent = emptyenv())
+  seen$gets <- list()
+  local_mocked_bindings(
+    req_perform = function(req) {
+      if (identical(req$method, "POST")) {
+        return(json_response(
+          list(result = list(searchResultsDbId = "sr123")), 202L
+        ))
+      }
+      expect_match(req$url, "/brapi/v2/search/germplasm/sr123\\?")
+      q <- httr2::url_parse(req$url)$query
+      seen$gets[[length(seen$gets) + 1L]] <- q
+      json_response(search_page_body(as.integer(q[["page"]] %||% 0L)))
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org", page_size = 2L)
+  result <- suppressMessages(brapi_post_search(
+    con, "/search/germplasm",
+    body = list(), poll_interval = 0
+  ))
+
+  expect_identical(result$germplasmDbId, paste0("g", 1:6))
+  pages <- vapply(seen$gets, function(q) q[["page"]] %||% "0", character(1))
+  expect_identical(pages, c("0", "1", "2"))
+  for (q in seen$gets) expect_identical(q[["pageSize"]], "2")
+})
+
 test_that("parse_brapi_result falls back to jsonlite flatten on bad records", {
   # A record whose element is itself a data.frame will break as_tibble_row's
   # size-1 assumption and trigger the tryCatch fallback branch.
