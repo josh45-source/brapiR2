@@ -4,8 +4,9 @@
 #' Enable Response Caching
 #'
 #' Returns a new connection object with caching enabled. Cached responses
-#' are stored as JSON files in the specified directory, keyed by URL and
-#' query parameters.
+#' are stored as JSON files in the specified directory, keyed by URL, query
+#' parameters and (hashed) token, so connections with different credentials
+#' never share an entry.
 #'
 #' @inheritParams brapi_shared_params
 #' @param dir Character. Directory to store cached responses.
@@ -17,7 +18,7 @@
 #'
 #' @examples
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' con <- brapi_cache_enable(con, dir = tempdir(), ttl = 7200)
+#' con <- brapi_cache_enable(con, dir = tempfile("brapi_cache_"), ttl = 7200)
 #' con
 #'
 #' @export
@@ -46,7 +47,9 @@ brapi_cache_enable <- function(con, dir = NULL, ttl = 3600) {
 
 #' Clear the Response Cache
 #'
-#' Removes all cached responses from the cache directory.
+#' Removes all cached responses from the cache directory. Only brapiR2's
+#' own cache files are removed; anything else in the directory is left
+#' alone.
 #'
 #' @param con A [brapi_connection()] object with caching enabled.
 #'
@@ -54,7 +57,7 @@ brapi_cache_enable <- function(con, dir = NULL, ttl = 3600) {
 #'
 #' @examples
 #' con <- brapi_connection("https://test-server.brapi.org")
-#' con <- brapi_cache_enable(con, dir = tempdir())
+#' con <- brapi_cache_enable(con, dir = tempfile("brapi_cache_"))
 #' brapi_cache_clear(con)
 #'
 #' @export
@@ -66,10 +69,16 @@ brapi_cache_clear <- function(con) {
     return(invisible(con))
   }
 
-  files <- list.files(con$cache$dir, full.names = TRUE)
+  # Cache entries (<hash>.json) and any temporary file an interrupted
+  # write left behind; nothing else.
+  files <- list.files(
+    con$cache$dir,
+    pattern = "^([0-9a-f]{32}\\.json|brapi_cache_[0-9a-f]+)$",
+    full.names = TRUE
+  )
   if (length(files) > 0) {
-    file.remove(files)
-    cli_alert_success("Cleared {length(files)} cached response(s).")
+    n <- sum(file.remove(files))
+    cli_alert_success("Cleared {n} cached response(s).")
   } else {
     cli_alert_info("Cache is already empty.")
   }
