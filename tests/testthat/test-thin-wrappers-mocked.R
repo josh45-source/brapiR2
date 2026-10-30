@@ -406,6 +406,45 @@ test_that("brapi_server_info returns an empty tibble with no calls", {
   expect_identical(nrow(info), 0L)
 })
 
+test_that("brapi_server_info reports an HTTP error with the server's message", {
+  local_mocked_bindings(
+    req_perform = function(req) {
+      expect_identical(req$url, "https://example.org/brapi/v2/serverinfo")
+      httr2::response(
+        status_code = 401L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw(
+          '{"metadata": {"status": [{"messageType": "ERROR",
+            "message": "You must login"}]}}'
+        )
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  err <- expect_error(brapi_server_info(con), "HTTP 401")
+  expect_match(conditionMessage(err), "You must login")
+  expect_match(conditionMessage(err), "/serverinfo")
+})
+
+test_that("brapi_server_info reports an HTTP error from an HTML error page", {
+  local_mocked_bindings(
+    req_perform = function(req) {
+      expect_identical(req$url, "https://example.org/brapi/v2/serverinfo")
+      httr2::response(
+        status_code = 500L,
+        headers = list(`Content-Type` = "text/html"),
+        body = charToRaw("<html>Internal Server Error</html>")
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  expect_error(brapi_server_info(con), "HTTP 500")
+})
+
 test_that("brapi_endpoints delegates to brapi_server_info", {
   canned <- tibble::tibble(service = "programs")
   local_mocked_bindings(

@@ -316,10 +316,11 @@ fetch_allele_matrix_pages <- function(con, query) {
       query[["dimensionVariantPage"]] <- pinned_v %||% v_page
       query[["dimensionCallSetPage"]] <- pinned_cs %||% cs_page
 
-      body <- brapi_req(con, "/allelematrix") |>
+      resp <- brapi_req(con, "/allelematrix") |>
         req_url_query(!!!query) |>
-        req_perform() |>
-        resp_body_json(simplifyVector = FALSE)
+        req_perform()
+      brapi_stop_for_status(resp, con, "/allelematrix")
+      body <- resp_body_json(resp, simplifyVector = FALSE)
 
       for (p in body$result$pagination) {
         if (isTRUE(p$dimension %in% names(totals))) {
