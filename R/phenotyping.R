@@ -395,33 +395,50 @@ brapi_search_variables <- function(con, traitClasses = NULL, ...) {
 
 #' Get Study Data in Wide Format
 #'
-#' A convenience function that fetches observation units and observations
-#' for a given study and pivots them into a wide-format tibble with one
-#' row per observation unit and one column per trait — ready for analysis.
+#' A convenience function that fetches a study's observations and pivots
+#' them into a wide-format tibble with one row per observation unit and one
+#' column per trait — ready for analysis.
+#'
+#' Some servers ignore the `studyDbId` filter on `/observations` and return
+#' nothing for it; the public BrAPI test server (test-server.brapi.org) is
+#' one. Set `fallback = TRUE` to fetch every observation on such a server
+#' and filter them locally. That can mean a very large download on a
+#' production server, so it is off by default.
 #'
 #' @inheritParams brapi_shared_params
 #' @inheritParams brapi_shared_ids
+#' @param fallback Logical. If the filtered request returns no
+#'   observations, fetch all observations on the server and filter them to
+#'   `studyDbId` locally. Default `FALSE`.
 #'
-#' @return A wide-format tibble with columns for plot metadata and
-#'   one column per observed trait containing the measurement values.
+#' @return A wide-format tibble with the observation unit, germplasm and
+#'   study identifier columns the server provides, and one character column
+#'   per observed trait holding its values. A cell with repeated
+#'   measurements is a list of them.
 #'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
 #' if (brapi_ping(con)) {
-#'   data <- brapi_study_data(con, "study1")
+#'   # The test server ignores the studyDbId filter, so opt in to the fallback
+#'   data <- brapi_study_data(con, "study1", fallback = TRUE)
 #'   head(data)
 #' }
 #' }
 #'
 #' @importFrom tidyselect where
 #' @export
-brapi_study_data <- function(con, studyDbId) {
+brapi_study_data <- function(con, studyDbId, fallback = FALSE) {
+  if (!rlang::is_bool(fallback)) {
+    cli_abort("{.arg fallback} must be {.code TRUE} or {.code FALSE}.")
+  }
+
   obs <- brapi_observations(con, studyDbId = studyDbId)
 
   # Some servers do not implement the studyDbId GET filter on /observations.
-  # Fall back to fetching all observations and filtering client-side.
-  if (nrow(obs) == 0L) {
+  # On request, fall back to fetching all observations and filtering
+  # client-side.
+  if (nrow(obs) == 0L && fallback) {
     all_obs <- brapi_observations(con)
     if ("studyDbId" %in% names(all_obs)) {
       # .env$studyDbId (not bare studyDbId) is required here: dplyr's data
@@ -448,7 +465,16 @@ brapi_study_data <- function(con, studyDbId) {
   }
 
   if (nrow(obs) == 0L) {
-    cli_alert_warning("No observations found for study {.val {studyDbId}}.")
+    msg <- c("!" = "No observations found for study {.val {studyDbId}}.")
+    if (!fallback) {
+      msg <- c(msg, "i" = paste(
+        "Some servers, including the public BrAPI test server",
+        "(test-server.brapi.org), ignore the {.field studyDbId} filter on",
+        "{.field /observations}. Try {.code fallback = TRUE} to fetch all",
+        "observations and filter them locally."
+      ))
+    }
+    cli::cli_inform(msg)
     return(tibble())
   }
 
@@ -468,18 +494,24 @@ brapi_study_data <- function(con, studyDbId) {
     "observationVariableDbId"
   }
 
-  obs_slim <- obs[, c(id_cols, var_col, value_col), drop = FALSE]
-
-  # Some servers return the same observation more than once. After key-order
-  # normalisation in the parser these are exact duplicates, and they would
-  # otherwise pivot into cells holding several copies of one value.
-  n_before <- nrow(obs_slim)
-  obs_slim <- obs_slim[!duplicated(obs_slim), , drop = FALSE]
-  if (nrow(obs_slim) < n_before) {
+  # Some servers return the same observation more than once, which would
+  # otherwise pivot into cells holding several copies of one value. A
+  # duplicate is the same observationDbId (or, without one, the same whole
+  # record): two measurements that merely share a value are both kept.
+  n_before <- nrow(obs)
+  dup <- if ("observationDbId" %in% names(obs)) {
+    duplicated(obs$observationDbId)
+  } else {
+    duplicated(obs)
+  }
+  obs <- obs[!dup, , drop = FALSE]
+  if (nrow(obs) < n_before) {
     cli_alert_info(
-      "Dropped {n_before - nrow(obs_slim)} duplicate observation record{?s}."
+      "Dropped {n_before - nrow(obs)} duplicate observation record{?s}."
     )
   }
+
+  obs_slim <- obs[, c(id_cols, var_col, value_col), drop = FALSE]
 
   wide <- pivot_wider(
     obs_slim,

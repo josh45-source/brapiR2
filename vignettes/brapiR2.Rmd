@@ -111,20 +111,22 @@ nearly every R modelling function expects one row per experimental unit and
 one column per variable.
 
 `brapi_study_data()` does that reshaping for you. It fetches the study's
-observations, pivots traits into columns, and joins the germplasm and plot
-identifiers you need to link phenotypes back to genotypes or to a field
-layout. Doing this by hand is not difficult, but it is fiddly in ways that
-are easy to get subtly wrong, particularly when an observation unit carries
-more than one value for the same trait. Repeated measurements are kept as
-list-columns rather than silently averaged or dropped, which is why the
-summary below unnests before taking means. The function also falls back to
-fetching all observations and filtering client-side when a server does not
-honour the `studyDbId` filter, so it returns data on servers where a direct
-`brapi_observations()` call would come back empty.
+observations, pivots traits into columns, and keeps the observation unit,
+germplasm and study identifiers you need to link phenotypes back to
+genotypes; join `brapi_observation_units()` on `observationUnitDbId` for the
+plot's position in the field. Doing this by hand is not difficult, but it is
+fiddly in ways that are easy to get subtly wrong, particularly when an
+observation unit carries more than one value for the same trait. Repeated
+measurements are kept as list-columns rather than silently averaged or
+dropped, which is why the summary below unnests before taking means. Some
+servers, this test server among them, do not honour the `studyDbId` filter
+on `/observations`; `fallback = TRUE` then fetches all observations and
+filters them client-side. It is off by default because on a production
+server that can be a very large download.
 
 ```{r pheno, eval = server_up}
 # Get analysis-ready wide format: one row per plot, one column per trait
-data <- brapi_study_data(con, studies$studyDbId[1])
+data <- brapi_study_data(con, studies$studyDbId[1], fallback = TRUE)
 data
 ```
 
@@ -362,7 +364,9 @@ future::plan(future::multisession, workers = 2)
 # Fetch study data from multiple studies in parallel (all studies on the
 # server, not just the one attached to the trial filtered above)
 study_ids <- brapi_studies(con)$studyDbId
-all_data <- brapi_fetch_parallel(perf_con, brapi_study_data, study_ids)
+all_data <- brapi_fetch_parallel(
+  perf_con, brapi_study_data, study_ids, fallback = TRUE
+)
 all_data
 ```
 

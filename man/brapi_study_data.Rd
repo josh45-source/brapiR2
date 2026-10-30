@@ -4,27 +4,41 @@
 \alias{brapi_study_data}
 \title{Get Study Data in Wide Format}
 \usage{
-brapi_study_data(con, studyDbId)
+brapi_study_data(con, studyDbId, fallback = FALSE)
 }
 \arguments{
 \item{con}{A \code{\link[=brapi_connection]{brapi_connection()}} object.}
 
 \item{studyDbId}{Character. The unique study identifier.}
+
+\item{fallback}{Logical. If the filtered request returns no
+observations, fetch all observations on the server and filter them to
+\code{studyDbId} locally. Default \code{FALSE}.}
 }
 \value{
-A wide-format tibble with columns for plot metadata and
-one column per observed trait containing the measurement values.
+A wide-format tibble with the observation unit, germplasm and
+study identifier columns the server provides, and one character column
+per observed trait holding its values. A cell with repeated
+measurements is a list of them.
 }
 \description{
-A convenience function that fetches observation units and observations
-for a given study and pivots them into a wide-format tibble with one
-row per observation unit and one column per trait — ready for analysis.
+A convenience function that fetches a study's observations and pivots
+them into a wide-format tibble with one row per observation unit and one
+column per trait — ready for analysis.
+}
+\details{
+Some servers ignore the \code{studyDbId} filter on \verb{/observations} and return
+nothing for it; the public BrAPI test server (test-server.brapi.org) is
+one. Set \code{fallback = TRUE} to fetch every observation on such a server
+and filter them locally. That can mean a very large download on a
+production server, so it is off by default.
 }
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 if (brapi_ping(con)) {
-  data <- brapi_study_data(con, "study1")
+  # The test server ignores the studyDbId filter, so opt in to the fallback
+  data <- brapi_study_data(con, "study1", fallback = TRUE)
   head(data)
 }
 }

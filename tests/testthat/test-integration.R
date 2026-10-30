@@ -257,7 +257,8 @@ test_that("brapi_study_data returns a wide tibble with trait columns", {
   skip_if(nrow(obs_all) == 0L, "No observations on test server")
 
   study_id <- obs_all$studyDbId[[1L]]
-  sd <- brapi_study_data(con, study_id)
+  # The test server ignores the studyDbId filter on /observations.
+  sd <- brapi_study_data(con, study_id, fallback = TRUE)
 
   expect_s3_class(sd, "data.frame")
   expect_gt(nrow(sd), 0L)
@@ -489,7 +490,7 @@ test_that("full pipeline programs -> trials -> studies -> study_data works", {
   skip_if(nrow(obs_all) == 0L, "No observations on test server")
 
   study_id <- obs_all$studyDbId[[1L]]
-  sd <- brapi_study_data(con, study_id)
+  sd <- brapi_study_data(con, study_id, fallback = TRUE)
 
   expect_s3_class(sd, "data.frame")
   expect_gt(nrow(sd), 0L)

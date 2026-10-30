@@ -68,12 +68,14 @@ seasons
 ```
 
 ```{r pheno-live, eval = server_up}
-# brapi_study_data() falls back to an unfiltered fetch + client-side filter
-# when a server doesn't honour the studyDbId filter on /observations, so it
-# finds data that a direct brapi_observations(con, studyDbId = ...) call
-# would miss on this server. It still returns an honest empty tibble (with
-# a warning) for studies that genuinely have no observations.
-met_raw <- lapply(studies$studyDbId, brapi_study_data, con = con) |>
+# This server doesn't honour the studyDbId filter on /observations, so
+# fallback = TRUE does an unfiltered fetch + client-side filter, finding
+# data that a direct brapi_observations(con, studyDbId = ...) call would
+# miss. It still returns an honest empty tibble (with a message) for
+# studies that genuinely have no observations.
+met_raw <- lapply(
+  studies$studyDbId, brapi_study_data, con = con, fallback = TRUE
+) |>
   bind_rows()
 met_raw
 ```

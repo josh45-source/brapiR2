@@ -52,6 +52,15 @@
   package. The test for the default directory no longer writes to the
   user's home directory (#13).
 
+* `brapi_study_data()` no longer drops repeated measurements that happen to
+  share a value: duplicates are now identified by `observationDbId`. It also
+  no longer fetches every observation on the server when the filtered
+  request comes back empty, which is the normal answer for a study with no
+  data. That fallback, for servers that ignore the `studyDbId` filter such
+  as the public BrAPI test server, is now opt-in with `fallback = TRUE`, and
+  the empty-study message says so. Code that relied on the fallback needs
+  to set it (#14).
+
 ## Documentation
 
 ## Internal
