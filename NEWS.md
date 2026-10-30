@@ -40,6 +40,12 @@
   same way. Cache entries are now written to a temporary file and renamed
   into place, so a parallel worker never reads a half-written entry (#11).
 
+* The cache key now includes a hash of the connection's token, so a
+  response fetched with one token is never served to a connection with a
+  different token or none. `brapi_cache_clear()` removes only brapiR2's own
+  cache files rather than everything in the directory, and its examples no
+  longer point the cache at `tempdir()` (#12).
+
 ## Documentation
 
 ## Internal

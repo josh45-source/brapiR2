@@ -13,11 +13,13 @@ brapi_cache_clear(con)
 Invisibly returns \code{con}.
 }
 \description{
-Removes all cached responses from the cache directory.
+Removes all cached responses from the cache directory. Only brapiR2's
+own cache files are removed; anything else in the directory is left
+alone.
 }
 \examples{
 con <- brapi_connection("https://test-server.brapi.org")
-con <- brapi_cache_enable(con, dir = tempdir())
+con <- brapi_cache_enable(con, dir = tempfile("brapi_cache_"))
 brapi_cache_clear(con)
 
 }

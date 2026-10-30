@@ -122,7 +122,9 @@ brapi_get <- function(con, endpoint, query = list(), max_pages = Inf) {
 #'
 #' Returns `NULL` if caching is not enabled on `con`. Otherwise builds a
 #' deterministic cache key from the URL and sorted query parameters
-#' (excluding `page`, since the key covers the full multi-page result).
+#' (excluding `page`, since the key covers the full multi-page result),
+#' plus a hash of the connection's token, so that responses fetched with
+#' one set of credentials are never served to a connection with another.
 #'
 #' @inheritParams brapi_shared_params
 #' @param endpoint Character. The API endpoint.
@@ -149,6 +151,9 @@ brapi_cache_path <- function(con, endpoint, query) {
         collapse = "&"
       )
     )
+  }
+  if (!is.null(con$token)) {
+    key_str <- paste0(key_str, "#token:", rlang::hash(con$token))
   }
   file.path(con$cache$dir, paste0(rlang::hash(key_str), ".json"))
 }

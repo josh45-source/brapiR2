@@ -16,12 +16,86 @@ test_that("brapi_cache_clear removes populated cache files", {
     brapi_cache_enable(dir = tmpdir, ttl = 3600)
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
-  writeLines("{}", file.path(tmpdir, "a.json"))
-  writeLines("{}", file.path(tmpdir, "b.json"))
+  writeLines("{}", brapi_cache_path(con, "/programs", list()))
+  writeLines("{}", brapi_cache_path(con, "/trials", list()))
   expect_length(list.files(tmpdir), 2L)
 
   brapi_cache_clear(con)
   expect_length(list.files(tmpdir), 0L)
+})
+
+test_that("brapi_cache_clear leaves files that aren't cache entries", {
+  tmpdir <- tempfile("brapi_cache_shared_")
+  con <- brapi_connection("https://example.org") |>
+    brapi_cache_enable(dir = tmpdir)
+  on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
+
+  entry <- brapi_cache_path(con, "/programs", list())
+  writeLines("{}", entry)
+  writeLines("x <- 1", file.path(tmpdir, "my-analysis.R"))
+  writeLines("{}", file.path(tmpdir, "results.json"))
+  dir.create(file.path(tmpdir, "subdir"))
+
+  brapi_cache_clear(con)
+
+  expect_setequal(
+    list.files(tmpdir),
+    c("my-analysis.R", "results.json", "subdir")
+  )
+})
+
+## The bearer token a request carries, or NULL. httr2 >= 1.1.0 redacts the
+## Authorization header in `req$headers`, so read it back with
+## req_get_headers(); DESCRIPTION still allows httr2 1.0.0, which lacks it.
+request_token <- function(req) {
+  headers <- if (utils::packageVersion("httr2") >= "1.1.0") {
+    httr2::req_get_headers(req, "reveal")
+  } else {
+    req$headers
+  }
+  auth <- headers$Authorization
+  if (is.null(auth)) NULL else sub("^Bearer ", "", auth)
+}
+
+test_that("cache entries are not shared between different tokens", {
+  tmpdir <- tempfile("brapi_cache_tokens_")
+  on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
+
+  local_mocked_bindings(
+    req_perform = function(req) {
+      q <- httr2::url_parse(req$url)$query
+      expect_match(req$url, "/brapi/v2/programs\\?")
+      expect_identical(q[["page"]], "0")
+      expect_identical(q[["pageSize"]], "1000")
+      id <- request_token(req) %||% "public"
+      httr2::response(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw(paste0(
+          '{"metadata": {"pagination": {"totalPages": 1}},',
+          ' "result": {"data": [{"programDbId": "', id, '"}]}}'
+        ))
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  base <- brapi_connection("https://example.org") |>
+    brapi_cache_enable(dir = tmpdir)
+  alice <- brapi_set_token(base, "alice-token")
+  bob <- brapi_set_token(base, "bob-token")
+
+  expect_identical(brapi_get(alice, "/programs")$programDbId, "alice-token")
+  expect_identical(brapi_get(base, "/programs")$programDbId, "public")
+  expect_identical(brapi_get(bob, "/programs")$programDbId, "bob-token")
+  # Each identity's entry is still served from the cache afterwards.
+  expect_message(
+    alice_again <- brapi_get(alice, "/programs"),
+    "cached"
+  )
+  expect_identical(alice_again$programDbId, "alice-token")
+  # The token never appears in the cache file names.
+  expect_false(any(grepl("token", list.files(tmpdir))))
 })
 
 test_that("brapi_fetch_parallel calls future_map_dfr() and combines results", {
