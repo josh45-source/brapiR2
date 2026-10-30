@@ -165,3 +165,30 @@ test_that("brapi_login honours the connection path and sends a user agent", {
   expect_match(captured$url, "/gringlobal/brapi/v2/token", fixed = TRUE)
   expect_match(captured$ua, "^brapiR2/")
 })
+
+test_that("brapi_login reports the server's reason when no token comes back", {
+  # Breedbase answers a bad password with HTTP 200, a null token and the
+  # reason in metadata.status.
+  seen <- new.env(parent = emptyenv())
+  local_mocked_bindings(
+    req_perform = function(req) {
+      seen$req <- req
+      httr2::response(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw(paste0(
+          '{"metadata": {"status": [{"messageType": "ERROR",',
+          ' "message": "Incorrect Password"}]},',
+          ' "access_token": null}'
+        ))
+      )
+    },
+    .package = "brapiR2"
+  )
+
+  con <- brapi_connection("https://example.org")
+  err <- expect_error(brapi_login(con, "user", "wrong"), "Login failed")
+  expect_match(conditionMessage(err), "Incorrect Password")
+  expect_identical(seen$req$url, "https://example.org/brapi/v2/token")
+  expect_identical(seen$req$body$data$username, "user")
+})

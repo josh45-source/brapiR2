@@ -119,6 +119,13 @@
 
 ## Internal
 
+* New tests cover the error and paging paths that had none: a Breedbase
+  401 on a list endpoint, plain-text and HTML error bodies, a login that
+  fails with the server's reason, and an asynchronous search that is still
+  running on more than one poll. With the tests added alongside the fixes
+  for #7, #8, #11, #12, #16 and #42, every path listed in the issue is now
+  tested (#26).
+
 # brapiR2 0.2.0
 
 ### Breaking changes

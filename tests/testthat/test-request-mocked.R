@@ -864,3 +864,101 @@ test_that("brapi_allele_matrix sends logical parameters as true/false", {
   expect_identical(seen$query[["variantSetDbId"]], "vs1")
   expect_identical(seen$query[["expandHomozygotes"]], "true")
 })
+
+## The error paths a failed request takes, end to end through brapi_get().
+error_response <- function(status, type, body) {
+  httr2::response(
+    status_code = status,
+    headers = list(`Content-Type` = type),
+    body = charToRaw(body)
+  )
+}
+
+test_that("a 401 from a list endpoint reports the server's BrAPI message", {
+  # The Breedbase form, from #1: the reason is in metadata.status.
+  local_mocked_bindings(
+    req_perform = function(req) {
+      q <- httr2::url_parse(req$url)$query
+      expect_match(req$url, "/brapi/v2/studies\\?")
+      expect_identical(q[["page"]], "0")
+      error_response(401L, "application/json", paste0(
+        '{"metadata": {"status": [{"messageType": "ERROR", "message":',
+        ' "You must login and have permission to access this BrAPI call."}]}}'
+      ))
+    },
+    .package = "brapiR2"
+  )
+
+  err <- expect_error(
+    brapi_studies(brapi_connection("https://example.org")),
+    "HTTP 401"
+  )
+  expect_match(conditionMessage(err), "You must login")
+  expect_match(conditionMessage(err), "/studies")
+})
+
+test_that("a plain-text error body is reported, an HTML page is not", {
+  local_mocked_bindings(
+    req_perform = function(req) {
+      expect_match(req$url, "/brapi/v2/programs\\?")
+      error_response(500L, "text/plain", '"Database connection lost"')
+    },
+    .package = "brapiR2"
+  )
+  err <- expect_error(
+    brapi_programs(brapi_connection("https://example.org")),
+    "HTTP 500"
+  )
+  expect_match(conditionMessage(err), "Database connection lost")
+
+  local_mocked_bindings(
+    req_perform = function(req) {
+      error_response(502L, "text/html", "<html><body>Bad Gateway</body></html>")
+    },
+    .package = "brapiR2"
+  )
+  err <- expect_error(
+    brapi_programs(brapi_connection("https://example.org")),
+    "HTTP 502"
+  )
+  expect_no_match(conditionMessage(err), "<html>")
+})
+
+test_that("an async search that is still running is polled until it's ready", {
+  seen <- new.env(parent = emptyenv())
+  seen$gets <- 0L
+  local_mocked_bindings(
+    req_perform = function(req) {
+      if (identical(req$method, "POST")) {
+        expect_match(req$url, "/brapi/v2/search/germplasm$")
+        return(error_response(
+          202L, "application/json",
+          '{"result": {"searchResultsDbId": "sr42"}}'
+        ))
+      }
+      expect_match(req$url, "/brapi/v2/search/germplasm/sr42\\?")
+      expect_identical(httr2::url_parse(req$url)$query[["page"]], "0")
+      seen$gets <- seen$gets + 1L
+      # Still processing on the first two polls, done on the third.
+      if (seen$gets < 3L) {
+        return(error_response(
+          202L, "application/json",
+          '{"result": {"searchResultsDbId": "sr42"}}'
+        ))
+      }
+      error_response(200L, "application/json", paste0(
+        '{"metadata": {"pagination": {"totalPages": 1}},',
+        ' "result": {"data": [{"germplasmDbId": "g1"}]}}'
+      ))
+    },
+    .package = "brapiR2"
+  )
+
+  res <- suppressMessages(brapi_post_search(
+    brapi_connection("https://example.org"), "/search/germplasm",
+    body = list(), poll_interval = 0, max_polls = 5L
+  ))
+
+  expect_identical(seen$gets, 3L)
+  expect_identical(res$germplasmDbId, "g1")
+})
