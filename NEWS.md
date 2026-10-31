@@ -157,6 +157,10 @@
   chunk end, failing pkgcheck with "Chunk start/end indices failed sanity
   checks in vignette" (#42).
 
+* CI now checks the minimum supported R version (4.1), reports test
+  coverage to Codecov, and runs R CMD check weekly so the live tests notice
+  changes on the test server (#27).
+
 # brapiR2 0.2.0
 
 ### Breaking changes

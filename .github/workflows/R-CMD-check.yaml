@@ -3,6 +3,10 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  # Weekly, so a change in the test server's data shows up in the live
+  # tests even when nobody pushes.
+  schedule:
+    - cron: '23 4 * * 1'
 
 name: R-CMD-check
 
@@ -23,6 +27,8 @@ jobs:
           - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,  r: 'release'}
           - {os: ubuntu-latest,  r: 'oldrel-1'}
+          # The minimum R version in DESCRIPTION.
+          - {os: ubuntu-latest,  r: '4.1'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
