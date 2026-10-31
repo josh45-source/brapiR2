@@ -516,3 +516,49 @@ test_that("brapi_get_marker_map errors when both identifiers are given", {
     "exactly one"
   )
 })
+
+test_that("a null genotype mid-row stays in its own cell", {
+  seen <- new.env(parent = emptyenv())
+  seen$urls <- character()
+  local_mocked_bindings(
+    req_perform = function(req) {
+      seen$urls <- c(seen$urls, req$url)
+      httr2::response(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw(paste0(
+          '{"result": {',
+          '"pagination": [',
+          '{"dimension": "VARIANTS", "totalPages": 1},',
+          '{"dimension": "CALLSETS", "totalPages": 1}],',
+          '"variantDbIds": ["v1", "v2"],',
+          '"callSetDbIds": ["s1", "s2", "s3"],',
+          '"dataMatrices": [{"dataMatrixName": "Genotype",',
+          ' "dataMatrixAbbreviation": "GT",',
+          ' "dataMatrix": [["0/0", null, "1/1"], ["0/1", "0/1", "0/0"]]}]',
+          "}}"
+        ))
+      )
+    },
+    .package = "brapiR2"
+  )
+  con <- brapi_connection("https://example.org")
+
+  am <- brapi_allele_matrix(con, variantSetDbId = "vs1")
+  gt <- stats::setNames(am$genotype, paste(am$variantDbId, am$callSetDbId))
+  expect_identical(gt[["v1 s1"]], "0/0")
+  expect_identical(gt[["v1 s2"]], NA_character_)
+  expect_identical(gt[["v1 s3"]], "1/1")
+  expect_identical(gt[["v2 s3"]], "0/0")
+
+  dm <- suppressMessages(brapi_get_dosage_matrix(con, "vs1"))
+  expect_true(is.na(dm["s2", "v1"]))
+  expect_identical(unname(dm["s3", "v1"]), 2)
+  expect_identical(unname(dm["s1", "v1"]), 0)
+
+  q <- lapply(seen$urls, function(u) httr2::url_parse(u)$query)
+  expect_identical(q[[1]][["variantSetDbId"]], "vs1")
+  expect_identical(q[[2]][["variantSetDbId"]], "vs1")
+  expect_identical(q[[2]][["expandHomozygotes"]], "true")
+  expect_true(all(grepl("/brapi/v2/allelematrix?", seen$urls, fixed = TRUE)))
+})

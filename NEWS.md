@@ -115,6 +115,11 @@
   between IDs are combined (as character, or a list-column) instead of
   aborting the whole batch (#21).
 
+* `brapi_allele_matrix()` and `brapi_get_dosage_matrix()` no longer shift
+  genotype calls when the server sends a JSON `null` for a missing call: the
+  null becomes `NA` in its own cell instead of being dropped, which moved
+  every later call in that row to the wrong call set (#67).
+
 ## Documentation
 
 * The README installation section now leads with CRAN, keeping R-universe and
