@@ -13,6 +13,12 @@
 #'   `vignette("brapiR2")` for how to keep `username`/`password` out of
 #'   your script, using `.Renviron` or the keyring package.
 #'
+#' @section BrAPI endpoint:
+#' `POST /token`. This is not part of the BrAPI v2.1 specification: it is
+#' a server extension, implemented by Breedbase and by the BrAPI test
+#' server. Servers without it need [brapi_login_oauth2()] or
+#' [brapi_set_token()] instead.
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -77,6 +83,10 @@ brapi_login <- function(con, username, password) {
 #' @param access_url Character. The token endpoint URL.
 #'
 #' @return A new `brapi_con` object with the token populated.
+#'
+#' @section BrAPI endpoint:
+#' None. The token request goes to `access_url`, your identity provider's
+#' OAuth 2.0 token endpoint, which is not part of the BrAPI specification.
 #'
 #' @examples
 #' \dontrun{

@@ -4,10 +4,12 @@
 \alias{brapi_ping}
 \title{Ping a BrAPI Server}
 \usage{
-brapi_ping(con)
+brapi_ping(con, ...)
 }
 \arguments{
 \item{con}{A \code{\link[=brapi_connection]{brapi_connection()}} object.}
+
+\item{...}{Additional query parameters.}
 }
 \value{
 Logical, invisibly. \code{TRUE} if \verb{/serverinfo} answers with HTTP 200

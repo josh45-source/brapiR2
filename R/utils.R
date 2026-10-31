@@ -31,11 +31,12 @@
 #' }
 #'
 #' @export
-brapi_ping <- function(con) {
+brapi_ping <- function(con, ...) {
   validate_con(con)
   tryCatch(
     {
       resp <- brapi_req(con, "/serverinfo") |>
+        req_url_query(!!!brapi_query_values(compact(list(...)))) |>
         req_retry(max_tries = 1) |>
         req_timeout(min(con$timeout %||% 10, 10)) |>
         req_perform()
@@ -101,8 +102,8 @@ brapi_ping <- function(con) {
 #' }
 #'
 #' @export
-brapi_endpoints <- function(con) {
-  brapi_server_info(con)
+brapi_endpoints <- function(con, ...) {
+  brapi_server_info(con, ...)
 }
 
 

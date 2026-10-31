@@ -33,6 +33,12 @@ secret, form-encoded, to the token endpoint and returns an updated
 connection object with the Bearer token set. Interactive
 (authorization-code) login is not supported.
 }
+\section{BrAPI endpoint}{
+
+None. The token request goes to \code{access_url}, your identity provider's
+OAuth 2.0 token endpoint, which is not part of the BrAPI specification.
+}
+
 \examples{
 \dontrun{
 # Needs an OAuth 2.0 token endpoint and client credentials of your own;

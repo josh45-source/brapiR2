@@ -33,6 +33,13 @@ one. Set \code{fallback = TRUE} to fetch every observation on such a server
 and filter them locally. That can mean a very large download on a
 production server, so it is off by default.
 }
+\section{BrAPI endpoint}{
+
+\code{GET /observations}, filtered by \code{studyDbId}, and with no filter when
+\code{fallback = TRUE} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Observations/Observations_GET_POST_PUT.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

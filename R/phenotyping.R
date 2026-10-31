@@ -418,6 +418,11 @@ brapi_search_variables <- function(con, traitClasses = NULL, ...) {
 #'   per observed trait holding its values. A cell with repeated
 #'   measurements is a list of them.
 #'
+#' @section BrAPI endpoint:
+#' `GET /observations`, filtered by `studyDbId`, and with no filter when
+#' `fallback = TRUE` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Phenotyping/Observations/Observations_GET_POST_PUT.yaml).
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")

@@ -64,7 +64,6 @@ brapi_germplasm_detail <- function(con, germplasmDbId) {
 
 #' Get Germplasm Pedigree
 #'
-#'
 #' The `/germplasm/{germplasmDbId}/pedigree` endpoint this function
 #' originally called was deprecated in BrAPI v2.1. It now queries
 #' `/pedigree?germplasmDbId=` instead, which returns a richer record.
@@ -95,9 +94,9 @@ brapi_germplasm_detail <- function(con, germplasmDbId) {
 #' }
 #'
 #' @export
-brapi_germplasm_pedigree <- function(con, germplasmDbId) {
+brapi_germplasm_pedigree <- function(con, germplasmDbId, ...) {
   brapi_id_segment(germplasmDbId, "germplasmDbId")
-  res <- brapi_pedigree(con, germplasmDbId = germplasmDbId)
+  res <- brapi_pedigree(con, germplasmDbId = germplasmDbId, ...)
   # Some servers do not apply the germplasmDbId filter, returning other
   # nodes alongside the requested one. This function promises a single
   # germplasm, so filter client-side as well.
@@ -137,12 +136,13 @@ brapi_germplasm_pedigree <- function(con, germplasmDbId) {
 #' }
 #'
 #' @export
-brapi_germplasm_progeny <- function(con, germplasmDbId) {
+brapi_germplasm_progeny <- function(con, germplasmDbId, ...) {
   brapi_id_segment(germplasmDbId, "germplasmDbId")
   res <- brapi_pedigree(
     con,
     germplasmDbId = germplasmDbId,
-    includeProgeny = TRUE
+    includeProgeny = TRUE,
+    ...
   )
   if ("germplasmDbId" %in% names(res)) {
     res <- res[res$germplasmDbId == germplasmDbId, , drop = FALSE]

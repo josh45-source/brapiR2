@@ -135,3 +135,38 @@ test_that("brapi_germplasm_pedigree filters client-side when the server does not
   expect_identical(nrow(out), 1L)
   expect_identical(out$germplasmDbId, "g1")
 })
+
+test_that("brapi_germplasm_pedigree and _progeny pass ... to /pedigree", {
+  seen <- new.env(parent = emptyenv())
+  seen$urls <- character()
+  local_mocked_bindings(
+    req_perform = function(req) {
+      seen$urls <- c(seen$urls, req$url)
+      httr2::response(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw(paste0(
+          '{"metadata": {"pagination": {"currentPage": 0, "pageSize": 1000,',
+          ' "totalCount": 1, "totalPages": 1}},',
+          ' "result": {"data": [{"germplasmDbId": "g1"}]}}'
+        ))
+      )
+    },
+    .package = "brapiR2"
+  )
+  con <- brapi_connection("https://example.org")
+
+  out <- brapi_germplasm_pedigree(con, "g1", includeParents = TRUE)
+  expect_identical(out$germplasmDbId, "g1")
+  brapi_germplasm_progeny(con, "g1", progenyDepth = 2)
+
+  q1 <- httr2::url_parse(seen$urls[[1]])$query
+  expect_match(seen$urls[[1]], "/brapi/v2/pedigree?", fixed = TRUE)
+  expect_identical(q1[["germplasmDbId"]], "g1")
+  expect_identical(q1[["includeParents"]], "true")
+
+  q2 <- httr2::url_parse(seen$urls[[2]])$query
+  expect_identical(q2[["germplasmDbId"]], "g1")
+  expect_identical(q2[["includeProgeny"]], "true")
+  expect_identical(q2[["progenyDepth"]], "2")
+})

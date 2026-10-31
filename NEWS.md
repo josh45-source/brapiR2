@@ -129,6 +129,14 @@
   test server's real IDs (`study1`, `variantset1`) in the quick start, and no
   longer credit untested servers with login styles (#22).
 
+* `brapi_germplasm_pedigree()`, `brapi_germplasm_progeny()`,
+  `brapi_server_info()`, `brapi_endpoints()` and `brapi_ping()` now take `...`,
+  so the query parameters their help pages list can be passed. The help
+  pages for `brapi_study_data()`, `brapi_get_dosage_matrix()`,
+  `brapi_get_marker_map()`, `brapi_login()` and `brapi_login_oauth2()` now
+  name the endpoints they call, and `?brapi_login` says `/token` is not
+  part of BrAPI v2.1 (#23).
+
 ## Internal
 
 * New tests cover the error and paging paths that had none: a Breedbase

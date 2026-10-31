@@ -4,10 +4,12 @@
 \alias{brapi_server_info}
 \title{Get Server Info}
 \usage{
-brapi_server_info(con)
+brapi_server_info(con, ...)
 }
 \arguments{
 \item{con}{A \code{\link[=brapi_connection]{brapi_connection()}} object.}
+
+\item{...}{Additional query parameters.}
 }
 \value{
 A tibble of supported endpoints and their methods.
