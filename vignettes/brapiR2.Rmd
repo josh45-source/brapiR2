@@ -269,10 +269,10 @@ credentials in a `.Renviron` file (in your home directory for all
 projects, or in the project directory for that project only) as
 `NAME=value` pairs, one per line:
 
-```
+~~~
 BRAPI_TOKEN=abc123...
 BRAPI_PASSWORD=my_password
-```
+~~~
 
 R reads `.Renviron` automatically at startup, so after restarting your R
 session the values are available via `Sys.getenv()`:
