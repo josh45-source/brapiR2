@@ -2,7 +2,8 @@
 
 0 errors | 0 warnings | 1 note
 
-* This is a new release.
+* This is an update to brapiR2 0.2.0, fixing bugs and documentation
+  errors reported since that release; see NEWS.md.
 
 * The NOTE reports that the Title field is not in title case, suggesting
   'BrAPI' V2 in place of 'BrAPI' v2. The BrAPI specification
@@ -10,8 +11,7 @@
   so capitalising it would misname the standard. The Title is left as is.
 
 * The NOTE also lists possibly misspelled words in DESCRIPTION: BrAPI,
-  Germplasm, Phenotyping, Tidyverse, async, bioinformaticians,
-  specification's and tibbles. These are correct - BrAPI is the name of
+  Germplasm, Phenotyping, Tidyverse, async, bioinformaticians and tibbles. These are correct - BrAPI is the name of
   the specification, Germplasm and Phenotyping are its module names, and
   the rest are standard terms in R and plant breeding.
 

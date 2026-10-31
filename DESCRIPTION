@@ -1,6 +1,6 @@
 Package: brapiR2
 Title: A Tidyverse-Native Client for the 'BrAPI' v2 (Breeding API) Specification
-Version: 0.2.0.9000
+Version: 0.2.1
 Authors@R: c(
     person("Joash Joshua", "Ayo", , "joashjoshua789@gmail.com",
            role = c("aut", "cre", "cph"),

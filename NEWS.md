@@ -1,4 +1,4 @@
-# brapiR2 (development version)
+# brapiR2 0.2.1
 
 ## Bug fixes
 
@@ -137,6 +137,12 @@
   name the endpoints they call, and `?brapi_login` says `/token` is not
   part of BrAPI v2.1 (#23).
 
+* Release housekeeping for 0.2.1: the NEWS headings use `##` throughout,
+  cran-comments.md describes an update rather than a new release,
+  CONTRIBUTING links the rOpenSci Code of Conduct and lists only the test
+  dependencies the tests use, and `dev/SERVERS.md` notes that `max_pages`
+  now fetches a single page (#24).
+
 ## Internal
 
 * New tests cover the error and paging paths that had none: a Breedbase
@@ -163,7 +169,7 @@
 
 # brapiR2 0.2.0
 
-### Breaking changes
+## Breaking changes
 
 * `brapi_get_marker_map()` no longer reads position data from
   `brapi_variants()` (`referenceName`/`start`, which many servers -
@@ -189,7 +195,7 @@
   `breedingMethodName`, `breedingMethodDbId`, `additionalInfo` and
   `externalReferences` (@dwaring87, ropensci/software-review#792).
 
-### Bug fixes
+## Bug fixes
 
 * `brapi_study_data()` no longer silently returns the wrong study's
   observations on servers that don't implement the `studyDbId` filter on
@@ -242,7 +248,7 @@
   single object. `/commoncropnames` returns its crop names that way, and the
   whole response came back as one row with a list-column.
 
-### Minor improvements
+## Minor improvements
 
 * Failed requests now report what the server said, not just the HTTP status.
   A 401 from a Breedbase server reads "You must login and have permission to
@@ -260,7 +266,7 @@
   Extra studies are now filtered out, and the function says how many it
   found (@dwaring87, ropensci/software-review#792).
 
-### New features
+## New features
 
 * New Genome Maps entity support (`R/genome_maps.R`): `brapi_maps()`,
   `brapi_map()`, `brapi_map_linkage_groups()`, `brapi_marker_positions()`,
@@ -279,8 +285,8 @@
   `brapi_scales()`, `brapi_methods()`, and
   `brapi_observation_variables()`.
 * brapiR2 now wraps 32 of the 37 BrAPI v2.1 entities across all four
-  modules (49 of 138 retrieval endpoints); see `DESIGN.md` for the full
-  coverage breakdown and which entities remain uncovered.
+  modules (49 of 138 retrieval endpoints); see `?brapi_coverage` for the
+  full coverage breakdown and which entities remain uncovered.
 * `brapi_connection()` gains a `path` argument for servers that do not
   serve BrAPI under `/brapi/`. GRIN-Global instances use
   `gringlobal/brapi` and were previously unreachable; Germinate and
@@ -316,7 +322,7 @@
   just the first page. The default fetches everything as before, and a
   truncated result is never cached.
 
-### Deprecated
+## Deprecated
 
 * `brapi_fetch_parallel()` no longer sets or restores a `future` plan
   itself. Per the future package's best-practices vignette, the parallel
@@ -325,7 +331,7 @@
   argument is deprecated - supplying it now emits a warning and has no
   effect.
 
-### Documentation
+## Documentation
 
 * Added `LICENSE.md` with the full MIT licence text, which was missing
   from the repository, so GitHub had no licence to detect and anyone
@@ -402,7 +408,7 @@
   example makes live requests, and CRAN runs `\donttest{}` examples on
   some check flavours.
 
-### Testing
+## Testing
 
 * Substantially expanded the mocked and live-server test suites
   alongside the features above: argument-capturing tests for every new
@@ -421,7 +427,7 @@
 
 # brapiR2 0.1.0
 
-### New features
+## New features
 
 * Initial release covering the BrAPI v2.1 specification's Core,
   Germplasm, Phenotyping, and Genotyping modules.
