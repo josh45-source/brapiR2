@@ -312,9 +312,8 @@ brapi_search_germplasm <- function(con,
 #'
 #' Retrieves a filtered subset of a pedigree tree via `/pedigree` - a batch
 #' endpoint for pulling pedigree records across many germplasm in one call.
-#' This is different from [brapi_germplasm_pedigree()], which retrieves one
-#' germplasm's immediate pedigree via the germplasm sub-resource
-#' (`/germplasm/{germplasmDbId}/pedigree`) and must be called once per
+#' [brapi_germplasm_pedigree()] calls this endpoint for a single germplasm
+#' and returns just that germplasm's node, so it must be called once per
 #' germplasm. Use `brapi_pedigree()` (or [brapi_search_pedigree()]) to pull
 #' pedigree records for many germplasm at once - e.g. everything in a crop,
 #' program, or family - in one or a few requests; use
@@ -349,8 +348,8 @@ brapi_search_germplasm <- function(con,
 #'   and `progeny`, when requested, are list-columns of small tibbles (one
 #'   row per relative) rather than raw nested lists or a flattened table.
 #'
-#' @seealso [brapi_germplasm_pedigree()] for one germplasm's pedigree via
-#'   the germplasm sub-resource; [brapi_search_pedigree()] for the same
+#' @seealso [brapi_germplasm_pedigree()] for one germplasm's pedigree
+#'   node; [brapi_search_pedigree()] for the same
 #'   batch retrieval via `POST`, with a fuller set of filters.
 #'
 #' @section BrAPI endpoint:

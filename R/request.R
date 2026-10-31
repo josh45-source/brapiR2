@@ -35,7 +35,7 @@ brapi_req <- function(con, endpoint) {
 
 #' Call Any BrAPI GET Endpoint
 #'
-#' The named functions in brapiR2 cover 32 of the 36 BrAPI v2.1 entities.
+#' The named functions in brapiR2 cover 32 of the 37 BrAPI v2.1 entities.
 #' This is the layer beneath them, for endpoints brapiR2 does not wrap, for
 #' servers with non-standard extensions, and for query parameters a named
 #' function does not expose. Pagination, caching, authentication and error
