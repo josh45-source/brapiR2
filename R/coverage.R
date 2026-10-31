@@ -21,7 +21,8 @@
 #'   \item{`GET /programs`}{[brapi_programs()]}
 #'   \item{`GET /programs/{programDbId}`}{[brapi_program()]}
 #'   \item{`GET /seasons`}{[brapi_seasons()]}
-#'   \item{`GET /serverinfo`}{[brapi_endpoints()], [brapi_ping()], [brapi_server_info()]}
+#'   \item{`GET /serverinfo`}{[brapi_endpoints()], [brapi_ping()],
+#'     [brapi_server_info()]}
 #'   \item{`GET /studies`}{[brapi_studies()]}
 #'   \item{`GET /studies/{studyDbId}`}{[brapi_study()]}
 #'   \item{`GET /trials`}{[brapi_trials()]}
@@ -35,7 +36,8 @@
 #'   \item{`GET /crossingprojects`}{[brapi_crossing_projects()]}
 #'   \item{`GET /germplasm`}{[brapi_germplasm()]}
 #'   \item{`GET /germplasm/{germplasmDbId}`}{[brapi_germplasm_detail()]}
-#'   \item{`GET /pedigree`}{[brapi_germplasm_pedigree()], [brapi_germplasm_progeny()], [brapi_pedigree()]}
+#'   \item{`GET /pedigree`}{[brapi_germplasm_pedigree()],
+#'     [brapi_germplasm_progeny()], [brapi_pedigree()]}
 #'   \item{`POST /search/germplasm`}{[brapi_search_germplasm()]}
 #'   \item{`POST /search/pedigree`}{[brapi_search_pedigree()]}
 #'   \item{`GET /seedlots`}{[brapi_seed_lots()]}

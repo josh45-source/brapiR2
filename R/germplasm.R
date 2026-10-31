@@ -373,9 +373,9 @@ brapi_search_germplasm <- function(con,
 #'
 #' @export
 brapi_pedigree <- function(con, germplasmDbId = NULL, includeParents = NULL,
-                            includeSiblings = NULL, includeProgeny = NULL,
-                            includeFullTree = NULL, pedigreeDepth = NULL,
-                            progenyDepth = NULL, ...) {
+                           includeSiblings = NULL, includeProgeny = NULL,
+                           includeFullTree = NULL, pedigreeDepth = NULL,
+                           progenyDepth = NULL, ...) {
   query <- list(...)
   if (!is.null(germplasmDbId)) query$germplasmDbId <- germplasmDbId
   if (!is.null(includeParents)) query$includeParents <- includeParents
@@ -426,12 +426,12 @@ brapi_pedigree <- function(con, germplasmDbId = NULL, includeParents = NULL,
 #'
 #' @export
 brapi_search_pedigree <- function(con, germplasmDbIds = NULL,
-                                   includeParents = NULL,
-                                   includeSiblings = NULL,
-                                   includeProgeny = NULL,
-                                   includeFullTree = NULL,
-                                   pedigreeDepth = NULL,
-                                   progenyDepth = NULL, ...) {
+                                  includeParents = NULL,
+                                  includeSiblings = NULL,
+                                  includeProgeny = NULL,
+                                  includeFullTree = NULL,
+                                  pedigreeDepth = NULL,
+                                  progenyDepth = NULL, ...) {
   body <- compact(list(
     germplasmDbIds  = germplasmDbIds,
     includeParents  = includeParents,

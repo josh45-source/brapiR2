@@ -465,9 +465,10 @@ brapi_study_data <- function(con, studyDbId, fallback = FALSE) {
     others <- setdiff(unique(obs$studyDbId), studyDbId)
     if (length(others)) {
       obs <- dplyr::filter(obs, .data$studyDbId == .env$studyDbId) # nolint
-      cli_alert_info(
-        "Server returned observations for {length(others) + 1} studies; filtered to {.val {studyDbId}}."
-      )
+      cli_alert_info(paste(
+        "Server returned observations for {length(others) + 1} studies;",
+        "filtered to {.val {studyDbId}}."
+      ))
     }
   }
 

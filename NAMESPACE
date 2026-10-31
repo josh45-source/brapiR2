@@ -72,16 +72,11 @@ importFrom(cli,
   cli_alert_info,
   cli_alert_success,
   cli_alert_warning,
-  cli_progress_bar,
-  cli_progress_done,
-  cli_progress_update,
   cli_warn
 )
 importFrom(dplyr,
   bind_rows,
-  filter,
-  mutate,
-  select
+  mutate
 )
 importFrom(glue,glue)
 importFrom(httr2,
@@ -108,26 +103,17 @@ importFrom(jsonlite,
 )
 importFrom(purrr,
   compact,
-  map,
-  map_chr,
-  map_dfr,
-  map_lgl
+  map
 )
 importFrom(rlang,
   "%||%",
   .data,
   .env,
-  abort,
-  hash,
-  inform,
-  warn
+  hash
 )
 importFrom(tibble,
   as_tibble,
   tibble
 )
-importFrom(tidyr,
-  pivot_wider,
-  unnest
-)
+importFrom(tidyr,pivot_wider)
 importFrom(tidyselect,where)

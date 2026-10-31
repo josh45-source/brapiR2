@@ -53,8 +53,8 @@ brapi_connection <- function(url,
   path <- gsub("^/+|/+$", "", path)
 
   if (!is.null(user_agent) &&
-      (!is.character(user_agent) || length(user_agent) != 1 ||
-       nchar(user_agent) == 0)) {
+        (!is.character(user_agent) || length(user_agent) != 1 ||
+           nchar(user_agent) == 0)) {
     cli_abort(
       "{.arg user_agent} must be NULL or a single non-empty character string."
     )

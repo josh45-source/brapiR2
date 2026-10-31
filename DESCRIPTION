@@ -48,7 +48,6 @@ Imports:
 Suggests:
     furrr (>= 0.3.0),
     future (>= 1.33.0),
-    httptest2,
     keyring,
     knitr,
     rmarkdown,

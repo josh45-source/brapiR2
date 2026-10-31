@@ -49,7 +49,10 @@ looking up positions for an entire variant set.
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
 if (brapi_ping(con)) {
-  brapi_search_marker_positions(con, variantDbIds = c("variant01", "variant02"))
+  brapi_search_marker_positions(
+    con,
+    variantDbIds = c("variant01", "variant02")
+  )
 }
 }
 
