@@ -152,6 +152,11 @@
   httptest2 from Suggests, fixed the remaining indentation and long-line
   lints, and added missing words to `inst/WORDLIST` (#25).
 
+* The `.Renviron` example in the main vignette uses a `~~~` fence instead of
+  a bare ```` ``` ```` one, which goodpractice miscounted as an unmatched R
+  chunk end, failing pkgcheck with "Chunk start/end indices failed sanity
+  checks in vignette" (#42).
+
 # brapiR2 0.2.0
 
 ### Breaking changes
