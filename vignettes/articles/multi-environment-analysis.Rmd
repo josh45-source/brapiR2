@@ -117,8 +117,8 @@ studies_priv
 study_ids_priv <- studies_priv$studyDbId
 ```
 
-`brapi_fetch_parallel()` uses the **furrr** package to run one worker per
-study concurrently, against whatever `future` plan is already active. It
+`brapi_fetch_parallel()` uses the **furrr** package to run the studies
+across the workers of whatever `future` plan is already active. It
 does not set a backend itself - per the future package's best-practices
 vignette, that choice belongs to the caller, not to the package, so you
 set the plan yourself before calling it:

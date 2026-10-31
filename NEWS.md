@@ -123,6 +123,12 @@
   longer say `brapi_germplasm_pedigree()` calls the
   `/germplasm/{germplasmDbId}/pedigree` sub-resource (#6).
 
+* The README, vignettes and DESIGN.md no longer overstate what brapiR2
+  returns or how it was tested: they name the functions that don't return a
+  tibble, describe the server survey as one request per endpoint, use the
+  test server's real IDs (`study1`, `variantset1`) in the quick start, and no
+  longer credit untested servers with login styles (#22).
+
 ## Internal
 
 * New tests cover the error and paging paths that had none: a Breedbase

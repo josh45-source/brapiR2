@@ -91,8 +91,10 @@ isolation and safe to run in parallel workers.
 
 ### Tibbles everywhere, not raw lists
 
-Every exported function that returns data returns a tibble, never a raw
-parsed JSON list. BrAPI responses are deeply nested and inconsistently
+Every exported function that retrieves records returns a tibble, never a
+raw parsed JSON list. The one exception is `brapi_get_dosage_matrix()`,
+which returns a numeric samples × markers matrix because that is what
+genomic-selection packages take. BrAPI responses are deeply nested and inconsistently
 shaped across servers; `parse_brapi_result()` centralizes the
 list-of-records-to-tibble conversion (including the list-column fallback
 for genuinely nested fields) so callers can pipe directly into `dplyr`/
@@ -195,11 +197,14 @@ The current design deliberately leaves several things out of scope:
   produced in shapes that downstream genomic-selection and analysis
   packages expect, but `brapiR2` does not itself fit models, compute BLUPs,
   or perform GWAS.
-- **No server-specific workarounds.** `brapiR2` targets the BrAPI v2
-  specification as written. It does not carry bespoke branches for
-  particular server implementations (BMS, Breedbase, EBS, GIGWA,
+- **No per-implementation branches.** `brapiR2` targets the BrAPI v2
+  specification as written. It does not branch on which server
+  implementation it is talking to (BMS, Breedbase, EBS, GIGWA,
   Germinate); servers that deviate from spec are expected to be fixed
-  upstream rather than special-cased here.
+  upstream rather than special-cased here. What it does have is
+  defensive handling applied the same way to every server, such as
+  re-applying a filter client-side when a server ignores it and reading
+  an error message from wherever the server put it.
 - **No visualisation.** Plotting genotype, pedigree, or phenotype data is
   left to downstream packages that consume `brapiR2`'s tibbles.
 
