@@ -374,7 +374,11 @@ allele_matrix_block <- function(result) {
     if (nm == "Genotype" || ab == "GT") {
       rows <- seq_len(min(length(dm$dataMatrix), length(v_ids)))
       for (i in rows) {
-        row <- unlist(dm$dataMatrix[[i]])
+        # A JSON null is a missing call. unlist() would drop it and shift
+        # every later call one call set to the left, so map cell by cell.
+        row <- vapply(dm$dataMatrix[[i]], function(cell) {
+          if (length(cell) == 0L) NA_character_ else as.character(cell[[1L]])
+        }, character(1))
         cols <- seq_len(min(length(row), length(cs_ids)))
         block[i, cols] <- row[cols]
       }
