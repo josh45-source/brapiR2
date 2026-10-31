@@ -33,8 +33,11 @@ Thank you for your interest in contributing to brapiR2!
 
 - Integration tests run against the public BrAPI test server at
   <https://test-server.brapi.org> and require no authentication token.
-- These tests are guarded by `skip_on_cran()` and `skip_if_offline()`, so they
-  are skipped automatically when there's no network access.
+- These tests are guarded by `skip_on_cran()` and by `skip_if_brapi_down()`
+  (in `tests/testthat/helper-live-server.R`), which pings the server once per
+  run. They run, on CI as well as locally, whenever the server answers
+  `/serverinfo` with HTTP 200 and JSON, and are skipped otherwise, with the
+  HTTP status (or "no response") in the skip message.
 - Mocked tests use `testthat::local_mocked_bindings()` and run fully offline.
 - The parallel batch-fetching tests need `furrr` and `future` installed.
   They are skipped rather than failed when either package is missing.

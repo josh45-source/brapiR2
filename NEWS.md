@@ -143,6 +143,10 @@
   dependencies the tests use, and `dev/SERVERS.md` notes that `max_pages`
   now fetches a single page (#24).
 
+* CONTRIBUTING now describes how the live-server tests really skip: on
+  CRAN, and whenever the test server doesn't answer `/serverinfo` with HTTP
+  200 and JSON, rather than via `skip_if_offline()` (#68).
+
 ## Internal
 
 * New tests cover the error and paging paths that had none: a Breedbase
