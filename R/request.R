@@ -294,8 +294,8 @@ brapi_get_pages <- function(con, endpoint, query, max_pages = Inf) {
     # list of crop names that way).
     is_envelope <- !is.null(body$result$data) &&
       (length(data) == 0L ||
-        all(vapply(data, is.list, logical(1))) ||
-        identical(names(body$result), "data"))
+         all(vapply(data, is.list, logical(1))) ||
+         identical(names(body$result), "data"))
     if (!is.null(body$result) && !is_envelope) {
       return(list(data = list(body$result), single = TRUE, complete = TRUE))
     }

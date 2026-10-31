@@ -25,7 +25,8 @@ which endpoints \emph{it} implements, which is usually a smaller set again.
 \item{\code{GET /programs}}{\code{\link[=brapi_programs]{brapi_programs()}}}
 \item{\code{GET /programs/{programDbId}}}{\code{\link[=brapi_program]{brapi_program()}}}
 \item{\code{GET /seasons}}{\code{\link[=brapi_seasons]{brapi_seasons()}}}
-\item{\code{GET /serverinfo}}{\code{\link[=brapi_endpoints]{brapi_endpoints()}}, \code{\link[=brapi_ping]{brapi_ping()}}, \code{\link[=brapi_server_info]{brapi_server_info()}}}
+\item{\code{GET /serverinfo}}{\code{\link[=brapi_endpoints]{brapi_endpoints()}}, \code{\link[=brapi_ping]{brapi_ping()}},
+\code{\link[=brapi_server_info]{brapi_server_info()}}}
 \item{\code{GET /studies}}{\code{\link[=brapi_studies]{brapi_studies()}}}
 \item{\code{GET /studies/{studyDbId}}}{\code{\link[=brapi_study]{brapi_study()}}}
 \item{\code{GET /trials}}{\code{\link[=brapi_trials]{brapi_trials()}}}
@@ -41,7 +42,8 @@ which endpoints \emph{it} implements, which is usually a smaller set again.
 \item{\code{GET /crossingprojects}}{\code{\link[=brapi_crossing_projects]{brapi_crossing_projects()}}}
 \item{\code{GET /germplasm}}{\code{\link[=brapi_germplasm]{brapi_germplasm()}}}
 \item{\code{GET /germplasm/{germplasmDbId}}}{\code{\link[=brapi_germplasm_detail]{brapi_germplasm_detail()}}}
-\item{\code{GET /pedigree}}{\code{\link[=brapi_germplasm_pedigree]{brapi_germplasm_pedigree()}}, \code{\link[=brapi_germplasm_progeny]{brapi_germplasm_progeny()}}, \code{\link[=brapi_pedigree]{brapi_pedigree()}}}
+\item{\code{GET /pedigree}}{\code{\link[=brapi_germplasm_pedigree]{brapi_germplasm_pedigree()}},
+\code{\link[=brapi_germplasm_progeny]{brapi_germplasm_progeny()}}, \code{\link[=brapi_pedigree]{brapi_pedigree()}}}
 \item{\code{POST /search/germplasm}}{\code{\link[=brapi_search_germplasm]{brapi_search_germplasm()}}}
 \item{\code{POST /search/pedigree}}{\code{\link[=brapi_search_pedigree]{brapi_search_pedigree()}}}
 \item{\code{GET /seedlots}}{\code{\link[=brapi_seed_lots]{brapi_seed_lots()}}}

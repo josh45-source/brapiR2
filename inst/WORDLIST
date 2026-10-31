@@ -17,6 +17,7 @@ BMS
 Bolker
 bp
 BrAPI
+brapi
 BrAPI's
 brapir
 brapiR
@@ -55,10 +56,13 @@ GxE
 hardcoded
 heritabilities
 heritability
+homozygote
+homozygotes
 httr
 imputer
 IPCA
 Joash
+jsonlite's
 Keychain
 keyring
 LD
@@ -67,6 +71,7 @@ Lifecycle
 lme
 los
 Lúcio
+macOS
 Mächler
 md
 metan
@@ -76,6 +81,8 @@ multisession
 OAuth
 Olivoto
 ORCID
+org
+params
 Pazaran
 Pérez
 phenotyped
@@ -91,6 +98,7 @@ QBMS's
 R's
 ropensci
 rOpenSci
+rOpenSci's
 rrBLUP
 Selby
 Sheng
@@ -109,6 +117,7 @@ Tidyverse
 TTL
 unnests
 Unphased
+unphased
 variantDbIds
 Yan
 Zobel

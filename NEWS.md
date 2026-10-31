@@ -146,6 +146,12 @@
   for #7, #8, #11, #12, #16 and #42, every path listed in the issue is now
   tested (#26).
 
+* Removed unused imports (`rlang::abort()`, `inform()`, `warn()`,
+  `dplyr::select()`, `filter()`, `purrr::map_dfr()`, `map_chr()`, `map_lgl()`,
+  `tidyr::unnest()` and the `cli_progress_*()` functions) and the unused
+  httptest2 from Suggests, fixed the remaining indentation and long-line
+  lints, and added missing words to `inst/WORDLIST` (#25).
+
 # brapiR2 0.2.0
 
 ### Breaking changes
