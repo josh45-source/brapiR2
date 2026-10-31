@@ -36,11 +36,8 @@ Thank you for your interest in contributing to brapiR2!
 - These tests are guarded by `skip_on_cran()` and `skip_if_offline()`, so they
   are skipped automatically when there's no network access.
 - Mocked tests use `testthat::local_mocked_bindings()` and run fully offline.
-- Some tests exercise optional integrations and require their packages to be
-  installed for the full suite to run: `furrr` and `future` (parallel batch
-  fetching), and `AGHmatrix`, `BGLR`, `lme4`,
-  `metan`, `rrBLUP`, and `sommer` (genomic selection workflows). Tests that
-  depend on a missing package are skipped rather than failed.
+- The parallel batch-fetching tests need `furrr` and `future` installed.
+  They are skipped rather than failed when either package is missing.
 
 ## Reporting Issues
 
@@ -50,5 +47,6 @@ Thank you for your interest in contributing to brapiR2!
 
 ## Code of Conduct
 
-Please be respectful and constructive. We follow the
-[Contributor Covenant](https://www.contributor-covenant.org/) code of conduct.
+Please note that this package is released with a
+[Contributor Code of Conduct](https://ropensci.org/code-of-conduct/). By
+contributing to this project, you agree to abide by its terms.

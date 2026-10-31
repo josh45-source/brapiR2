@@ -1,6 +1,6 @@
 # ---- BrAPI Genotyping Module ----
 # Endpoints: /samples, /variants, /variantsets, /calls, /callsets,
-#            /references, /referencesets, /allelematrix, /vendor/orders
+#            /references, /referencesets, /allelematrix
 # Genome Maps (/maps, /markerpositions) lives in R/genome_maps.R instead;
 # brapi_get_marker_map() below builds on top of it.
 

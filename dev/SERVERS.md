@@ -79,7 +79,8 @@ treats as the discovery endpoint. The others do not.
   wheat-sandbox: a single request answers in under a second, but
   brapi_get() walks every page, and these servers hold hundreds of
   thousands of records. Cassavabase took 18 minutes to walk 8,539 studies.
-  There is no way to ask brapi_get() for just the first page.
+  brapi_get(con, "/germplasm", max_pages = 1) now fetches just the first
+  page.
 - /locations/{locationDbId} works on all four reachable servers. Column
   counts differ (21 on the test server, 19 on Cassavabase, oat-sandbox
   and GRIN), since servers return different optional fields.
