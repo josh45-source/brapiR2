@@ -176,6 +176,11 @@
   coverage to Codecov, and runs R CMD check weekly so the live tests notice
   changes on the test server (#27).
 
+* The by-ID URL-encoding test no longer expects `&` to be percent-encoded
+  in a URL path. It checks that the ID's path segment has no raw space, `?`
+  or `/` and decodes back to the ID, so it passes whichever way curl treats
+  `&` (#72).
+
 # brapiR2 0.2.0
 
 ## Breaking changes
