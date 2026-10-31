@@ -410,13 +410,15 @@ brapi_people <- function(con, ...) {
 #' }
 #'
 #' @export
-brapi_server_info <- function(con) {
+brapi_server_info <- function(con, ...) {
   validate_con(con)
   # /serverinfo is a single metadata object, not a paginated list.
   # Extract the `calls` array which describes supported endpoints.
   # Use simplifyVector = TRUE so jsonlite flattens single-element arrays
   # into scalars and multi-element arrays into list-columns automatically.
-  resp <- brapi_req(con, "/serverinfo") |> req_perform()
+  resp <- brapi_req(con, "/serverinfo") |>
+    req_url_query(!!!brapi_query_values(compact(list(...)))) |>
+    req_perform()
   brapi_stop_for_status(resp, con, "/serverinfo")
   body <- resp_body_json(resp, simplifyVector = TRUE)
   calls <- body$result$calls

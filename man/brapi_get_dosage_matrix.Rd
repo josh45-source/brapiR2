@@ -39,6 +39,12 @@ the data, or to 2 if every call is collapsed. Alleles must be numeric
 indices (\code{"0"}, \code{"1"}, ...); nucleotide calls such as \code{"A/T"} are an
 error.
 }
+\section{BrAPI endpoint}{
+
+\code{GET /allelematrix} - see the
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/AlleleMatrix/AlleleMatrix_GET.yaml}{v2.1 specification}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

@@ -20,6 +20,14 @@ A new \code{brapi_con} object with the token populated.
 Authenticates using the BrAPI \verb{/token} endpoint and returns an updated
 connection object with the Bearer token set.
 }
+\section{BrAPI endpoint}{
+
+\code{POST /token}. This is not part of the BrAPI v2.1 specification: it is
+a server extension, implemented by Breedbase and by the BrAPI test
+server. Servers without it need \code{\link[=brapi_login_oauth2]{brapi_login_oauth2()}} or
+\code{\link[=brapi_set_token]{brapi_set_token()}} instead.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")

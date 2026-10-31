@@ -471,6 +471,10 @@ brapi_search_calls <- function(con, variantSetDbIds = NULL,
 #'   columns = markers (variantDbIds). Values are whole-number dosages
 #'   (0, 1, 2 for diploids; 0–N for polyploids). Missing calls are `NA`.
 #'
+#' @section BrAPI endpoint:
+#' `GET /allelematrix` - see the
+#' [v2.1 specification](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/AlleleMatrix/AlleleMatrix_GET.yaml).
+#'
 #' @examples
 #' \donttest{
 #' con <- brapi_connection("https://test-server.brapi.org")
@@ -614,6 +618,15 @@ genotype_dosages <- function(calls, sep, unknown_string) {
 #'   row per marker-map placement, so a marker on several maps appears
 #'   more than once. `type` and `unit` are joined in from [brapi_maps()]
 #'   so a caller can tell a genetic (cM) map from a physical (bp) one.
+#'
+#' @section BrAPI endpoints:
+#' With `mapDbId`: `GET /markerpositions`. With `variantSetDbId`:
+#' `GET /variants`, then `POST /search/markerpositions`. Either way,
+#' `GET /maps` for the map metadata. See the v2.1 specification for
+#' [`/markerpositions`](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/MarkerPositions_GET.yaml),
+#' [`/variants`](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Variants/Variants_GET.yaml),
+#' [`/search/markerpositions`](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Search_MarkerPositions_POST.yaml)
+#' and [`/maps`](https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Maps_GET.yaml).
 #'
 #' @examples
 #' \donttest{

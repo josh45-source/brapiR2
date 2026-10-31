@@ -962,3 +962,33 @@ test_that("an async search that is still running is polled until it's ready", {
   expect_identical(seen$gets, 3L)
   expect_identical(res$germplasmDbId, "g1")
 })
+
+test_that("serverinfo functions pass ... through as query parameters", {
+  seen <- new.env(parent = emptyenv())
+  seen$urls <- character()
+  local_mocked_bindings(
+    req_perform = function(req) {
+      seen$urls <- c(seen$urls, req$url)
+      httr2::response(
+        status_code = 200L,
+        headers = list(`Content-Type` = "application/json"),
+        body = charToRaw(
+          '{"result": {"calls": [{"service": "studies", "methods": ["GET"]}]}}'
+        )
+      )
+    },
+    .package = "brapiR2"
+  )
+  con <- brapi_connection("https://example.org")
+
+  info <- brapi_server_info(con, dataType = "application/json")
+  expect_identical(info$service, "studies")
+  brapi_endpoints(con, contentType = "application/json")
+  suppressMessages(brapi_ping(con, dataType = "text/csv"))
+
+  q <- lapply(seen$urls, function(u) httr2::url_parse(u)$query)
+  expect_identical(q[[1]][["dataType"]], "application/json")
+  expect_identical(q[[2]][["contentType"]], "application/json")
+  expect_identical(q[[3]][["dataType"]], "text/csv")
+  expect_true(all(grepl("/brapi/v2/serverinfo?", seen$urls, fixed = TRUE)))
+})

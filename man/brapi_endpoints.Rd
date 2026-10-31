@@ -4,10 +4,12 @@
 \alias{brapi_endpoints}
 \title{List Available Endpoints}
 \usage{
-brapi_endpoints(con)
+brapi_endpoints(con, ...)
 }
 \arguments{
 \item{con}{A \code{\link[=brapi_connection]{brapi_connection()}} object.}
+
+\item{...}{Additional query parameters.}
 }
 \value{
 A tibble with columns for endpoint service, method(s), and

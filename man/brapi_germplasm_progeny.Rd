@@ -4,12 +4,14 @@
 \alias{brapi_germplasm_progeny}
 \title{Get Germplasm Progeny}
 \usage{
-brapi_germplasm_progeny(con, germplasmDbId)
+brapi_germplasm_progeny(con, germplasmDbId, ...)
 }
 \arguments{
 \item{con}{A \code{\link[=brapi_connection]{brapi_connection()}} object.}
 
 \item{germplasmDbId}{Character. The unique germplasm identifier.}
+
+\item{...}{Additional query parameters.}
 }
 \value{
 A single-row tibble of the germplasm's pedigree node, with

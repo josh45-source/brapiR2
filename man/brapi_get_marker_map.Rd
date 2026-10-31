@@ -43,6 +43,17 @@ call via \code{\link[=brapi_search_marker_positions]{brapi_search_marker_positio
 If a marker is placed on more than one map, it contributes one row per
 placement - the result is never collapsed to one row per marker.
 }
+\section{BrAPI endpoints}{
+
+With \code{mapDbId}: \code{GET /markerpositions}. With \code{variantSetDbId}:
+\code{GET /variants}, then \code{POST /search/markerpositions}. Either way,
+\code{GET /maps} for the map metadata. See the v2.1 specification for
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/MarkerPositions_GET.yaml}{\verb{/markerpositions}},
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/Variants/Variants_GET.yaml}{\verb{/variants}},
+\href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Search_MarkerPositions_POST.yaml}{\verb{/search/markerpositions}}
+and \href{https://github.com/plantbreeding/BrAPI/blob/V2.1/Specification/BrAPI-Genotyping/GenomeMaps/Maps_GET.yaml}{\verb{/maps}}.
+}
+
 \examples{
 \donttest{
 con <- brapi_connection("https://test-server.brapi.org")
