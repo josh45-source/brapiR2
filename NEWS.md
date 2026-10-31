@@ -117,6 +117,12 @@
 
 ## Documentation
 
+* The README installation section now leads with CRAN, keeping R-universe and
+  GitHub as alternatives, and adds CRAN and R-universe badges. `?brapi_get`
+  now counts 37 BrAPI v2.1 entities, and `?brapi_pedigree` and DESIGN.md no
+  longer say `brapi_germplasm_pedigree()` calls the
+  `/germplasm/{germplasmDbId}/pedigree` sub-resource (#6).
+
 ## Internal
 
 * New tests cover the error and paging paths that had none: a Breedbase

@@ -46,9 +46,8 @@ row per relative) rather than raw nested lists or a flattened table.
 \description{
 Retrieves a filtered subset of a pedigree tree via \verb{/pedigree} - a batch
 endpoint for pulling pedigree records across many germplasm in one call.
-This is different from \code{\link[=brapi_germplasm_pedigree]{brapi_germplasm_pedigree()}}, which retrieves one
-germplasm's immediate pedigree via the germplasm sub-resource
-(\verb{/germplasm/\{germplasmDbId\}/pedigree}) and must be called once per
+\code{\link[=brapi_germplasm_pedigree]{brapi_germplasm_pedigree()}} calls this endpoint for a single germplasm
+and returns just that germplasm's node, so it must be called once per
 germplasm. Use \code{brapi_pedigree()} (or \code{\link[=brapi_search_pedigree]{brapi_search_pedigree()}}) to pull
 pedigree records for many germplasm at once - e.g. everything in a crop,
 program, or family - in one or a few requests; use
@@ -91,7 +90,7 @@ if (brapi_ping(con)) {
 
 }
 \seealso{
-\code{\link[=brapi_germplasm_pedigree]{brapi_germplasm_pedigree()}} for one germplasm's pedigree via
-the germplasm sub-resource; \code{\link[=brapi_search_pedigree]{brapi_search_pedigree()}} for the same
+\code{\link[=brapi_germplasm_pedigree]{brapi_germplasm_pedigree()}} for one germplasm's pedigree
+node; \code{\link[=brapi_search_pedigree]{brapi_search_pedigree()}} for the same
 batch retrieval via \code{POST}, with a fuller set of filters.
 }

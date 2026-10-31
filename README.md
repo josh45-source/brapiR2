@@ -6,6 +6,10 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/ropensci/brapiR2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ropensci/brapiR2/actions/workflows/R-CMD-check.yaml)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/brapiR2)](https://CRAN.R-project.org/package=brapiR2)
+[![R-universe
+version](https://ropensci.r-universe.dev/brapiR2/badges/version)](https://ropensci.r-universe.dev/brapiR2)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![Status at rOpenSci Software Peer
@@ -67,7 +71,14 @@ welcome in the issue tracker.
 
 ## Installation
 
-Install from rOpenSci's R-universe:
+Install the released version from CRAN:
+
+``` r
+install.packages("brapiR2")
+```
+
+Or from rOpenSci's R-universe, which builds the latest version on
+GitHub:
 
 ``` r
 install.packages(
