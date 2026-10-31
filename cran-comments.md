@@ -1,3 +1,10 @@
+## Resubmission
+
+This is a resubmission. The Debian pretest failed one test that expected &
+to be percent-encoded in a URL path; newer curl leaves it unencoded, which
+is equally valid. The test now checks the decoded path instead of an exact
+string.
+
 ## R CMD check results
 
 0 errors | 0 warnings | 0 notes

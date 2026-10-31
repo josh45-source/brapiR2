@@ -49,9 +49,25 @@ test_that("by-ID functions URL-encode the ID and accept a whole number", {
   brapi_study(con, 6882)
   brapi_map_linkage_groups(con, "map 1")
 
-  urls <- sub("\\?page.*$", "", server$urls())
-  expect_identical(urls, c(
-    "https://example.org/brapi/v2/studies/a%20b%3Fc%26d",
+  urls <- server$urls()
+
+  # `&` is a sub-delimiter, valid unencoded in a path, and curl versions
+  # differ on whether they decode `%26`. So check the raw segment for the
+  # characters that must be encoded, and that it decodes back to the ID.
+  prefix <- "https://example.org/brapi/v2/studies/"
+  expect_true(startsWith(urls[[1]], prefix))
+  segment <- sub("\\?.*$", "", substring(urls[[1]], nchar(prefix) + 1L))
+  expect_false(grepl("[ ?/]", segment))
+  expect_match(segment, "%20", fixed = TRUE)
+  expect_match(segment, "%3F", ignore.case = TRUE)
+  expect_identical(utils::URLdecode(segment), "a b?c&d")
+  # The encoded `?` must not have started the query string early.
+  expect_setequal(
+    names(httr2::url_parse(urls[[1]])$query),
+    c("page", "pageSize")
+  )
+
+  expect_identical(sub("\\?page.*$", "", urls[2:3]), c(
     "https://example.org/brapi/v2/studies/6882",
     "https://example.org/brapi/v2/maps/map%201/linkagegroups"
   ))
